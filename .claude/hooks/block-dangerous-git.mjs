@@ -19,6 +19,8 @@ try {
 } catch {
   block("could not read the hook input");
 }
+// Tira redireções (`2>&1`, `> log`, `>$null`) para não virarem argumento nem quebrarem no `&`.
+command = command.replace(/[\d*]*[<>]+&?\d*(?:\s*[^\s;&|<>]+)?/g, " ");
 
 // Analisa o comando inteiro e também o conteúdo de cada string entre aspas
 // (pega `bash -c "git push -f"`), quebrando nos separadores de comando.

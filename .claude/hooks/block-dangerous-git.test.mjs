@@ -14,6 +14,9 @@ const liberados = [
   "git push origin HEAD:refs/heads/main",
   "git push --tags",
   "git -C . push origin main",
+  "git push 2>&1 && git log --oneline -5",
+  "git push origin main > /dev/null",
+  "git push -u origin main 2>$null",
   "git status && git commit -m \"fix: push normal\"",
   "git branch -d feature-pronta",
   "git log --oneline",
@@ -23,6 +26,8 @@ const liberados = [
 const bloqueados = [
   "git push --force",
   "git push -f origin main",
+  "git push --force 2>&1",
+  "git push -f origin main >$null",
   "git push -uf origin main",
   "git push origin main --force-with-lease",
   "git push --force-if-includes origin main",
