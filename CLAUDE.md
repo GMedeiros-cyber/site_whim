@@ -2,6 +2,13 @@
 
 @AGENTS.md
 
+## Ponte com outro agente
+
+Outro agente (Claude, em outra conta) acompanha o projeto pela pasta `docs/ponte/`.
+
+- **No início de cada sessão e antes de cada tarefa**, leia `docs/ponte/PEDIDOS.md`. Não apague pedidos; marque cada um como `[feito]` ou `[pendente: motivo]`.
+- **Ao terminar cada tarefa**, acrescente no fim de `docs/ponte/RELATORIO.md` (nunca reescreva o que já existe) um bloco de **no máximo 8 linhas** com: data e hora, o que foi feito, comandos principais, resultado do build, hash do commit e o que ficou pendente.
+
 ## Cliente
 
 Whim Confecção e Estamparia, de Guarulhos/SP. Faz silk, DTF e confecção para empresas, escolas e confecções. Já atendeu Globo e Lollapalooza.
@@ -52,3 +59,13 @@ O site precisa de metadados, sitemap, dados estruturados (LocalBusiness e produt
 9. Qualidade
 10. Deploy Hostinger
 11. Entrega
+
+## Agent skills
+
+### Issue tracker
+
+Tarefas e specs ficam no GitHub Issues de `GMedeiros-cyber/site_whim` (via `gh`). Ver `docs/agents/issue-tracker.md`.
+
+### Domain docs
+
+Single-context: um `GLOSSARY.md` e `docs/adr/` na raiz, criados só quando precisar. Ver `docs/agents/domain.md`.
