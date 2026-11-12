@@ -21,8 +21,9 @@ Apresentar a empresa, mostrar o catálogo e gerar pedidos de orçamento. **Não 
 
 - Next.js (App Router, TypeScript, `src/`), Tailwind CSS v4, shadcn/ui (preset `base-nova`, componentes em `src/components/ui`).
 - Gerenciador de pacotes: **npm**.
-- Fonte: Montserrat via `next/font/google` (`src/app/layout.tsx`), exposta como `--font-sans`.
+- Fonte: Poppins (pesos 300 a 800, aprovada pela Whim em 12/11/2026) via `next/font/google` (`src/app/layout.tsx`), exposta como `--font-sans`.
 - Planejados para depois (não instalar antes da hora): Motion, GSAP + ScrollTrigger + Lenis, react-three-fiber + drei (personalizador 3D da camiseta), `@lucasmarkes/hairline` (ilustrações em linha) e Postgres próprio para os orçamentos.
+- Referência de estrutura aprovada pelo cliente: `referencia/prototipo/` (ler o README antes de mexer no layout).
 - Hospedagem: Hostinger (Node.js com deploy pelo GitHub). Deploy ainda não configurado.
 
 Comandos: `npm run dev` · `npm run build` · `npm run lint`.
