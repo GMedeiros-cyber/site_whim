@@ -45,6 +45,21 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+
+  /* Animações do protótipo. Usar sempre com motion-safe:. */
+  --animate-hero-zoom: hero-zoom 14s ease-out forwards;
+  --animate-marquee: marquee 32s linear infinite;
+
+  @keyframes hero-zoom {
+    from {
+      transform: scale(1.05);
+    }
+  }
+  @keyframes marquee {
+    to {
+      transform: translateX(-50%);
+    }
+  }
 }
 
 /*
