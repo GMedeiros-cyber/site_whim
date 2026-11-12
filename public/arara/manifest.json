@@ -1,0 +1,65 @@
+{
+ "observacao": "Quadros 480x640 (3:4), fundo branco puro: use mix-blend-mode: multiply. Quadro 001 = de lado, ultimo = de frente.",
+ "pecas": [
+  {
+   "id": "camiseta",
+   "nome": "Camiseta",
+   "cor": "Branco",
+   "quadros": 26,
+   "pasta": "/arara/camiseta/frames/",
+   "frente": "/arara/camiseta/frente.webp",
+   "largura": 480,
+   "altura": 640
+  },
+  {
+   "id": "polo",
+   "nome": "Polo",
+   "cor": "Azul-marinho",
+   "quadros": 26,
+   "pasta": "/arara/polo/frames/",
+   "frente": "/arara/polo/frente.webp",
+   "largura": 480,
+   "altura": 640
+  },
+  {
+   "id": "golav",
+   "nome": "Gola V",
+   "cor": "Turquesa",
+   "quadros": 24,
+   "pasta": "/arara/golav/frames/",
+   "frente": "/arara/golav/frente.webp",
+   "largura": 480,
+   "altura": 640
+  },
+  {
+   "id": "regata",
+   "nome": "Regata",
+   "cor": "Azul-marinho",
+   "quadros": 29,
+   "pasta": "/arara/regata/frames/",
+   "frente": "/arara/regata/frente.webp",
+   "largura": 480,
+   "altura": 640
+  },
+  {
+   "id": "babylook",
+   "nome": "Baby look",
+   "cor": "Turquesa",
+   "quadros": 39,
+   "pasta": "/arara/babylook/frames/",
+   "frente": "/arara/babylook/frente.webp",
+   "largura": 480,
+   "altura": 640
+  },
+  {
+   "id": "moletom",
+   "nome": "Moletom canguru",
+   "cor": "Mescla",
+   "quadros": 30,
+   "pasta": "/arara/moletom/frames/",
+   "frente": "/arara/moletom/frente.webp",
+   "largura": 480,
+   "altura": 640
+  }
+ ]
+}
