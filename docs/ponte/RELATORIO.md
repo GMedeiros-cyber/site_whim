@@ -25,3 +25,10 @@ Uma entrada por tarefa, sempre acrescentada no fim (nunca reescrever as anterior
 - Build: ok; lint sem erros.
 - Commits: `bf63018` (hook) + `ae600be` (redireções) + `docs: relatório da ponte`; enviados ao `origin/main` junto com `1ef5ed2` e `f78887a`.
 - Pendente: nada.
+
+### 2026-11-12 19:35 · Protótipo aprovado entra no repositório
+- Feito: `referencia/prototipo/` com o HTML aprovado pela Whim, imagens, SVGs do logo e um README com o que foi aprovado, o que não foi avaliado e os dados reais.
+- Decisão do cliente: fonte **Poppins** no lugar da Montserrat (atualizar `layout.tsx` e o `CLAUDE.md` na próxima tarefa).
+- Comandos: só cópia de arquivos; sem mudança no código do Next, sem build.
+- Commit: `docs: protótipo aprovado como referência`.
+- Pendente: portar o protótipo para o Next; trocar a fonte.
