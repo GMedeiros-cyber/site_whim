@@ -1,0 +1,14 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "bounce-easing",
+        "value": "cubic-bezier(.3, 1.6, .4, 1)",
+        "createdAt": "2026-11-12T23:01:51.170Z",
+        "reason": "decisão do agente: balanço de pêndulo do cabide na arara, copiado do protótipo aprovado (referencia/prototipo/index.html, .hg); só com motion-safe"
+      }
+    ]
+  }
+}
