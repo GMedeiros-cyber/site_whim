@@ -72,3 +72,11 @@ Uma entrada por tarefa, sempre acrescentada no fim (nunca reescrever as anterior
 - Scripts em `referencia/arara/scripts-cor/`, vídeos em `referencia/arara/videos-verde/`.
 - Build: não rodei (só assets e JSON; o componente ainda não lê os campos novos).
 - Commit: ver o log (`feat: arara com a cor real`). Pendente: o Antigravity ligar o `PecaGirando` aos quadros por cor (pedido em PEDIDOS.md).
+
+### 2026-11-12 22:17 · Arara com a cor real (pedido de 2026-11-12)
+- Feito: `PecaGirando` acha a pasta pela cor do passo Cor (hex casando com `manifest.cores`) e desenha `{coresPasta}{cor}/001…NNN.webp` (`coresQuadros`), só com `drawImage`; saíram o `mix-blend-multiply` do canvas e o tingimento (o cano segue com multiply). Ao trocar de cor, o quadro atual fica na tela até o novo decodificar; depois os quadros da cor anterior são liberados. Vista ampliada com `{coresPasta}{pasta}/frente.webp` e texto "A estampa você escolhe…".
+- Também: o `CORES` do `Personalizador` agora vem do manifesto (some o hex solto do componente e o hex sempre casa com a pasta).
+- Teste (Playwright, produção, 360/390/1280 + reduced-motion): 142 checagens ok; canvas sem multiply, sem caixa branca, troca para Preto sem a peça sumir, vista com o frente da cor.
+- Comandos: `npm run lint` e `npm run build` (ok, páginas estáticas).
+- Commit: `8185a48` + este registro.
+- Pendente: nada deste pedido. Os quadros antigos (`frames/`, `frente.webp` de fundo branco) não são mais lidos pelo site.
