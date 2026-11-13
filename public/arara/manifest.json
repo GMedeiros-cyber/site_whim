@@ -61,5 +61,12 @@
    "largura": 480,
    "altura": 640
   }
- ]
+ ],
+ "cano": {
+  "arquivo": "/arara/cano.webp",
+  "largura": 1360,
+  "altura": 96,
+  "obs": "Tubo cromado de ponta a ponta; pode esticar na horizontal."
+ },
+ "gancho": "A curva do gancho fica a ~42/640 da altura do quadro, centralizada: alinhe esse ponto ao centro do cano."
 }

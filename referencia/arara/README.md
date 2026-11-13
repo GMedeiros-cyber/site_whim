@@ -16,3 +16,7 @@ Peças geradas com IA (Nano Banana no Google Flow) e giro animado com Veo 3.1, s
 ## Fontes
 - `fontes-916/`: quadros de lado e de frente em 9:16 usados no Veo (formato igual ao do vídeo, para não cortar).
 - `videos/`: giros originais (720×1280, 8 s). `scripts/`: recorte (`manual.json` = quadro inicial e final de cada giro).
+
+## Cano
+- `public/arara/cano.webp` (1360×96): cano cromado realista de ponta a ponta, fundo branco (usar `multiply`). Pode esticar na largura.
+- Pendure cada quadro com a curva do gancho (≈ 42/640 da altura do quadro, no centro) sobre o eixo do cano. Prévia montada: `referencia/arara/previa-arara.png`.
