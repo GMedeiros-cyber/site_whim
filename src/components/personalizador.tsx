@@ -78,6 +78,7 @@ export function Personalizador() {
           <div className="mt-10">
             <Arara
               selecionada={peca}
+              cor={cor.hex}
               onEscolher={(p) => {
                 setPeca(p);
                 setPasso(1);

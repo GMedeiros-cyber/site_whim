@@ -16,12 +16,50 @@ import {
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 
+type Modelo = {
+  id: string;
+  nome: string;
+  cor: string;
+  quadros: number;
+  /** Pasta dos quadros coloridos com fundo branco (001.webp … NNN.webp). */
+  pasta: string;
+  frente: string;
+  largura: number;
+  altura: number;
+  /**
+   * Modo cor (ainda sem arquivos): pasta dos quadros BRANCOS com fundo transparente,
+   * mesma numeração (001.webp …). Se existir, a peça é tingida com a cor escolhida.
+   */
+  framesBrancos?: string;
+  quadrosBrancos?: number;
+};
+
 /** Modelos da arara, na ordem do manifesto (public/arara/manifest.json). */
-export const MODELOS = manifest.pecas;
-type Modelo = (typeof MODELOS)[number];
+export const MODELOS: Modelo[] = manifest.pecas;
+const CANO = manifest.cano;
 
 /** Duração do giro de lado → de frente (a volta faz o mesmo caminho). */
 const DURACAO_MS = 900;
+
+/**
+ * Pinta um quadro no canvas.
+ * - Sem cor (modo atual): quadro colorido de fundo branco; o branco some com
+ *   mix-blend-mode: multiply no próprio canvas.
+ * - Com cor (modo cor): quadro branco transparente, tingido com a cor e recortado
+ *   pela silhueta do próprio quadro; o canvas fica sem multiply.
+ */
+function pintarQuadro(ctx: CanvasRenderingContext2D, img: HTMLImageElement, w: number, h: number, cor?: string) {
+  ctx.globalCompositeOperation = "source-over";
+  ctx.clearRect(0, 0, w, h);
+  ctx.drawImage(img, 0, 0, w, h);
+  if (!cor) return;
+  ctx.globalCompositeOperation = "multiply";
+  ctx.fillStyle = cor;
+  ctx.fillRect(0, 0, w, h);
+  ctx.globalCompositeOperation = "destination-in";
+  ctx.drawImage(img, 0, 0, w, h);
+  ctx.globalCompositeOperation = "source-over";
+}
 
 function usePoucoMovimento() {
   return useSyncExternalStore(
@@ -35,39 +73,42 @@ function usePoucoMovimento() {
   );
 }
 
-const urlQuadro = (m: Modelo, i: number) => `${m.pasta}${String(i + 1).padStart(3, "0")}.webp`;
-
 /**
  * Uma peça pendurada: desenha no canvas o quadro que corresponde ao progresso
  * do giro (0 = de lado, quadro 001; 1 = de frente, último quadro).
- * O fundo branco dos quadros some com mix-blend-mode: multiply, por isso
+ * No modo atual o fundo branco some com mix-blend-mode: multiply, por isso
  * nenhum ancestral do canvas pode criar stacking context.
  */
-function PecaGirando({ modelo, deFrente, carregar, semGiro }: { modelo: Modelo; deFrente: boolean; carregar: boolean; semGiro: boolean }) {
+function PecaGirando({ modelo, cor, deFrente, carregar, semGiro }: { modelo: Modelo; cor: string; deFrente: boolean; carregar: boolean; semGiro: boolean }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const quadros = useRef<HTMLImageElement[]>([]);
   const progresso = useRef(0);
   const desenhado = useRef(-1);
+  const corRef = useRef(cor);
+
+  const modoCor = Boolean(modelo.framesBrancos);
+  const pasta = modelo.framesBrancos ?? modelo.pasta;
+  const total = (modoCor && modelo.quadrosBrancos) || modelo.quadros;
 
   const desenhar = useCallback(() => {
-    const i = Math.round(progresso.current * (modelo.quadros - 1));
+    const i = Math.round(progresso.current * (total - 1));
     const img = quadros.current[i];
-    const canvas = canvasRef.current;
+    const ctx = canvasRef.current?.getContext("2d");
     // Só desenha quadro que já terminou de carregar; senão fica o anterior.
-    if (!img || !canvas || i === desenhado.current) return;
-    canvas.getContext("2d")?.drawImage(img, 0, 0, modelo.largura, modelo.altura);
-    canvas.dataset.quadro = String(i + 1);
+    if (!img || !ctx || i === desenhado.current) return;
+    pintarQuadro(ctx, img, modelo.largura, modelo.altura, modoCor ? corRef.current : undefined);
+    ctx.canvas.dataset.quadro = String(i + 1);
     desenhado.current = i;
-  }, [modelo]);
+  }, [modelo, total, modoCor]);
 
   // Pré-carrega quando a arara entra na tela: primeiro e último quadros na frente da fila.
   useEffect(() => {
     if (!carregar) return;
     let vivo = true;
-    for (let i = 0; i < modelo.quadros; i++) {
+    for (let i = 0; i < total; i++) {
       const img = new window.Image(); // "Image" aqui é o do next/image
-      img.fetchPriority = i === 0 || i === modelo.quadros - 1 ? "high" : "low";
-      img.src = urlQuadro(modelo, i);
+      img.fetchPriority = i === 0 || i === total - 1 ? "high" : "low";
+      img.src = `${pasta}${String(i + 1).padStart(3, "0")}.webp`;
       img.decode().then(
         () => {
           if (!vivo) return;
@@ -80,7 +121,15 @@ function PecaGirando({ modelo, deFrente, carregar, semGiro }: { modelo: Modelo; 
     return () => {
       vivo = false;
     };
-  }, [carregar, modelo, desenhar]);
+  }, [carregar, pasta, total, desenhar]);
+
+  // Modo cor: trocou a cor, repinta o quadro atual.
+  useEffect(() => {
+    corRef.current = cor;
+    if (!modoCor) return;
+    desenhado.current = -1;
+    desenhar();
+  }, [cor, modoCor, desenhar]);
 
   // Gira até o alvo, quadro a quadro; com movimento reduzido, pula direto.
   useEffect(() => {
@@ -110,18 +159,23 @@ function PecaGirando({ modelo, deFrente, carregar, semGiro }: { modelo: Modelo; 
       width={modelo.largura}
       height={modelo.altura}
       aria-hidden
-      // A curva do gancho fica a 42/640 da altura do quadro (manifest.gancho); sobe o
-      // canvas para ela cair no centro da barra de 6px: 42/640 × 4/3 da largura = 0,0875.
-      className="pointer-events-none -mt-[calc(var(--w)*0.0875+3px)] w-(--w) max-w-none shrink-0 mix-blend-multiply"
+      data-modo={modoCor ? "cor" : "original"}
+      // A curva do gancho fica a 42/640 da altura do quadro (manifest.gancho): sobe o
+      // canvas para ela cair no eixo do cano (metade do cano + 42/640 × 4/3 da largura).
+      className={cn(
+        "pointer-events-none -mt-[calc(var(--cano)/2+var(--w)*0.0875)] w-(--w) max-w-none shrink-0",
+        !modoCor && "mix-blend-multiply"
+      )}
     />
   );
 }
 
 /**
  * Arara de modelos: hover (ou 1º toque) gira a peça para a frente; clique
- * (ou 2º toque) escolhe e abre a vista ampliada.
+ * (ou 2º toque) escolhe e abre a vista ampliada. `cor` só tinge as peças que
+ * tiverem quadros brancos no manifesto (modo cor).
  */
-export function Arara({ selecionada, onEscolher }: { selecionada: string; onEscolher: (nome: string) => void }) {
+export function Arara({ selecionada, cor, onEscolher }: { selecionada: string; cor: string; onEscolher: (nome: string) => void }) {
   const araraRef = useRef<HTMLDivElement>(null);
   const tipoPonteiro = useRef("");
   const [carregar, setCarregar] = useState(false);
@@ -175,10 +229,19 @@ export function Arara({ selecionada, onEscolher }: { selecionada: string; onEsco
 
   return (
     <>
-      <div ref={araraRef} className="[--w:170px] min-[601px]:[--w:230px]">
+      {/* --w: largura do quadro; --cano: altura do cano (proporção da prévia em referencia/arara). */}
+      <div ref={araraRef} className="[--cano:calc(var(--w)*0.1067)] [--w:170px] min-[601px]:[--w:230px]">
         <div className="-mx-5 snap-x snap-proximity overflow-x-auto px-5 pb-2 min-[601px]:mx-0 min-[601px]:px-0">
           <div className="mx-auto w-max min-w-full">
-            <div aria-hidden className="h-1.5 rounded-full bg-primary" />
+            {/* Cano cromado esticado na largura da arara; o fundo branco some com multiply. */}
+            <Image
+              src={CANO.arquivo}
+              alt=""
+              width={CANO.largura}
+              height={CANO.altura}
+              sizes="100vw"
+              className="block h-(--cano) w-full mix-blend-multiply"
+            />
             <ul aria-label="Arara de modelos" className="flex justify-center px-4">
               {MODELOS.map((m, i) => (
                 <li key={m.id} className="flex snap-center">
@@ -198,7 +261,7 @@ export function Arara({ selecionada, onEscolher }: { selecionada: string; onEsco
                       foco === i ? "w-[calc(var(--w)*0.88)]" : "w-[calc(var(--w)*0.3)]"
                     )}
                   >
-                    <PecaGirando modelo={m} deFrente={foco === i} carregar={carregar} semGiro={semGiro} />
+                    <PecaGirando modelo={m} cor={cor} deFrente={foco === i} carregar={carregar} semGiro={semGiro} />
                     {selecionada === m.nome && (
                       <span aria-hidden className="absolute bottom-0 left-1/2 -ml-3 h-1 w-6 rounded-full bg-accent" />
                     )}
