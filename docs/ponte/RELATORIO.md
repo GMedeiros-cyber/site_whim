@@ -80,3 +80,10 @@ Uma entrada por tarefa, sempre acrescentada no fim (nunca reescrever as anterior
 - Comandos: `npm run lint` e `npm run build` (ok, páginas estáticas).
 - Commit: `8185a48` + este registro.
 - Pendente: nada deste pedido. Os quadros antigos (`frames/`, `frente.webp` de fundo branco) não são mais lidos pelo site.
+
+### 2026-11-13 20:45 · Molde da prévia da peça e da ficha do pedido
+- Molde no Figma (PC e celular) aprovado pelo Gabriel: camisa no cano + cartão com título e vitrine de cores; ficha vertical de passos à direita.
+- Especificação escrita em `referencia/previa-cor/README.md` (layout, movimentos e acessibilidade); `manifest.cores` ganhou `curto` ("Marinho").
+- Pedido novo em PEDIDOS.md para o Antigravity implementar.
+- Build: não rodei (só documentação e JSON).
+- Pendente: implementação pelo Antigravity.
