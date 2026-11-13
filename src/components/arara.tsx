@@ -16,49 +16,19 @@ import {
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 
-type Modelo = {
-  id: string;
-  nome: string;
-  cor: string;
-  quadros: number;
-  /** Pasta dos quadros coloridos com fundo branco (001.webp … NNN.webp). */
-  pasta: string;
-  frente: string;
-  largura: number;
-  altura: number;
-  /**
-   * Modo cor (ainda sem arquivos): pasta dos quadros BRANCOS com fundo transparente,
-   * mesma numeração (001.webp …). Se existir, a peça é tingida com a cor escolhida.
-   */
-  framesBrancos?: string;
-  quadrosBrancos?: number;
-};
-
 /** Modelos da arara, na ordem do manifesto (public/arara/manifest.json). */
-export const MODELOS: Modelo[] = manifest.pecas;
+export const MODELOS = manifest.pecas;
+type Modelo = (typeof MODELOS)[number];
+/** Cores do tecido com quadros já pintados; o passo "Cor" usa esta mesma lista. */
+export const CORES = manifest.cores;
 const CANO = manifest.cano;
 
 /** Duração do giro de lado → de frente (a volta faz o mesmo caminho). */
 const DURACAO_MS = 900;
 
-/**
- * Pinta um quadro no canvas.
- * - Sem cor (modo atual): quadro colorido de fundo branco; o branco some com
- *   mix-blend-mode: multiply no próprio canvas.
- * - Com cor (modo cor): quadro branco transparente, tingido com a cor e recortado
- *   pela silhueta do próprio quadro; o canvas fica sem multiply.
- */
-function pintarQuadro(ctx: CanvasRenderingContext2D, img: HTMLImageElement, w: number, h: number, cor?: string) {
-  ctx.globalCompositeOperation = "source-over";
-  ctx.clearRect(0, 0, w, h);
-  ctx.drawImage(img, 0, 0, w, h);
-  if (!cor) return;
-  ctx.globalCompositeOperation = "multiply";
-  ctx.fillStyle = cor;
-  ctx.fillRect(0, 0, w, h);
-  ctx.globalCompositeOperation = "destination-in";
-  ctx.drawImage(img, 0, 0, w, h);
-  ctx.globalCompositeOperation = "source-over";
+/** Pasta da cor escolhida: casa o hex com manifest.cores (se não casar, a primeira cor). */
+function pastaDaCor(hex: string) {
+  return (CORES.find((c) => c.hex.toLowerCase() === hex.toLowerCase()) ?? CORES[0]).pasta;
 }
 
 function usePoucoMovimento() {
@@ -75,61 +45,59 @@ function usePoucoMovimento() {
 
 /**
  * Uma peça pendurada: desenha no canvas o quadro que corresponde ao progresso
- * do giro (0 = de lado, quadro 001; 1 = de frente, último quadro).
- * No modo atual o fundo branco some com mix-blend-mode: multiply, por isso
- * nenhum ancestral do canvas pode criar stacking context.
+ * do giro (0 = de lado, quadro 001; 1 = de frente, último quadro), já pintado
+ * na cor escolhida e com fundo transparente ({coresPasta}{cor}/NNN.webp).
  */
 function PecaGirando({ modelo, cor, deFrente, carregar, semGiro }: { modelo: Modelo; cor: string; deFrente: boolean; carregar: boolean; semGiro: boolean }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const quadros = useRef<HTMLImageElement[]>([]);
+  // Quadros decodificados por pasta de cor: a atual e, durante a troca, a que está saindo.
+  const bancos = useRef(new Map<string, HTMLImageElement[]>());
   const progresso = useRef(0);
-  const desenhado = useRef(-1);
-  const corRef = useRef(cor);
-
-  const modoCor = Boolean(modelo.framesBrancos);
-  const pasta = modelo.framesBrancos ?? modelo.pasta;
-  const total = (modoCor && modelo.quadrosBrancos) || modelo.quadros;
+  const desenhado = useRef("");
+  const pasta = `${modelo.coresPasta}${pastaDaCor(cor)}/`;
+  const pastaRef = useRef(pasta);
+  const total = modelo.coresQuadros;
 
   const desenhar = useCallback(() => {
+    const atual = pastaRef.current;
     const i = Math.round(progresso.current * (total - 1));
-    const img = quadros.current[i];
+    const img = bancos.current.get(atual)?.[i];
     const ctx = canvasRef.current?.getContext("2d");
-    // Só desenha quadro que já terminou de carregar; senão fica o anterior.
-    if (!img || !ctx || i === desenhado.current) return;
-    pintarQuadro(ctx, img, modelo.largura, modelo.altura, modoCor ? corRef.current : undefined);
+    // Só desenha quadro já decodificado; até lá fica o que está na tela (inclusive o da cor anterior).
+    if (!img || !ctx || desenhado.current === `${atual}#${i}`) return;
+    ctx.clearRect(0, 0, modelo.largura, modelo.altura);
+    ctx.drawImage(img, 0, 0, modelo.largura, modelo.altura);
     ctx.canvas.dataset.quadro = String(i + 1);
-    desenhado.current = i;
-  }, [modelo, total, modoCor]);
+    ctx.canvas.dataset.cor = atual;
+    desenhado.current = `${atual}#${i}`;
+    // A cor anterior saiu da tela: libera os quadros dela.
+    for (const k of bancos.current.keys()) if (k !== atual) bancos.current.delete(k);
+  }, [modelo, total]);
 
-  // Pré-carrega quando a arara entra na tela: primeiro e último quadros na frente da fila.
+  // Carrega os quadros da cor atual quando a arara entra na tela e a cada troca de cor.
+  // Primeiro e último quadros vão na frente da fila.
   useEffect(() => {
+    pastaRef.current = pasta;
     if (!carregar) return;
-    let vivo = true;
+    if (bancos.current.has(pasta)) {
+      desenhar();
+      return;
+    }
+    const banco: HTMLImageElement[] = [];
+    bancos.current.set(pasta, banco);
     for (let i = 0; i < total; i++) {
       const img = new window.Image(); // "Image" aqui é o do next/image
       img.fetchPriority = i === 0 || i === total - 1 ? "high" : "low";
       img.src = `${pasta}${String(i + 1).padStart(3, "0")}.webp`;
       img.decode().then(
         () => {
-          if (!vivo) return;
-          quadros.current[i] = img;
+          banco[i] = img;
           desenhar();
         },
         () => {}
       );
     }
-    return () => {
-      vivo = false;
-    };
   }, [carregar, pasta, total, desenhar]);
-
-  // Modo cor: trocou a cor, repinta o quadro atual.
-  useEffect(() => {
-    corRef.current = cor;
-    if (!modoCor) return;
-    desenhado.current = -1;
-    desenhar();
-  }, [cor, modoCor, desenhar]);
 
   // Gira até o alvo, quadro a quadro; com movimento reduzido, pula direto.
   useEffect(() => {
@@ -159,21 +127,17 @@ function PecaGirando({ modelo, cor, deFrente, carregar, semGiro }: { modelo: Mod
       width={modelo.largura}
       height={modelo.altura}
       aria-hidden
-      data-modo={modoCor ? "cor" : "original"}
       // A curva do gancho fica a 42/640 da altura do quadro (manifest.gancho): sobe o
       // canvas para ela cair no eixo do cano (metade do cano + 42/640 × 4/3 da largura).
-      className={cn(
-        "pointer-events-none -mt-[calc(var(--cano)/2+var(--w)*0.0875)] w-(--w) max-w-none shrink-0",
-        !modoCor && "mix-blend-multiply"
-      )}
+      className="pointer-events-none -mt-[calc(var(--cano)/2+var(--w)*0.0875)] w-(--w) max-w-none shrink-0"
     />
   );
 }
 
 /**
  * Arara de modelos: hover (ou 1º toque) gira a peça para a frente; clique
- * (ou 2º toque) escolhe e abre a vista ampliada. `cor` só tinge as peças que
- * tiverem quadros brancos no manifesto (modo cor).
+ * (ou 2º toque) escolhe e abre a vista ampliada. `cor` (hex do passo "Cor")
+ * escolhe a pasta dos quadros pintados.
  */
 export function Arara({ selecionada, cor, onEscolher }: { selecionada: string; cor: string; onEscolher: (nome: string) => void }) {
   const araraRef = useRef<HTMLDivElement>(null);
@@ -233,7 +197,8 @@ export function Arara({ selecionada, cor, onEscolher }: { selecionada: string; c
       <div ref={araraRef} className="[--cano:calc(var(--w)*0.1067)] [--w:170px] min-[601px]:[--w:230px]">
         <div className="-mx-5 snap-x snap-proximity overflow-x-auto px-5 pb-2 min-[601px]:mx-0 min-[601px]:px-0">
           <div className="mx-auto w-max min-w-full">
-            {/* Cano cromado esticado na largura da arara; o fundo branco some com multiply. */}
+            {/* Cano cromado esticado na largura da arara; o fundo branco some com multiply,
+                por isso nenhum ancestral dele pode criar stacking context. */}
             <Image
               src={CANO.arquivo}
               alt=""
@@ -299,9 +264,9 @@ export function Arara({ selecionada, cor, onEscolher }: { selecionada: string; c
               </DialogHeader>
               <div className="relative">
                 <Image
-                  key={vista.id}
-                  src={vista.frente}
-                  alt={`${vista.nome} de frente`}
+                  key={`${vista.id}-${cor}`}
+                  src={`${vista.coresPasta}${pastaDaCor(cor)}/frente.webp`}
+                  alt={`${vista.nome} de frente, na cor escolhida`}
                   width={900}
                   height={1200}
                   sizes="(min-width: 640px) 26rem, 90vw"
@@ -315,7 +280,7 @@ export function Arara({ selecionada, cor, onEscolher }: { selecionada: string; c
                 </Button>
               </div>
               <DialogDescription>
-                Imagem ilustrativa do modelo. Cor e estampa você escolhe nos próximos passos.
+                Imagem ilustrativa do modelo na cor escolhida. A estampa você escolhe nos próximos passos.
               </DialogDescription>
               <div className="flex flex-col-reverse gap-2.5 sm:flex-row sm:justify-end">
                 <DialogClose render={<Button variant="outline" size="xl" />}>Fechar</DialogClose>

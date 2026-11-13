@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { Arara, MODELOS } from "@/components/arara";
+import { Arara, CORES, MODELOS } from "@/components/arara";
 import { Container, Destaque, Eyebrow, Seta, Titulo } from "@/components/blocos";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -14,15 +14,7 @@ import { cn } from "@/lib/utils";
 import { linkWhatsApp } from "@/lib/whim";
 
 const PECAS = MODELOS.map((m) => m.nome);
-// Cores do TECIDO oferecidas pela Whim: são dados do produto (pintam a peça na
-// prévia), não cores da interface; por isso ficam em hex aqui.
-const CORES = [
-  { nome: "Branco", hex: "#FFFFFF" },
-  { nome: "Azul-marinho", hex: "#373857" },
-  { nome: "Turquesa", hex: "#31C4EA" },
-  { nome: "Mescla", hex: "#B9BFCB" },
-  { nome: "Preto", hex: "#1E1F2B" },
-];
+// As cores do tecido vêm do manifesto da arara (CORES), as mesmas dos quadros pintados.
 const LOCAIS = ["Frente", "Costas", "Frente e costas"];
 const TECNICAS = ["Silk", "DTF", "Bordado", "Ainda não sei"];
 const PASSOS = ["Peça", "Cor", "Estampa", "Quantidade", "Resumo"];
