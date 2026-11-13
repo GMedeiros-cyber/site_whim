@@ -56,3 +56,11 @@ Uma entrada por tarefa, sempre acrescentada no fim (nunca reescrever as anterior
 - Comandos: `shadcn add dialog` (sem sobrescrever o `button.tsx`), `npm run lint`, `npm run build` (ok, páginas estáticas).
 - Commits (após rebase sobre `59ffcc4`): `a77b983` dialog, `dcfe6b2` arara, `ac6be7e` exceção do impeccable removida, `c9fd8c0` gancho no centro da barra (medida 42/640 do manifesto) + este registro.
 - Pendente: o `cano.webp` cromado não foi usado, porque o prompt do Gabriel pede a barra nas cores do tema; trocar só se ele preferir o cano.
+
+### 2026-11-12 21:15 · Arara: cano cromado e canvas pronto para o modo cor (ajuste do Gabriel)
+- Feito: a barra virou o `cano.webp` (multiply, esticado na largura da arara); cada canvas sobe até a curva do gancho (42/640) cair no eixo do cano. Resolve o pendente acima.
+- Modo cor: `pintarQuadro` aceita os dois modos; com `framesBrancos` no manifesto, desenha o quadro branco transparente, `multiply` + `fillRect` com a cor do passo Cor e `destination-in` com o próprio quadro, sem multiply no elemento. Sem o campo, segue o modo atual. Suposição: `framesBrancos` é uma pasta com `001.webp…`, igual a `pasta`; a cor vale para todas as peças com quadros brancos.
+- Teste (Playwright, produção, 360/390/1280 + reduced-motion): 139 checagens ok; ganchos no eixo do cano com 0 px de desvio, margem branca do cano invisível, todas no modo atual; receita do modo cor conferida num quadro sintético (peça tingida, fora transparente, gancho escuro).
+- Comandos: `npm run lint`, `npm run build` (ok, páginas estáticas).
+- Commit: `b1432b8` + este registro.
+- Pendente: os quadros brancos de cada peça (quando chegarem, é só pôr `framesBrancos` e `quadrosBrancos` no manifesto).
