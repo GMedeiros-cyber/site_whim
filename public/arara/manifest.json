@@ -9,7 +9,9 @@
    "pasta": "/arara/camiseta/frames/",
    "frente": "/arara/camiseta/frente.webp",
    "largura": 480,
-   "altura": 640
+   "altura": 640,
+   "coresPasta": "/arara/camiseta/cores/",
+   "coresQuadros": 26
   },
   {
    "id": "polo",
@@ -19,7 +21,9 @@
    "pasta": "/arara/polo/frames/",
    "frente": "/arara/polo/frente.webp",
    "largura": 480,
-   "altura": 640
+   "altura": 640,
+   "coresPasta": "/arara/polo/cores/",
+   "coresQuadros": 28
   },
   {
    "id": "golav",
@@ -29,7 +33,9 @@
    "pasta": "/arara/golav/frames/",
    "frente": "/arara/golav/frente.webp",
    "largura": 480,
-   "altura": 640
+   "altura": 640,
+   "coresPasta": "/arara/golav/cores/",
+   "coresQuadros": 21
   },
   {
    "id": "regata",
@@ -39,7 +45,9 @@
    "pasta": "/arara/regata/frames/",
    "frente": "/arara/regata/frente.webp",
    "largura": 480,
-   "altura": 640
+   "altura": 640,
+   "coresPasta": "/arara/regata/cores/",
+   "coresQuadros": 23
   },
   {
    "id": "babylook",
@@ -49,7 +57,9 @@
    "pasta": "/arara/babylook/frames/",
    "frente": "/arara/babylook/frente.webp",
    "largura": 480,
-   "altura": 640
+   "altura": 640,
+   "coresPasta": "/arara/babylook/cores/",
+   "coresQuadros": 44
   },
   {
    "id": "moletom",
@@ -59,7 +69,9 @@
    "pasta": "/arara/moletom/frames/",
    "frente": "/arara/moletom/frente.webp",
    "largura": 480,
-   "altura": 640
+   "altura": 640,
+   "coresPasta": "/arara/moletom/cores/",
+   "coresQuadros": 24
   }
  ],
  "cano": {
@@ -68,5 +80,33 @@
   "altura": 96,
   "obs": "Tubo cromado de ponta a ponta; pode esticar na horizontal."
  },
- "gancho": "A curva do gancho fica a ~42/640 da altura do quadro, centralizada: alinhe esse ponto ao centro do cano."
+ "gancho": "A curva do gancho fica a ~42/640 da altura do quadro, centralizada: alinhe esse ponto ao centro do cano.",
+ "cores": [
+  {
+   "nome": "Branco",
+   "hex": "#FFFFFF",
+   "pasta": "branco"
+  },
+  {
+   "nome": "Azul-marinho",
+   "hex": "#373857",
+   "pasta": "azul-marinho"
+  },
+  {
+   "nome": "Turquesa",
+   "hex": "#31C4EA",
+   "pasta": "turquesa"
+  },
+  {
+   "nome": "Mescla",
+   "hex": "#B9BFCB",
+   "pasta": "mescla"
+  },
+  {
+   "nome": "Preto",
+   "hex": "#1E1F2B",
+   "pasta": "preto"
+  }
+ ],
+ "observacaoCores": "Cor real na arara: para a cor escolhida use {coresPasta}{cores[].pasta}/001.webp … NNN.webp (NNN = coresQuadros) e {coresPasta}{pasta}/frente.webp na vista ampliada (900x1200). Quadros 480x640 já pintados, com fundo TRANSPARENTE (sem mix-blend-mode, sem tingir no canvas). Quadro 001 = de lado, último = de frente. Mesmo enquadramento e mesma posição do gancho dos quadros antigos."
 }

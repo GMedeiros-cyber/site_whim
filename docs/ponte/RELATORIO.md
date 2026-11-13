@@ -64,3 +64,11 @@ Uma entrada por tarefa, sempre acrescentada no fim (nunca reescrever as anterior
 - Comandos: `npm run lint`, `npm run build` (ok, páginas estáticas).
 - Commit: `b1432b8` + este registro.
 - Pendente: os quadros brancos de cada peça (quando chegarem, é só pôr `framesBrancos` e `quadrosBrancos` no manifesto).
+
+### 2026-11-12 22:30 · Arara com a cor real (quadros por cor)
+- Gerei 12 fotos das peças brancas no verde (Nano Banana) e 6 giros no Veo 3.1 Fast (140 créditos; a gola V foi refeita porque saiu uma mão no vídeo).
+- Recorte do verde, gancho prateado recuperado, cabide protegido do tingimento; pintura com as dobras preservadas nas 5 cores do `CORES`.
+- Saída: `public/arara/<peca>/cores/<cor>/` (quadros 480x640 transparentes + `frente.webp`), manifesto com `cores`, `coresPasta` e `coresQuadros`.
+- Scripts em `referencia/arara/scripts-cor/`, vídeos em `referencia/arara/videos-verde/`.
+- Build: não rodei (só assets e JSON; o componente ainda não lê os campos novos).
+- Commit: ver o log (`feat: arara com a cor real`). Pendente: o Antigravity ligar o `PecaGirando` aos quadros por cor (pedido em PEDIDOS.md).
