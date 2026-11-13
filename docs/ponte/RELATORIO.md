@@ -54,5 +54,5 @@ Uma entrada por tarefa, sempre acrescentada no fim (nunca reescrever as anterior
 - Decisões: movimento reduzido troca direto de lado ↔ frente (sem giro, vaga sem transição); tocar fora da arara desvira a peça; ao abrir pelo toque o foco zera, para o próximo toque voltar a só girar.
 - Teste (Playwright, build de produção, 360/390/1280 + reduced-motion): 121 checagens ok — todas as peças giram até o último quadro e voltam ao 001, sem caixa branca (fundo pintado de cinza e pixels lidos), alvos ≥44px, snap no celular, vista ampliada completa.
 - Comandos: `shadcn add dialog` (sem sobrescrever o `button.tsx`), `npm run lint`, `npm run build` (ok, páginas estáticas).
-- Commits: `73ee8f4` dialog, `0a25491` arara, `b767521` exceção do impeccable removida + este registro.
-- Pendente: nada deste pedido.
+- Commits (após rebase sobre `59ffcc4`): `a77b983` dialog, `dcfe6b2` arara, `ac6be7e` exceção do impeccable removida, `c9fd8c0` gancho no centro da barra (medida 42/640 do manifesto) + este registro.
+- Pendente: o `cano.webp` cromado não foi usado, porque o prompt do Gabriel pede a barra nas cores do tema; trocar só se ele preferir o cano.
