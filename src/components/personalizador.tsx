@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 
+import { Arara, MODELOS } from "@/components/arara";
 import { Container, Destaque, Eyebrow, Seta, Titulo } from "@/components/blocos";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -12,7 +13,7 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { cn } from "@/lib/utils";
 import { linkWhatsApp } from "@/lib/whim";
 
-const PECAS = ["Camiseta", "Polo", "Regata", "Moletom", "Baby look"];
+const PECAS = MODELOS.map((m) => m.nome);
 // Cores do TECIDO oferecidas pela Whim: são dados do produto (pintam a peça na
 // prévia), não cores da interface; por isso ficam em hex aqui.
 const CORES = [
@@ -28,7 +29,7 @@ const PASSOS = ["Peça", "Cor", "Estampa", "Quantidade", "Resumo"];
 const MINIMO = 50;
 
 /** Silhueta da camiseta (viewBox 0 0 200 200). Contorno na cor do texto. */
-function Camiseta({ cor, className }: { cor: string; className?: string }) {
+function Camiseta({ cor }: { cor: string }) {
   return (
     <path
       d="M70 30 L48 40 L30 70 L48 80 L52 74 L52 170 Q52 174 56 174 L144 174 Q148 174 148 170 L148 74 L152 80 L170 70 L152 40 L130 30 C126 44 116 50 100 50 C84 50 74 44 70 30 Z"
@@ -36,7 +37,7 @@ function Camiseta({ cor, className }: { cor: string; className?: string }) {
       stroke="currentColor"
       strokeWidth={2.5}
       strokeLinejoin="round"
-      className={cn("motion-safe:transition-[fill] motion-safe:duration-300", className)}
+      className="motion-safe:transition-[fill] motion-safe:duration-300"
     />
   );
 }
@@ -74,36 +75,14 @@ export function Personalizador() {
           </Titulo>
 
           {/* Arara: atalho para a escolha da peça (leva direto ao passo da cor). */}
-          <div className="-mx-5 mt-8 snap-x snap-proximity overflow-x-auto px-5 pb-1.5 sm:mx-0 sm:px-0">
-            <div className="min-w-[470px] sm:min-w-[620px]">
-              <div aria-hidden className="h-1 rounded-sm bg-foreground/85" />
-              <ul aria-label="Arara de modelos" className="flex gap-2.5 sm:justify-center sm:gap-[clamp(10px,3vw,34px)]">
-                {PECAS.map((p, i) => (
-                  <li key={p} className="snap-center">
-                    <button
-                      type="button"
-                      aria-pressed={peca === p}
-                      onClick={() => {
-                        setPeca(p);
-                        setPasso(1);
-                      }}
-                      className="group grid origin-top justify-items-center gap-2 rounded-xl pb-1 duration-700 ease-[cubic-bezier(.3,1.6,.4,1)] motion-safe:transition-transform motion-safe:hover:-rotate-5"
-                    >
-                      <svg viewBox="0 0 120 140" aria-hidden className="w-[84px] text-primary sm:w-[104px]">
-                        <path d="M60 2c6 0 8 8 2 12l-2 6" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" />
-                        <path d="M60 20 30 44h60Z" fill="none" stroke="currentColor" strokeWidth={2} strokeLinejoin="round" />
-                        <g transform="translate(0 26) scale(.6)">
-                          <Camiseta cor={CORES[i % CORES.length].hex} className="group-aria-pressed:stroke-accent group-aria-pressed:stroke-4" />
-                        </g>
-                      </svg>
-                      <span className="text-[12.5px] font-medium text-muted-foreground group-aria-pressed:font-semibold group-aria-pressed:text-foreground">
-                        {p}
-                      </span>
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
+          <div className="mt-10">
+            <Arara
+              selecionada={peca}
+              onEscolher={(p) => {
+                setPeca(p);
+                setPasso(1);
+              }}
+            />
           </div>
         </Container>
       </section>
