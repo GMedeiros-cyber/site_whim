@@ -110,8 +110,9 @@ function PecaGirando({ modelo, deFrente, carregar, semGiro }: { modelo: Modelo; 
       width={modelo.largura}
       height={modelo.altura}
       aria-hidden
-      // Sobe um pouco para o gancho encaixar na barra.
-      className="pointer-events-none -mt-[calc(var(--w)*0.06)] w-(--w) max-w-none shrink-0 mix-blend-multiply"
+      // A curva do gancho fica a 42/640 da altura do quadro (manifest.gancho); sobe o
+      // canvas para ela cair no centro da barra de 6px: 42/640 × 4/3 da largura = 0,0875.
+      className="pointer-events-none -mt-[calc(var(--w)*0.0875+3px)] w-(--w) max-w-none shrink-0 mix-blend-multiply"
     />
   );
 }
