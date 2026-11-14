@@ -32,6 +32,9 @@ export function pastaDaCor(hex: string) {
   return (CORES.find((c) => c.hex.toLowerCase() === hex.toLowerCase()) ?? CORES[0]).pasta;
 }
 
+/** Cor própria de cada peça na arara (manifest.pecas[].cor casado com manifest.cores[].nome). */
+const corPropria = (m: Modelo) => (CORES.find((c) => c.nome === m.cor) ?? CORES[0]).hex;
+
 export function usePoucoMovimento() {
   return useSyncExternalStore(
     (avisar) => {
@@ -137,8 +140,8 @@ function PecaGirando({ modelo, cor, deFrente, carregar, semGiro }: { modelo: Mod
 
 /**
  * Arara de modelos: hover (ou 1º toque) gira a peça para a frente; clique
- * (ou 2º toque) escolhe e abre a vista ampliada. `cor` (hex do passo "Cor")
- * escolhe a pasta dos quadros pintados.
+ * (ou 2º toque) escolhe e abre a vista ampliada. Só a peça escolhida usa `cor`
+ * (hex da vitrine); as outras ficam na cor própria do manifesto.
  */
 export function Arara({ selecionada, cor, onEscolher }: { selecionada: string; cor: string; onEscolher: (nome: string) => void }) {
   const araraRef = useRef<HTMLDivElement>(null);
@@ -190,6 +193,7 @@ export function Arara({ selecionada, cor, onEscolher }: { selecionada: string; c
 
   const total = MODELOS.length;
   const vista = aberta === null ? null : MODELOS[aberta];
+  const corDe = (m: Modelo) => (m.nome === selecionada ? cor : corPropria(m));
   const andar = (passo: number) => setAberta((a) => (a === null ? a : (a + passo + total) % total));
   const doisDigitos = (n: number) => String(n).padStart(2, "0");
 
@@ -228,7 +232,7 @@ export function Arara({ selecionada, cor, onEscolher }: { selecionada: string; c
                       foco === i || selecionada === m.nome ? "w-[calc(var(--w)*0.88)]" : "w-[calc(var(--w)*0.3)]"
                     )}
                   >
-                    <PecaGirando modelo={m} cor={cor} deFrente={foco === i || selecionada === m.nome} carregar={carregar} semGiro={semGiro} />
+                    <PecaGirando modelo={m} cor={corDe(m)} deFrente={foco === i || selecionada === m.nome} carregar={carregar} semGiro={semGiro} />
                     {selecionada === m.nome && (
                       <span aria-hidden className="absolute bottom-0 left-1/2 -ml-3 h-1 w-6 rounded-full bg-accent" />
                     )}
@@ -240,7 +244,10 @@ export function Arara({ selecionada, cor, onEscolher }: { selecionada: string; c
         </div>
         <p aria-hidden className="mt-3 min-h-6 text-center text-[15px] font-semibold">
           {foco === null ? (
-            <span className="font-normal text-muted-foreground">Passe o mouse ou toque numa peça</span>
+            <span className="font-normal text-muted-foreground">
+              <span className="pointer-coarse:hidden">Clique numa peça</span>
+              <span className="hidden pointer-coarse:inline">Toque numa peça</span>
+            </span>
           ) : (
             MODELOS[foco].nome
           )}
@@ -266,9 +273,9 @@ export function Arara({ selecionada, cor, onEscolher }: { selecionada: string; c
               </DialogHeader>
               <div className="relative">
                 <Image
-                  key={`${vista.id}-${cor}`}
-                  src={`${vista.coresPasta}${pastaDaCor(cor)}/frente.webp`}
-                  alt={`${vista.nome} de frente, na cor escolhida`}
+                  key={`${vista.id}-${corDe(vista)}`}
+                  src={`${vista.coresPasta}${pastaDaCor(corDe(vista))}/frente.webp`}
+                  alt={`${vista.nome} de frente`}
                   width={900}
                   height={1200}
                   sizes="(min-width: 640px) 26rem, 90vw"
@@ -282,7 +289,7 @@ export function Arara({ selecionada, cor, onEscolher }: { selecionada: string; c
                 </Button>
               </div>
               <DialogDescription>
-                Imagem ilustrativa do modelo na cor escolhida. A estampa você escolhe nos próximos passos.
+                Imagem ilustrativa do modelo. A estampa você escolhe nos próximos passos.
               </DialogDescription>
               <div className="flex flex-col-reverse gap-2.5 sm:flex-row sm:justify-end">
                 <DialogClose render={<Button variant="outline" size="xl" />}>Fechar</DialogClose>
