@@ -101,3 +101,4 @@ Uma entrada por tarefa, sempre acrescentada no fim (nunca reescrever as anterior
 - Comandos: `costas_cor.py` e `areas.py` (em `referencia/arara/scripts-cor/`); conferência em `referencia/arara/areas-estampa.jpg`.
 - Build: não rodei (só imagens, JSON e documentação).
 - Pendente: implementação pelo Antigravity; a Whim confirmar tamanhos máximos das áreas e a lista de tamanhos.
+- Commit: `82e78a1`.
