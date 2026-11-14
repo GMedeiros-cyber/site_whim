@@ -116,3 +116,4 @@ Uma entrada por tarefa, sempre acrescentada no fim (nunca reescrever as anterior
 - Feito: `areas` por lado com ângulo das mangas e `medidasReferencia` (provisórias) no manifesto; `areas2.py`; conferência em `referencia/arara/areas-estampa.jpg`; `referencia/previa-cor/README-estampa-2.md`.
 - Build: não rodei (só JSON, imagem e documentação).
 - Pendente: implementação pelo Antigravity; a Whim confirmar as medidas de cada posição.
+- Commit: `eb33b84`.
