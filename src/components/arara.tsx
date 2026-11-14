@@ -18,20 +18,21 @@ import { cn } from "@/lib/utils";
 
 /** Modelos da arara, na ordem do manifesto (public/arara/manifest.json). */
 export const MODELOS = manifest.pecas;
-type Modelo = (typeof MODELOS)[number];
+export type Modelo = (typeof MODELOS)[number];
 /** Cores do tecido com quadros já pintados; o passo "Cor" usa esta mesma lista. */
 export const CORES = manifest.cores;
-const CANO = manifest.cano;
+export type Cor = (typeof CORES)[number];
+export const CANO = manifest.cano;
 
 /** Duração do giro de lado → de frente (a volta faz o mesmo caminho). */
 const DURACAO_MS = 900;
 
 /** Pasta da cor escolhida: casa o hex com manifest.cores (se não casar, a primeira cor). */
-function pastaDaCor(hex: string) {
+export function pastaDaCor(hex: string) {
   return (CORES.find((c) => c.hex.toLowerCase() === hex.toLowerCase()) ?? CORES[0]).pasta;
 }
 
-function usePoucoMovimento() {
+export function usePoucoMovimento() {
   return useSyncExternalStore(
     (avisar) => {
       const mq = matchMedia("(prefers-reduced-motion: reduce)");
@@ -176,7 +177,8 @@ export function Arara({ selecionada, cor, onEscolher }: { selecionada: string; c
   function clicar(e: React.MouseEvent, i: number) {
     // No toque não há hover: o 1º toque gira, o 2º escolhe. Teclado (detail 0) escolhe direto.
     const toque = e.detail > 0 && tipoPonteiro.current !== "mouse";
-    if (toque && foco !== i) {
+    // A peça escolhida já está de frente: o 1º toque nela já escolhe.
+    if (toque && foco !== i && selecionada !== MODELOS[i].nome) {
       setFoco(i);
       return;
     }
@@ -223,10 +225,10 @@ export function Arara({ selecionada, cor, onEscolher }: { selecionada: string; c
                     onClick={(e) => clicar(e, i)}
                     className={cn(
                       "relative flex min-h-11 justify-center rounded-xl ease-out motion-safe:transition-[width] motion-safe:duration-700",
-                      foco === i ? "w-[calc(var(--w)*0.88)]" : "w-[calc(var(--w)*0.3)]"
+                      foco === i || selecionada === m.nome ? "w-[calc(var(--w)*0.88)]" : "w-[calc(var(--w)*0.3)]"
                     )}
                   >
-                    <PecaGirando modelo={m} cor={cor} deFrente={foco === i} carregar={carregar} semGiro={semGiro} />
+                    <PecaGirando modelo={m} cor={cor} deFrente={foco === i || selecionada === m.nome} carregar={carregar} semGiro={semGiro} />
                     {selecionada === m.nome && (
                       <span aria-hidden className="absolute bottom-0 left-1/2 -ml-3 h-1 w-6 rounded-full bg-accent" />
                     )}
