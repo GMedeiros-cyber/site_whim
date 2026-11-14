@@ -68,6 +68,82 @@
           0.384,
           0.4097
         ]
+      },
+      "areas": {
+        "frente": {
+          "peito-esquerdo": [
+            0.5594,
+            0.2921,
+            0.1188,
+            0.0891
+          ],
+          "peito-direito": [
+            0.3218,
+            0.2921,
+            0.1188,
+            0.0891
+          ],
+          "centro-peito": [
+            0.392,
+            0.2921,
+            0.216,
+            0.1318
+          ],
+          "frente-inteira": [
+            0.3164,
+            0.2921,
+            0.3672,
+            0.3809
+          ],
+          "manga-direita": [
+            0.1429,
+            0.3372,
+            0.0556,
+            0.0417,
+            31.7
+          ],
+          "manga-esquerda": [
+            0.8006,
+            0.3383,
+            0.055,
+            0.0412,
+            -32.0
+          ]
+        },
+        "costas": {
+          "nuca": [
+            0.4456,
+            0.2424,
+            0.1067,
+            0.0439
+          ],
+          "costas-em-cima": [
+            0.3282,
+            0.279,
+            0.3413,
+            0.1097
+          ],
+          "costas-inteira": [
+            0.3176,
+            0.2936,
+            0.3627,
+            0.3951
+          ],
+          "manga-esquerda": [
+            0.1462,
+            0.34,
+            0.0543,
+            0.0407,
+            31.6
+          ],
+          "manga-direita": [
+            0.7966,
+            0.3373,
+            0.0582,
+            0.0436,
+            -32.3
+          ]
+        }
       }
     },
     {
@@ -137,6 +213,82 @@
           0.3896,
           0.4153
         ]
+      },
+      "areas": {
+        "frente": {
+          "peito-esquerdo": [
+            0.5594,
+            0.2884,
+            0.1188,
+            0.0891
+          ],
+          "peito-direito": [
+            0.3218,
+            0.2884,
+            0.1188,
+            0.0891
+          ],
+          "centro-peito": [
+            0.392,
+            0.2884,
+            0.216,
+            0.1326
+          ],
+          "frente-inteira": [
+            0.3164,
+            0.2884,
+            0.3672,
+            0.3831
+          ],
+          "manga-direita": [
+            0.1432,
+            0.3361,
+            0.0551,
+            0.0413,
+            32.2
+          ],
+          "manga-esquerda": [
+            0.8007,
+            0.3366,
+            0.055,
+            0.0412,
+            -32.3
+          ]
+        },
+        "costas": {
+          "nuca": [
+            0.4498,
+            0.2321,
+            0.1082,
+            0.0445
+          ],
+          "costas-em-cima": [
+            0.3307,
+            0.2692,
+            0.3463,
+            0.1113
+          ],
+          "costas-inteira": [
+            0.3199,
+            0.284,
+            0.368,
+            0.4005
+          ],
+          "manga-esquerda": [
+            0.1456,
+            0.3333,
+            0.0559,
+            0.0419,
+            32.8
+          ],
+          "manga-direita": [
+            0.805,
+            0.3336,
+            0.0559,
+            0.0419,
+            -32.8
+          ]
+        }
       }
     },
     {
@@ -206,6 +358,82 @@
           0.3904,
           0.4111
         ]
+      },
+      "areas": {
+        "frente": {
+          "peito-esquerdo": [
+            0.5594,
+            0.2928,
+            0.1188,
+            0.0891
+          ],
+          "peito-direito": [
+            0.3218,
+            0.2928,
+            0.1188,
+            0.0891
+          ],
+          "centro-peito": [
+            0.392,
+            0.2928,
+            0.216,
+            0.1317
+          ],
+          "frente-inteira": [
+            0.3164,
+            0.2928,
+            0.3672,
+            0.3805
+          ],
+          "manga-direita": [
+            0.1423,
+            0.3379,
+            0.056,
+            0.042,
+            31.9
+          ],
+          "manga-esquerda": [
+            0.8004,
+            0.3387,
+            0.0556,
+            0.0417,
+            -32.0
+          ]
+        },
+        "costas": {
+          "nuca": [
+            0.4469,
+            0.2392,
+            0.1084,
+            0.044
+          ],
+          "costas-em-cima": [
+            0.3276,
+            0.2759,
+            0.347,
+            0.1101
+          ],
+          "costas-inteira": [
+            0.3168,
+            0.2906,
+            0.3687,
+            0.3965
+          ],
+          "manga-esquerda": [
+            0.1441,
+            0.3372,
+            0.0546,
+            0.041,
+            31.5
+          ],
+          "manga-direita": [
+            0.8023,
+            0.3376,
+            0.0533,
+            0.04,
+            -31.2
+          ]
+        }
       }
     },
     {
@@ -263,6 +491,54 @@
           0.3944,
           0.4088
         ]
+      },
+      "areas": {
+        "frente": {
+          "peito-esquerdo": [
+            0.5594,
+            0.2899,
+            0.1188,
+            0.0891
+          ],
+          "peito-direito": [
+            0.3218,
+            0.2899,
+            0.1188,
+            0.0891
+          ],
+          "centro-peito": [
+            0.392,
+            0.2899,
+            0.216,
+            0.1323
+          ],
+          "frente-inteira": [
+            0.3164,
+            0.2899,
+            0.3672,
+            0.3822
+          ]
+        },
+        "costas": {
+          "nuca": [
+            0.4447,
+            0.2432,
+            0.1096,
+            0.0438
+          ],
+          "costas-em-cima": [
+            0.3242,
+            0.2797,
+            0.3506,
+            0.1095
+          ],
+          "costas-inteira": [
+            0.3132,
+            0.2943,
+            0.3725,
+            0.3942
+          ]
+        }
       }
     },
     {
@@ -332,6 +608,82 @@
           0.3976,
           0.3799
         ]
+      },
+      "areas": {
+        "frente": {
+          "peito-esquerdo": [
+            0.5602,
+            0.2867,
+            0.1215,
+            0.0911
+          ],
+          "peito-direito": [
+            0.3172,
+            0.2867,
+            0.1215,
+            0.0911
+          ],
+          "centro-peito": [
+            0.389,
+            0.2867,
+            0.2209,
+            0.1237
+          ],
+          "frente-inteira": [
+            0.3117,
+            0.2867,
+            0.3755,
+            0.3575
+          ],
+          "manga-direita": [
+            0.149,
+            0.3218,
+            0.0483,
+            0.0362,
+            17.5
+          ],
+          "manga-esquerda": [
+            0.8006,
+            0.3219,
+            0.048,
+            0.036,
+            -17.9
+          ]
+        },
+        "costas": {
+          "nuca": [
+            0.4476,
+            0.2472,
+            0.1104,
+            0.0407
+          ],
+          "costas-em-cima": [
+            0.3261,
+            0.2812,
+            0.3534,
+            0.1018
+          ],
+          "costas-inteira": [
+            0.315,
+            0.2947,
+            0.3755,
+            0.3663
+          ],
+          "manga-esquerda": [
+            0.1482,
+            0.3291,
+            0.0513,
+            0.0385,
+            20.5
+          ],
+          "manga-direita": [
+            0.8038,
+            0.3324,
+            0.0477,
+            0.0357,
+            -20.4
+          ]
+        }
       }
     },
     {
@@ -395,6 +747,76 @@
           0.3592,
           0.4377
         ]
+      },
+      "areas": {
+        "frente": {
+          "peito-esquerdo": [
+            0.5557,
+            0.3289,
+            0.1115,
+            0.0836
+          ],
+          "peito-direito": [
+            0.3328,
+            0.3289,
+            0.1115,
+            0.0836
+          ],
+          "centro-peito": [
+            0.3987,
+            0.3289,
+            0.2027,
+            0.1347
+          ],
+          "frente-inteira": [
+            0.3277,
+            0.3289,
+            0.3445,
+            0.2993
+          ],
+          "manga-direita": [
+            0.159,
+            0.3285,
+            0.0608,
+            0.0456,
+            12.0
+          ],
+          "manga-esquerda": [
+            0.78,
+            0.3285,
+            0.0608,
+            0.0456,
+            -12.0
+          ]
+        },
+        "costas": {
+          "costas-em-cima": [
+            0.342,
+            0.4156,
+            0.3193,
+            0.1173
+          ],
+          "costas-inteira": [
+            0.332,
+            0.4313,
+            0.3392,
+            0.4221
+          ],
+          "manga-esquerda": [
+            0.1653,
+            0.3029,
+            0.0599,
+            0.0449,
+            11.9
+          ],
+          "manga-direita": [
+            0.7765,
+            0.3029,
+            0.0599,
+            0.0449,
+            -11.9
+          ]
+        }
       }
     }
   ],
@@ -434,5 +856,44 @@
     }
   ],
   "observacaoCores": "Cor real na arara: para a cor escolhida use {coresPasta}{cores[].pasta}/001.webp … NNN.webp (NNN = coresQuadros) e {coresPasta}{pasta}/frente.webp na vista ampliada (900x1200). Quadros 480x640 já pintados, com fundo TRANSPARENTE (sem mix-blend-mode, sem tingir no canvas). Quadro 001 = de lado, último = de frente. Mesmo enquadramento e mesma posição do gancho dos quadros antigos.",
-  "observacaoCostas": "Cada cor tem frente.webp e costas.webp (900x1200, mesmo enquadramento: a peça fica na mesma altura e no mesmo centro). A versão branca de cada lado serve de mapa de dobras e sombras para deformar a arte. areasEstampa: [x, y, largura, altura] normalizados (0 a 1) no quadro 900x1200. Lado de quem veste: peito-esquerdo e manga-esquerda aparecem à direita de quem olha. Medidas aproximadas, tiradas das fotos; a Whim confirma os tamanhos máximos de cada área."
+  "observacaoCostas": "Cada cor tem frente.webp e costas.webp (900x1200, mesmo enquadramento: a peça fica na mesma altura e no mesmo centro). A versão branca de cada lado serve de mapa de dobras e sombras para deformar a arte. areasEstampa: [x, y, largura, altura] normalizados (0 a 1) no quadro 900x1200. Lado de quem veste: peito-esquerdo e manga-esquerda aparecem à direita de quem olha. Medidas aproximadas, tiradas das fotos; a Whim confirma os tamanhos máximos de cada área.",
+  "medidasReferencia": {
+    "peito-esquerdo": [
+      10,
+      10
+    ],
+    "peito-direito": [
+      10,
+      10
+    ],
+    "centro-peito": [
+      25,
+      12
+    ],
+    "frente-inteira": [
+      28,
+      38
+    ],
+    "nuca": [
+      8,
+      4
+    ],
+    "costas-em-cima": [
+      30,
+      10
+    ],
+    "costas-inteira": [
+      30,
+      40
+    ],
+    "manga-esquerda": [
+      8,
+      8
+    ],
+    "manga-direita": [
+      8,
+      8
+    ]
+  },
+  "observacaoAreas": "Novo: pecas[].areas[lado][chave] = [x, y, largura, altura] de 0 a 1 no quadro 900x1200; nas mangas vem um 5º número, o ângulo em graus (positivo = horário na tela). Substitui areasEstampa (remover depois de migrar). Lado de quem veste: na frente, peito-esquerdo e manga-esquerda ficam à direita de quem olha; nas costas, a manga-esquerda fica à esquerda de quem olha. medidasReferencia = [largura, altura] máximas em cm, referência de mercado PROVISÓRIA: a Whim confirma."
 }

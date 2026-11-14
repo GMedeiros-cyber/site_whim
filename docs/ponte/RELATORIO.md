@@ -110,3 +110,9 @@ Uma entrada por tarefa, sempre acrescentada no fim (nunca reescrever as anterior
 - Comandos: `npm run lint` e `npm run build` (ok); `shadcn add slider checkbox` (Base UI, sem dependência nova).
 - Commits: `1f62d06` arara, `b692935` prévia, `962723c` ficha.
 - Pendente: a Whim confirmar tamanhos e áreas máximas; no celular a prévia fica acima da ficha (fora da tela enquanto se edita a Estampa).
+
+### 2026-11-13 23:40 · Estampa 2: teste, áreas novas e especificação (Claude, outra conta)
+- Teste no navegador (Playwright): espelho troca a cada ~2,5 s parado; troca de cor pula θ de −0,05 para −0,20; costas funcionam com "Frente e costas", mangas presas à arte da frente.
+- Feito: `areas` por lado com ângulo das mangas e `medidasReferencia` (provisórias) no manifesto; `areas2.py`; conferência em `referencia/arara/areas-estampa.jpg`; `referencia/previa-cor/README-estampa-2.md`.
+- Build: não rodei (só JSON, imagem e documentação).
+- Pendente: implementação pelo Antigravity; a Whim confirmar as medidas de cada posição.
