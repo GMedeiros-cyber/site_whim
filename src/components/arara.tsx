@@ -2,18 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import Image from "next/image";
-import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 
 import manifest from "../../public/arara/manifest.json";
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 
 /** Modelos da arara, na ordem do manifesto (public/arara/manifest.json). */
@@ -23,6 +13,8 @@ export type Modelo = (typeof MODELOS)[number];
 export const CORES = manifest.cores;
 export type Cor = (typeof CORES)[number];
 export const CANO = manifest.cano;
+/** Medidas de referência de cada posição, [largura, altura] em cm (provisórias; a Whim confirma). */
+export const MEDIDAS: Record<string, number[]> = manifest.medidasReferencia;
 
 /** Duração do giro de lado → de frente (a volta faz o mesmo caminho). */
 const DURACAO_MS = 900;
@@ -139,16 +131,14 @@ function PecaGirando({ modelo, cor, deFrente, carregar, semGiro }: { modelo: Mod
 }
 
 /**
- * Arara de modelos: hover (ou 1º toque) gira a peça para a frente; clique
- * (ou 2º toque) escolhe e abre a vista ampliada. Só a peça escolhida usa `cor`
- * (hex da vitrine); as outras ficam na cor própria do manifesto.
+ * Arara de modelos: hover (ou foco pelo teclado) gira a peça para a frente; um clique ou
+ * toque já escolhe. Só a peça escolhida usa `cor` (hex da vitrine); as outras ficam na
+ * cor própria do manifesto.
  */
 export function Arara({ selecionada, cor, onEscolher }: { selecionada: string; cor: string; onEscolher: (nome: string) => void }) {
   const araraRef = useRef<HTMLDivElement>(null);
-  const tipoPonteiro = useRef("");
   const [carregar, setCarregar] = useState(false);
   const [foco, setFoco] = useState<number | null>(null);
-  const [aberta, setAberta] = useState<number | null>(null);
   const semGiro = usePoucoMovimento();
 
   useEffect(() => {
@@ -167,35 +157,7 @@ export function Arara({ selecionada, cor, onEscolher }: { selecionada: string; c
     return () => io.disconnect();
   }, []);
 
-  // No toque, tocar fora da arara devolve a peça para o lado.
-  useEffect(() => {
-    if (foco === null) return;
-    const fora = (e: PointerEvent) => {
-      if (e.pointerType !== "mouse" && !araraRef.current?.contains(e.target as Node)) setFoco(null);
-    };
-    document.addEventListener("pointerdown", fora);
-    return () => document.removeEventListener("pointerdown", fora);
-  }, [foco]);
-
-  function clicar(e: React.MouseEvent, i: number) {
-    // No toque não há hover: o 1º toque gira, o 2º escolhe. Teclado (detail 0) escolhe direto.
-    const toque = e.detail > 0 && tipoPonteiro.current !== "mouse";
-    // A peça escolhida já está de frente: o 1º toque nela já escolhe.
-    if (toque && foco !== i && selecionada !== MODELOS[i].nome) {
-      setFoco(i);
-      return;
-    }
-    // Ao abrir pelo toque, zera o foco: depois de fechar, o próximo toque volta a só girar.
-    if (toque) setFoco(null);
-    onEscolher(MODELOS[i].nome);
-    setAberta(i);
-  }
-
-  const total = MODELOS.length;
-  const vista = aberta === null ? null : MODELOS[aberta];
   const corDe = (m: Modelo) => (m.nome === selecionada ? cor : corPropria(m));
-  const andar = (passo: number) => setAberta((a) => (a === null ? a : (a + passo + total) % total));
-  const doisDigitos = (n: number) => String(n).padStart(2, "0");
 
   return (
     <>
@@ -220,13 +182,12 @@ export function Arara({ selecionada, cor, onEscolher }: { selecionada: string; c
                     type="button"
                     aria-label={m.nome}
                     aria-pressed={selecionada === m.nome}
-                    onPointerDown={(e) => (tipoPonteiro.current = e.pointerType)}
                     onPointerEnter={(e) => e.pointerType === "mouse" && setFoco(i)}
                     onPointerLeave={(e) => e.pointerType === "mouse" && setFoco((f) => (f === i ? null : f))}
-                    // Teclado gira a peça; no toque, quem gira é o próprio toque (ignora o foco devolvido pelo modal).
-                    onFocus={(e) => tipoPonteiro.current !== "touch" && e.currentTarget.matches(":focus-visible") && setFoco(i)}
+                    // Teclado gira a peça em foco; o toque não (o próprio toque já escolhe).
+                    onFocus={(e) => e.currentTarget.matches(":focus-visible") && setFoco(i)}
                     onBlur={() => setFoco((f) => (f === i ? null : f))}
-                    onClick={(e) => clicar(e, i)}
+                    onClick={() => onEscolher(m.nome)}
                     className={cn(
                       "relative flex min-h-11 justify-center rounded-xl ease-out motion-safe:transition-[width] motion-safe:duration-700",
                       foco === i || selecionada === m.nome ? "w-[calc(var(--w)*0.88)]" : "w-[calc(var(--w)*0.3)]"
@@ -253,60 +214,6 @@ export function Arara({ selecionada, cor, onEscolher }: { selecionada: string; c
           )}
         </p>
       </div>
-
-      <Dialog open={vista !== null} onOpenChange={(aberto) => !aberto && setAberta(null)}>
-        <DialogContent
-          showCloseButton={false}
-          onKeyDown={(e) => {
-            if (e.key === "ArrowLeft") andar(-1);
-            if (e.key === "ArrowRight") andar(1);
-          }}
-          className="gap-5 p-5 motion-reduce:animate-none sm:max-w-md"
-        >
-          {vista && aberta !== null && (
-            <>
-              <DialogHeader className="flex-row items-baseline justify-between">
-                <DialogTitle className="text-xl font-semibold">{vista.nome}</DialogTitle>
-                <span className="text-sm text-muted-foreground tabular-nums">
-                  {doisDigitos(aberta + 1)} / {doisDigitos(total)}
-                </span>
-              </DialogHeader>
-              <div className="relative">
-                <Image
-                  key={`${vista.id}-${corDe(vista)}`}
-                  src={`${vista.coresPasta}${pastaDaCor(corDe(vista))}/frente.webp`}
-                  alt={`${vista.nome} de frente`}
-                  width={900}
-                  height={1200}
-                  sizes="(min-width: 640px) 26rem, 90vw"
-                  className="mx-auto h-auto max-h-[58svh] w-auto"
-                />
-                <Button variant="outline" size="icon-lg" aria-label="Peça anterior" onClick={() => andar(-1)} className="absolute top-1/2 left-0 size-11 -translate-y-1/2 rounded-full bg-background/80">
-                  <ChevronLeftIcon />
-                </Button>
-                <Button variant="outline" size="icon-lg" aria-label="Próxima peça" onClick={() => andar(1)} className="absolute top-1/2 right-0 size-11 -translate-y-1/2 rounded-full bg-background/80">
-                  <ChevronRightIcon />
-                </Button>
-              </div>
-              <DialogDescription>
-                Imagem ilustrativa do modelo. A estampa você escolhe nos próximos passos.
-              </DialogDescription>
-              <div className="flex flex-col-reverse gap-2.5 sm:flex-row sm:justify-end">
-                <DialogClose render={<Button variant="outline" size="xl" />}>Fechar</DialogClose>
-                <Button
-                  size="xl"
-                  onClick={() => {
-                    onEscolher(vista.nome);
-                    setAberta(null);
-                  }}
-                >
-                  Escolher esta peça
-                </Button>
-              </div>
-            </>
-          )}
-        </DialogContent>
-      </Dialog>
     </>
   );
 }
