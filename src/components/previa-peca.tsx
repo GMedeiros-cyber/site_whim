@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { MinusIcon, PlusIcon } from "lucide-react";
 
@@ -9,50 +9,245 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { areaDe, comporEstampa, type Area, type Lado } from "@/lib/estampa";
+import { areaDe, FRASE_TECNICA, zoomPara, type Lado, type Tecnica } from "@/lib/estampa";
+import { comporEstampa } from "@/lib/estampa-cliente";
 import { cn } from "@/lib/utils";
 
-// Movimento (referencia/previa-cor/README.md, opção A; README-estampa.md, 1). θ: −1 = de lado
-// para a esquerda, 0 = de frente, 1 = de lado para a direita.
-const SEGUE = 0.15; // lerp por quadro enquanto o mouse/dedo arrasta
-const MOLA_K = 39.5; // mola de ~1 Hz…
-const MOLA_C = 6.7; // …amortecida: assenta em ~1,2 s
-const IMPULSO = 0.35; // balanço ao trocar a cor
-const BALANCO = 0.06; // balanço contínuo…
+// Movimento (README.md, README-estampa.md 1 e README-estampa-2.md 2). θ: −1 = de lado para a
+// esquerda, 0 = de frente, 1 = de lado para a direita. θ só muda arrastando (ou pelas setas).
+const SEGUE = 0.15; // lerp por quadro até o destino do arrasto
+const HISTERESE = 0.04; // espelho liga abaixo de −0,04 e desliga acima de +0,04
+const MOLA_K = 39.5; // pêndulo no gancho: mola de ~1 Hz…
+const MOLA_C = 6.7; // …amortecida, assenta em ~1,2 s
+const PICO = 4; // ° que o pêndulo alcança na troca de cor…
+const RESPOSTA = 0.0843; // …pico por °/s de impulso, com essa mola (k = 39,5, c = 6,7)
+const BALANCO = 1.2; // ° de balanço contínuo…
 const PERIODO_MS = 5000; // …a cada 5 s
-const PASSO_TECLA = 0.1; // setas ← →
+const FADE_MS = 300; // troca de cor no mesmo θ
+const PASSO_TECLA = 0.1;
 const ZOOM_MAX = 3;
 
 const limitar = (v: number) => Math.max(-1, Math.min(1, v));
 const numero = (i: number) => String(i + 1).padStart(3, "0");
 
-type Banco = { pasta: string; n: number; quadros: HTMLImageElement[] };
+/**
+ * O giro e o pêndulo, fora do React: bancos de quadros por pasta de cor (carregados aos poucos),
+ * espelho com histerese, crossfade na troca de cor e o laço de animação (pausa fora da tela).
+ */
+function criarMotor(painel: HTMLElement, canvas: HTMLCanvasElement, pendulo: HTMLElement, sombra: HTMLElement) {
+  const ctx = canvas.getContext("2d")!;
+  const s = { theta: 0, destino: 0, espelho: false, ang: 0, vel: 0, arrasto: null as { x: number; theta: number } | null };
+  type Quadros = { pasta: string; n: number };
+  const bancos = new Map<string, (HTMLImageElement | undefined)[]>();
+  const pedidos = new Map<string, Set<number>>();
+  let atual: Quadros | null = null;
+  let anterior: (Quadros & { desde: number }) | null = null;
+  let alvo: Quadros = { pasta: "", n: 0 };
+  let semGiro = false, parado = false, naTela = true, raf = 0, antes = 0;
 
-/** O que a prévia mostra de um lado no passo Estampa. */
-export type LadoEstampa = {
-  areas: string[]; // chaves de manifest.pecas[].areasEstampa com arte (ou o marcador)
-  foco: string; // área onde o zoom aproxima
-  arte?: string; // URL local (blob:) da arte; sem ela, marcador "Sua arte"
+  const indice = (n: number) => (n - 1) * (1 - Math.abs(s.theta));
+  const perto = (n: number) => {
+    const i = Math.floor(indice(n));
+    return [i, i + 1, i - 1, i + 2];
+  };
+  const todos = (n: number) => Array.from({ length: n }, (_, i) => i);
+
+  function pedir(pasta: string, n: number, indices: number[], alta: boolean) {
+    let banco = bancos.get(pasta);
+    if (!banco) bancos.set(pasta, (banco = []));
+    let feitos = pedidos.get(pasta);
+    if (!feitos) pedidos.set(pasta, (feitos = new Set()));
+    const b = banco;
+    for (const i of indices) {
+      if (i < 0 || i >= n || feitos.has(i)) continue;
+      feitos.add(i);
+      const img = new window.Image(); // "Image" aqui é o do next/image
+      img.fetchPriority = alta ? "high" : "low";
+      img.src = `${pasta}${numero(i)}.webp`;
+      img.decode().then(() => {
+        b[i] = img;
+        trocar();
+        if (!raf) desenhar();
+      }, () => {});
+    }
+  }
+
+  // Troca para a cor pedida assim que os quadros do θ atual dela estiverem prontos.
+  function trocar() {
+    if (atual?.pasta === alvo.pasta) return;
+    const b = bancos.get(alvo.pasta);
+    const i = Math.floor(indice(alvo.n));
+    if (!b?.[i] || !b[Math.min(i + 1, alvo.n - 1)]) return;
+    if (atual && !semGiro && !parado) {
+      anterior = { ...atual, desde: performance.now() };
+      // Impulso de velocidade (não de posição) para o lado em que a peça já está, até ~4°.
+      const lado = Math.sign(s.ang) || 1;
+      s.vel = (lado * Math.max(1, PICO - Math.abs(s.ang))) / RESPOSTA;
+    } else if (atual) {
+      bancos.delete(atual.pasta);
+      pedidos.delete(atual.pasta);
+    }
+    atual = { ...alvo };
+    if (!semGiro) pedir(alvo.pasta, alvo.n, todos(alvo.n), false); // o resto em segundo plano
+  }
+
+  function maisPerto(b: (HTMLImageElement | undefined)[], i: number, n: number) {
+    for (let d = 0; d < n; d++) {
+      const img = b[i - d] ?? b[i + d];
+      if (img) return img;
+    }
+  }
+
+  // Quadro = (N−1)·(1−|θ|); os dois quadros vizinhos se misturam para não pular.
+  function pintar(q: Quadros, alfa: number) {
+    const b = bancos.get(q.pasta);
+    if (!b) return;
+    const f = indice(q.n);
+    const i0 = Math.floor(f);
+    const base = maisPerto(b, i0, q.n);
+    const cima = maisPerto(b, Math.min(i0 + 1, q.n - 1), q.n);
+    if (!base) return;
+    ctx.globalAlpha = alfa;
+    ctx.drawImage(base, 0, 0, canvas.width, canvas.height);
+    if (f - i0 > 0.01 && cima && cima !== base) {
+      ctx.globalAlpha = alfa * (f - i0);
+      ctx.drawImage(cima, 0, 0, canvas.width, canvas.height);
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  function desenhar(agora = performance.now()) {
+    if (!atual) return;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.save();
+    if (s.espelho) {
+      ctx.translate(canvas.width, 0);
+      ctx.scale(-1, 1);
+    }
+    let alfa = 1;
+    if (anterior) {
+      alfa = Math.min(1, (agora - anterior.desde) / FADE_MS);
+      if (alfa < 1) pintar(anterior, 1);
+      else {
+        bancos.delete(anterior.pasta);
+        pedidos.delete(anterior.pasta);
+        anterior = null;
+      }
+    }
+    pintar(atual, alfa);
+    ctx.restore();
+    const d = canvas.dataset;
+    d.theta = s.theta.toFixed(3);
+    d.quadro = String(Math.round(indice(atual.n)) + 1);
+    d.espelho = s.espelho ? "1" : "0";
+    d.cor = atual.pasta;
+    d.fade = anterior ? "1" : "0";
+    pendulo.style.transform = s.ang ? `rotate(${s.ang.toFixed(3)}deg)` : "";
+    pendulo.dataset.angulo = s.ang.toFixed(2);
+    // A sombra estreita quando a peça fica de lado.
+    sombra.style.transform = `scaleX(${1 - 0.4 * Math.abs(s.theta)})`;
+  }
+
+  function passo(agora: number) {
+    const dt = antes ? Math.min(0.05, (agora - antes) / 1000) : 1 / 60;
+    antes = agora;
+    s.theta += (s.destino - s.theta) * SEGUE;
+    if (Math.abs(s.destino - s.theta) < 1e-4) s.theta = s.destino;
+    if (s.theta < -HISTERESE) s.espelho = true;
+    else if (s.theta > HISTERESE) s.espelho = false;
+    const repouso = BALANCO * Math.sin((2 * Math.PI * agora) / PERIODO_MS);
+    s.vel += (-MOLA_K * (s.ang - repouso) - MOLA_C * s.vel) * dt;
+    s.ang += s.vel * dt;
+    trocar();
+    desenhar(agora);
+    raf = requestAnimationFrame(passo);
+  }
+  function ligar() {
+    if (raf || semGiro || parado || !naTela || document.hidden) return;
+    antes = 0;
+    raf = requestAnimationFrame(passo);
+  }
+  function desligar() {
+    cancelAnimationFrame(raf);
+    raf = 0;
+  }
+  const io = new IntersectionObserver(([e]) => {
+    naTela = e.isIntersecting;
+    if (naTela) ligar();
+    else desligar();
+  });
+  io.observe(painel);
+  const aba = () => (document.hidden ? desligar() : ligar());
+  document.addEventListener("visibilitychange", aba);
+
+  return {
+    /** Movimento reduzido (sem giro, pêndulo e fade) e passo Estampa (parada de frente). */
+    configurar(sem: boolean, paradaDeFrente: boolean) {
+      semGiro = sem;
+      parado = paradaDeFrente;
+      if (sem || paradaDeFrente) {
+        desligar();
+        Object.assign(s, { theta: 0, destino: 0, espelho: false, ang: 0, vel: 0, arrasto: null });
+        desenhar();
+      } else {
+        if (atual) pedir(atual.pasta, atual.n, todos(atual.n), false);
+        ligar();
+      }
+    },
+    escolher(pasta: string, n: number) {
+      alvo = { pasta, n };
+      pedir(pasta, n, semGiro ? [n - 1] : perto(n), true);
+      trocar();
+      desenhar();
+    },
+    /** Mouse em cima, foco ou toque num botão da vitrine: o quadro atual e os vizinhos daquela cor. */
+    preCarregar(pasta: string, n: number) {
+      pedir(pasta, n, semGiro ? [n - 1] : perto(n), true);
+    },
+    pegar(x: number) {
+      s.arrasto = { x, theta: s.theta };
+    },
+    arrastar(x: number, meio: number) {
+      if (s.arrasto) s.destino = limitar(s.arrasto.theta + (x - s.arrasto.x) / meio);
+    },
+    /** Soltou: a peça para onde está. */
+    soltar() {
+      if (s.arrasto) s.destino = s.theta;
+      s.arrasto = null;
+    },
+    tecla(passo: number) {
+      s.destino = limitar(s.destino + passo);
+    },
+    parar() {
+      desligar();
+      io.disconnect();
+      document.removeEventListener("visibilitychange", aba);
+    },
+  };
+}
+type Motor = ReturnType<typeof criarMotor>;
+
+/** O que o passo Estampa mostra: posições marcadas (na ordem dos números), técnica e foco do zoom. */
+export type PosicaoPrevia = { chave: string; url?: string; manterFundo?: boolean };
+export type EstampaPrevia = {
+  lado: Lado;
+  onLado: (lado: Lado) => void;
+  posicoes: PosicaoPrevia[];
+  tecnica: Tecnica;
+  foco: { chave: string; n: number }; // a cada posição marcada, n muda e o zoom aproxima nela
 };
-export type EstampaPrevia = { lado: Lado; onLado: (lado: Lado) => void } & Record<Lado, LadoEstampa>;
 
 /** Cor da marca para o marcador: azul-marinho em tecido claro, branco em tecido escuro. */
-function tintaPara(hex: string) {
+export function tintaPara(hex: string) {
   const [r, g, b] = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255);
   const raiz = getComputedStyle(document.documentElement);
   return raiz.getPropertyValue(0.2126 * r + 0.7152 * g + 0.0722 * b > 0.3 ? "--primary" : "--primary-foreground");
 }
 
-function carregar(src: string) {
-  const img = new window.Image(); // "Image" aqui é o do next/image
-  img.src = src;
-  return img.decode().then(() => img);
-}
-
 /**
  * Prévia da peça: a camisa da cor escolhida pendurada no cano, com o cartão embaixo
- * (nome da peça e da cor + vitrine das cores). Gira só arrastando (mouse ou dedo) e
- * para onde soltar. Com `estampa` (passo Estampa) vira a foto parada do lado escolhido
+ * (nome da peça e da cor + vitrine das cores). Gira só arrastando e para onde soltar; balança
+ * como pêndulo no gancho. Com `estampa` (passo Estampa) vira a foto parada do lado escolhido
  * com a arte nas dobras, Frente/Costas e zoom; o cartão some.
  * O cano usa mix-blend-multiply: o palco tem o mesmo fundo do painel para o multiply
  * continuar funcionando quando ele ganha transform.
@@ -70,189 +265,94 @@ export function PreviaPeca({
 }) {
   const painelRef = useRef<HTMLDivElement>(null);
   const palcoRef = useRef<HTMLDivElement>(null);
+  const penduloRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const estampaRef = useRef<HTMLCanvasElement>(null);
   const sombraRef = useRef<HTMLDivElement>(null);
-  const banco = useRef<Banco | null>(null);
-  const mov = useRef({ theta: 0, vel: 0, base: 0, alvo: null as number | null, arrasto: null as { x: number; theta: number } | null, sinal: 1 });
+  const motor = useRef<Motor | null>(null);
   const pan = useRef({ x: 0, y: 0, limite: { x: 0, y: 0 }, arrasto: null as { x: number; y: number } | null });
   const aplicar = useRef(() => {});
   const semGiro = usePoucoMovimento();
 
   const comEstampa = estampa !== undefined;
+  const lado = estampa?.lado ?? "frente";
   const [zoom, setZoom] = useState(1);
-  // Ao entrar ou sair do passo Estampa, o zoom volta para 1×.
+  // Ao entrar ou sair do passo Estampa o zoom volta para 1×; a cada posição marcada, aproxima nela.
   const [estavaComEstampa, setEstavaComEstampa] = useState(comEstampa);
+  const focoN = estampa?.foco.n ?? 0;
+  const [ultimoFoco, setUltimoFoco] = useState(focoN);
   if (estavaComEstampa !== comEstampa) {
     setEstavaComEstampa(comEstampa);
     setZoom(1);
   }
+  if (ultimoFoco !== focoN) {
+    setUltimoFoco(focoN);
+    const a = estampa && areaDe(modelo, lado, estampa.foco.chave);
+    if (a) setZoom(zoomPara(a));
+  }
   const z = comEstampa ? zoom : 1;
-  const lado = estampa?.lado ?? "frente";
-  const ladoAtual = estampa?.[lado];
-  const foco = ladoAtual?.foco ?? "";
-  const areas = ladoAtual?.areas.join(",") ?? "";
-  const arte = ladoAtual?.arte;
+
+  // Posições que aparecem no lado da tela e a área onde o zoom aproxima.
+  const naTela = estampa?.posicoes.filter((p) => areaDe(modelo, lado, p.chave)) ?? [];
+  const foco =
+    estampa && areaDe(modelo, lado, estampa.foco.chave)
+      ? estampa.foco.chave
+      : (naTela.at(-1)?.chave ?? (lado === "frente" ? "frente-inteira" : "costas-inteira"));
+  const tecnica = estampa?.tecnica ?? "DTF";
+  // Tudo o que muda a composição, numa chave estável (o objeto `estampa` muda a cada render).
+  const assinatura = comEstampa ? JSON.stringify({ lado, tecnica, p: naTela.map((p) => [p.chave, p.url ?? "", !!p.manterFundo]) }) : "";
 
   const pasta = `${modelo.coresPasta}${cor.pasta}/`;
   const n = modelo.coresQuadros;
 
-  // Quadro = (N−1)·(1−|θ|); θ < 0 desenha espelhado. Os dois quadros vizinhos se misturam
-  // (o de cima com alfa proporcional) para não pular.
-  const desenhar = useCallback(() => {
-    const b = banco.current;
-    const ctx = canvasRef.current?.getContext("2d");
-    if (!b || !ctx) return;
-    const t = mov.current.theta;
-    const f = (b.n - 1) * (1 - Math.abs(t));
-    const i0 = Math.floor(f);
-    const a = f - i0;
-    const base = b.quadros[i0] ?? b.quadros[b.n - 1];
-    const cima = b.quadros[Math.min(i0 + 1, b.n - 1)];
-    if (!base) return;
-    const { width: w, height: h } = ctx.canvas;
-    ctx.clearRect(0, 0, w, h);
-    ctx.save();
-    if (t < 0) {
-      ctx.translate(w, 0);
-      ctx.scale(-1, 1);
-    }
-    ctx.drawImage(base, 0, 0, w, h);
-    if (a > 0.01 && cima) {
-      ctx.globalAlpha = a;
-      ctx.drawImage(cima, 0, 0, w, h);
-    }
-    ctx.restore();
-    const d = ctx.canvas.dataset;
-    d.theta = t.toFixed(3);
-    d.quadro = String(Math.round(f) + 1);
-    d.espelho = t < 0 ? "1" : "0";
-    d.cor = b.pasta;
-    // A sombra estreita quando a peça fica de lado.
-    if (sombraRef.current) sombraRef.current.style.transform = `scaleX(${1 - 0.4 * Math.abs(t)})`;
+  useEffect(() => {
+    const m = criarMotor(painelRef.current!, canvasRef.current!, penduloRef.current!, sombraRef.current!);
+    motor.current = m;
+    return () => m.parar();
   }, []);
+  useEffect(() => motor.current?.configurar(semGiro, comEstampa), [semGiro, comEstampa]);
+  useEffect(() => motor.current?.escolher(pasta, n), [pasta, n]);
 
-  // Carrega os quadros da peça/cor. O quadro atual fica na tela até todos decodificarem;
-  // aí troca e entra balançando a partir de onde estava. Com movimento reduzido só o de frente.
-  useEffect(() => {
-    let vivo = true;
-    const quadros: HTMLImageElement[] = [];
-    const indices = semGiro ? [n - 1] : Array.from({ length: n }, (_, i) => i);
-    let faltam = indices.length;
-    const pronto = () => {
-      if (!vivo || --faltam > 0) return;
-      const primeiro = banco.current === null;
-      banco.current = { pasta, n, quadros };
-      if (!primeiro && !semGiro) {
-        const s = mov.current;
-        s.sinal *= -1;
-        s.theta = limitar(s.base + IMPULSO * s.sinal);
-        s.vel = 0;
-      }
-      desenhar();
-    };
-    for (const i of indices) {
-      const img = new window.Image();
-      img.fetchPriority = i === n - 1 ? "high" : "low";
-      img.src = `${pasta}${numero(i)}.webp`;
-      img.decode().then(() => {
-        quadros[i] = img;
-        pronto();
-      }, pronto);
-    }
-    return () => {
-      vivo = false;
-    };
-  }, [pasta, n, semGiro, desenhar]);
-
-  // Laço do movimento: segue o arrasto ou fica com mola no θ onde a peça parou (+ balanço leve).
-  // Pausa fora da tela e com a aba oculta. Movimento reduzido e passo Estampa: parada de frente.
-  useEffect(() => {
-    const s = mov.current;
-    if (semGiro || comEstampa) {
-      Object.assign(s, { theta: 0, vel: 0, base: 0, alvo: null, arrasto: null });
-      desenhar();
-      return;
-    }
-    let raf = 0;
-    let antes = 0;
-    let naTela = true;
-    const passo = (agora: number) => {
-      const dt = antes ? Math.min(0.05, (agora - antes) / 1000) : 1 / 60;
-      antes = agora;
-      if (s.alvo !== null) {
-        s.theta += (s.alvo - s.theta) * SEGUE;
-        s.vel = 0;
-      } else {
-        const repouso = s.base + BALANCO * Math.sin((2 * Math.PI * agora) / PERIODO_MS);
-        s.vel += (-MOLA_K * (s.theta - repouso) - MOLA_C * s.vel) * dt;
-        s.theta += s.vel * dt;
-      }
-      s.theta = limitar(s.theta);
-      desenhar();
-      raf = requestAnimationFrame(passo);
-    };
-    const ligar = () => {
-      if (raf || !naTela || document.hidden) return;
-      antes = 0;
-      raf = requestAnimationFrame(passo);
-    };
-    const desligar = () => {
-      cancelAnimationFrame(raf);
-      raf = 0;
-    };
-    const io = new IntersectionObserver(([e]) => {
-      naTela = e.isIntersecting;
-      if (naTela) ligar();
-      else desligar();
-    });
-    if (painelRef.current) io.observe(painelRef.current);
-    const aba = () => (document.hidden ? desligar() : ligar());
-    document.addEventListener("visibilitychange", aba);
-    ligar();
-    return () => {
-      desligar();
-      io.disconnect();
-      document.removeEventListener("visibilitychange", aba);
-    };
-  }, [semGiro, comEstampa, desenhar]);
-
-  // Passo Estampa: foto parada do lado escolhido com a arte (ou o marcador) nas dobras.
-  // Só recalcula quando muda arte, áreas, cor ou lado; a foto anterior fica até a nova sair.
+  // Passo Estampa: foto parada do lado escolhido com as artes (ou marcadores) nas dobras, em 2×,
+  // composta no Worker. Só recalcula quando muda a assinatura, a peça ou a cor; a foto anterior
+  // fica até a nova sair.
   useEffect(() => {
     const ctx = estampaRef.current?.getContext("2d");
     const giro = canvasRef.current;
     if (!ctx || !giro) return;
-    if (!comEstampa) {
+    if (!assinatura) {
       ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
       delete ctx.canvas.dataset.pronto;
       giro.style.visibility = "";
       return;
     }
+    const { lado: l, tecnica: t, p } = JSON.parse(assinatura) as { lado: Lado; tecnica: Tecnica; p: [string, string, boolean][] };
     let vivo = true;
-    const chave = `${cor.pasta}/${lado}/${areas}/${arte ? "arte" : "marcador"}`;
-    Promise.all([
-      carregar(`${modelo.coresPasta}${cor.pasta}/${lado}.webp`),
-      carregar(`${modelo.coresPasta}branco/${lado}.webp`),
-      arte ? carregar(arte).catch(() => null) : null,
-    ]).then(([peca, branco, imagemArte]) => {
-      if (!vivo) return;
-      const camadas = areas
-        .split(",")
-        .map((k) => areaDe(modelo, k))
-        .filter((a): a is Area => a !== undefined)
-        .map((area) => ({ area, arte: imagemArte }));
-      comporEstampa(ctx, peca, branco, camadas, tintaPara(cor.hex), getComputedStyle(document.body).fontFamily);
+    comporEstampa({
+      largura: ctx.canvas.width,
+      altura: ctx.canvas.height,
+      peca: `${modelo.coresPasta}${cor.pasta}/${l}.webp`,
+      branco: `${modelo.coresPasta}branco/${l}.webp`,
+      tecnica: t,
+      camadas: p.map(([chave, url, manter]) => ({ area: areaDe(modelo, l, chave)!, url: url || undefined, manter })),
+      tinta: tintaPara(cor.hex),
+      fonte: getComputedStyle(document.body).fontFamily,
+    }).then(({ bitmap, ms }) => {
+      if (!vivo) return bitmap.close();
+      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+      ctx.drawImage(bitmap, 0, 0);
+      bitmap.close();
       giro.style.visibility = "hidden";
-      ctx.canvas.dataset.pronto = chave;
+      ctx.canvas.dataset.ms = String(ms);
+      ctx.canvas.dataset.pronto = `${cor.pasta}|${assinatura}`;
     }, () => {});
     return () => {
       vivo = false;
     };
-  }, [comEstampa, modelo, cor, lado, areas, arte]);
+  }, [assinatura, modelo, cor]);
 
-  // Enquadramento do palco. No passo Estampa a peça cresce para ocupar o lugar do cartão;
-  // o zoom aproxima no centro da área em foco, levando-a para o meio do painel, e o arrasto move.
+  // Enquadramento do palco. No passo Estampa a peça cresce para ocupar o lugar do cartão, à
+  // esquerda da barra de zoom; o zoom leva o centro da área em foco para o meio, e o arrasto move.
   useEffect(() => {
     pan.current.x = pan.current.y = 0;
   }, [foco, lado, comEstampa]);
@@ -267,11 +367,11 @@ export function PreviaPeca({
       }
       const W = painel.clientWidth, H = painel.clientHeight;
       const cw = tela.offsetWidth, ch = tela.offsetHeight, cl = (W - cw) / 2, ct = tela.offsetTop;
-      // Espaço livre: de 8 px da borda esquerda até 8 px antes da barra de zoom (16 + 44 px).
-      // As peças ocupam até 90% da largura do quadro e terminam a 93,7% da altura.
+      // Espaço livre: de 8 px da borda esquerda até 8 px antes da barra de zoom (16 + 44 px), e
+      // acima da legenda da técnica. As peças vão até 95% da largura do quadro e 93,7% da altura.
       const cx = (W - 60) / 2;
-      const b = Math.min((0.95 * H) / (ct + 0.937 * ch), (W - 76) / 2 / (0.45 * cw));
-      const a = areaDe(modelo, foco) ?? [0.3, 0.27, 0.4, 0.4];
+      const b = Math.min((H - 56) / (ct + 0.937 * ch), (W - 76) / 2 / (0.47 * cw));
+      const a = areaDe(modelo, lado, foco) ?? [0.3, 0.27, 0.4, 0.4];
       const R = { x: cl + (a[0] + a[2] / 2) * cw, y: ct + (a[1] + a[3] / 2) * ch };
       const R1 = { x: cx + (R.x - W / 2) * b, y: R.y * b };
       const S = b * z;
@@ -286,7 +386,7 @@ export function PreviaPeca({
     const ro = new ResizeObserver(() => aplicar.current());
     ro.observe(painel);
     return () => ro.disconnect();
-  }, [comEstampa, z, foco, modelo]);
+  }, [comEstampa, z, foco, lado, modelo]);
 
   // Arrastar (botão apertado ou dedo) gira; com zoom no passo Estampa, move a imagem.
   // Os controles do painel (cartão, Frente/Costas, zoom) ficam fora disso.
@@ -297,7 +397,7 @@ export function PreviaPeca({
       pan.current.arrasto = { x: e.clientX - pan.current.x, y: e.clientY - pan.current.y };
     } else {
       if (semGiro) return;
-      mov.current.arrasto = { x: e.clientX, theta: mov.current.theta };
+      motor.current?.pegar(e.clientX);
     }
     e.currentTarget.setPointerCapture(e.pointerId);
     e.currentTarget.dataset.arrastando = "";
@@ -311,18 +411,10 @@ export function PreviaPeca({
       aplicar.current();
       return;
     }
-    const s = mov.current;
-    if (s.arrasto) s.alvo = limitar(s.arrasto.theta + (e.clientX - s.arrasto.x) / (e.currentTarget.clientWidth / 2));
+    motor.current?.arrastar(e.clientX, e.currentTarget.clientWidth / 2);
   }
-  // Soltou: a peça para onde está (o balanço leve continua em volta desse ponto).
   function soltar(e: React.PointerEvent<HTMLDivElement>) {
-    const s = mov.current;
-    if (s.arrasto) {
-      s.base = s.theta;
-      s.vel = 0;
-    }
-    s.arrasto = null;
-    s.alvo = null;
+    motor.current?.soltar();
     pan.current.arrasto = null;
     delete e.currentTarget.dataset.arrastando;
   }
@@ -331,12 +423,14 @@ export function PreviaPeca({
     const passo = e.key === "ArrowLeft" ? -PASSO_TECLA : e.key === "ArrowRight" ? PASSO_TECLA : 0;
     if (!passo) return;
     e.preventDefault();
-    mov.current.base = limitar(mov.current.base + passo);
+    motor.current?.tecla(passo);
   }
+  const preCarregar = (c: Cor) => motor.current?.preCarregar(`${modelo.coresPasta}${c.pasta}/`, n);
 
   const gira = !comEstampa && !semGiro;
   const limpo = z > 1; // com zoom: sem cano, sem sombra e sem o selo "Prévia"
   const ultimo = numero(n - 1);
+  const posicaoCanvas = "absolute top-[7.77%] left-1/2 h-[54%] w-auto -translate-x-1/2 min-[601px]:top-[8.21%] min-[601px]:h-[59%]";
 
   return (
     <div
@@ -371,31 +465,34 @@ export function PreviaPeca({
             limpo && "opacity-0"
           )}
         />
-        <div
-          ref={sombraRef}
-          aria-hidden
-          className={cn(
-            "absolute top-[57%] left-[33%] h-[3%] w-[34%] rounded-[50%] bg-primary/14 blur-md transition-opacity min-[601px]:top-[62%] min-[601px]:left-[35%] min-[601px]:w-[30%]",
-            limpo && "opacity-0"
-          )}
-        />
-        <canvas
-          ref={canvasRef}
-          width={modelo.largura}
-          height={modelo.altura}
-          role="img"
-          aria-label={`${modelo.nome} na cor ${cor.nome}`}
-          aria-hidden={comEstampa || undefined}
-          className="absolute top-[7.77%] left-1/2 h-[54%] w-auto -translate-x-1/2 min-[601px]:top-[8.21%] min-[601px]:h-[59%]"
-        />
+        {/* Pêndulo: peça e sombra giram em torno do gancho (no eixo do cano). */}
+        <div ref={penduloRef} className="absolute inset-0 origin-[50%_11.31%] min-[601px]:origin-[50%_12.08%]">
+          <div
+            ref={sombraRef}
+            aria-hidden
+            className={cn(
+              "absolute top-[57%] left-[33%] h-[3%] w-[34%] rounded-[50%] bg-primary/14 blur-md transition-opacity min-[601px]:top-[62%] min-[601px]:left-[35%] min-[601px]:w-[30%]",
+              limpo && "opacity-0"
+            )}
+          />
+          <canvas
+            ref={canvasRef}
+            width={modelo.largura}
+            height={modelo.altura}
+            role="img"
+            aria-label={`${modelo.nome} na cor ${cor.nome}`}
+            aria-hidden={comEstampa || undefined}
+            className={posicaoCanvas}
+          />
+        </div>
         <canvas
           ref={estampaRef}
-          width={900}
-          height={1200}
+          width={1800}
+          height={2400}
           role="img"
-          aria-label={`${modelo.nome} na cor ${cor.nome}, ${lado === "frente" ? "frente" : "costas"}${areas ? (arte ? ", com a sua arte" : ", com o lugar da arte marcado") : ""}`}
+          aria-label={`${modelo.nome} na cor ${cor.nome}, ${lado === "frente" ? "frente" : "costas"}${naTela.length ? `, com ${naTela.length} ${naTela.length > 1 ? "estampas" : "estampa"}` : ""}`}
           aria-hidden={!comEstampa || undefined}
-          className="absolute top-[7.77%] left-1/2 h-[54%] w-auto -translate-x-1/2 min-[601px]:top-[8.21%] min-[601px]:h-[59%]"
+          className={posicaoCanvas}
         />
       </div>
 
@@ -447,6 +544,11 @@ export function PreviaPeca({
               <MinusIcon />
             </Button>
           </div>
+
+          {/* Legenda da técnica no rodapé da prévia. */}
+          <p data-controle className="absolute inset-x-3 bottom-3 rounded-xl bg-background/85 px-3 py-1.5 text-center text-xs text-muted-foreground backdrop-blur-sm">
+            <span className="font-semibold text-foreground">{estampa.tecnica}</span> · {FRASE_TECNICA[estampa.tecnica]}
+          </p>
         </>
       )}
 
@@ -466,6 +568,9 @@ export function PreviaPeca({
                   aria-pressed={ativa}
                   aria-label={c.nome}
                   onClick={() => onCor(c)}
+                  onPointerEnter={() => preCarregar(c)}
+                  onPointerDown={() => preCarregar(c)}
+                  onFocus={() => preCarregar(c)}
                   className="flex min-h-11 flex-col items-center justify-end gap-1 rounded-xl pb-1 outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
                 >
                   <Image

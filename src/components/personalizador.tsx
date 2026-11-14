@@ -2,76 +2,57 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { CheckIcon, InfoIcon, MinusIcon, PlusIcon, UploadIcon } from "lucide-react";
+import { CheckIcon, DownloadIcon, InfoIcon, MinusIcon, PlusIcon, Share2Icon } from "lucide-react";
 
 import { Arara, CORES, MODELOS, usePoucoMovimento, type Cor } from "@/components/arara";
 import { Container, Destaque, Eyebrow, Seta, Titulo } from "@/components/blocos";
-import { PreviaPeca, type EstampaPrevia, type LadoEstampa } from "@/components/previa-peca";
+import {
+  conflitos,
+  juntar,
+  LinhaPosicao,
+  ListaPosicoes,
+  MapaPosicoes,
+  medidaDe,
+  NOME,
+  pecas,
+  temPosicao,
+  type Arte,
+  type Posicao,
+} from "@/components/posicoes";
+import { PreviaPeca, tintaPara, type EstampaPrevia } from "@/components/previa-peca";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { areaDe, type Lado } from "@/lib/estampa";
+import { areaDe, FRASE_TECNICA, TECNICAS, type InfoArte, type Lado, type Tecnica } from "@/lib/estampa";
+import { analisarArte } from "@/lib/estampa-cliente";
+import { gerarFicha, nomeFicha } from "@/lib/ficha";
 import { cn } from "@/lib/utils";
 import { linkWhatsApp } from "@/lib/whim";
 
 const PECAS = MODELOS.map((m) => m.nome);
 // As cores do tecido vêm do manifesto da arara (CORES), as mesmas dos quadros pintados.
-const LOCAIS = ["Frente", "Costas", "Frente e costas"];
-const TECNICAS = ["Silk", "DTF", "Bordado", "Ainda não sei"];
 const MINIMO = 50;
 
-// Posições do nicho (referencia/previa-cor/README-estampa.md, 2.1); as chaves são as de
-// manifest.pecas[].areasEstampa. "Esquerdo" é o lado de quem veste (à direita de quem olha).
-const POSICOES: Record<Lado, [string, string][]> = {
-  frente: [
-    ["peito-esquerdo", "Peito esquerdo"],
-    ["peito-direito", "Peito direito"],
-    ["centro-peito", "Centro do peito"],
-    ["frente-inteira", "Frente inteira"],
-  ],
-  costas: [
-    ["nuca", "Nuca"],
-    ["costas-em-cima", "Costas em cima"],
-    ["costas-inteira", "Costas inteira"],
-  ],
-};
-const MANGAS: [string, string][] = [
-  ["manga-esquerda", "Manga esquerda"],
-  ["manga-direita", "Manga direita"],
-];
-const PADRAO: Record<Lado, string> = { frente: "peito-esquerdo", costas: "costas-inteira" };
-const NOME = Object.fromEntries([...POSICOES.frente, ...POSICOES.costas, ...MANGAS]);
-
-const ARTE_TIPOS = ["image/png", "image/jpeg", "image/webp", "image/svg+xml"];
-const ARTE_MAX = 10 * 1024 * 1024;
-
 type Tamanho = { nome: string; qtd: number; extra?: boolean };
-type Arte = { arquivo: File; url: string }; // URL local (blob:), só no navegador
 type Pedido = {
   peca: string;
   cor: Cor;
-  local: string;
-  posicao: Record<Lado, string>;
-  mangas: string[];
-  artes: Partial<Record<Lado, Arte>>; // só para a prévia, nada vai para servidor
-  tecnica: string;
+  posicoes: Posicao[]; // na ordem em que foram marcadas (= números do mapa)
+  tecnica: Tecnica;
   tamanhos: Tamanho[];
 };
 
 const INICIAL: Pedido = {
   peca: PECAS[0],
   cor: CORES[1],
-  local: LOCAIS[0],
-  posicao: PADRAO,
-  mangas: [],
-  artes: {},
+  posicoes: [],
   tecnica: TECNICAS[0],
   tamanhos: ["P", "M", "G", "GG"].map((nome) => ({ nome, qtd: 0 })),
 };
 
 const modeloDe = (peca: string) => MODELOS.find((m) => m.nome === peca) ?? MODELOS[0];
-const temArea = (peca: string, chave: string) => areaDe(modeloDe(peca), chave) !== undefined;
+type Ficha = { chave: string; url: string; arquivo: File; compartilhavel: boolean };
 
 export function Personalizador() {
   const [pedido, setPedido] = useState(INICIAL);
@@ -79,68 +60,73 @@ export function Personalizador() {
   const [alcancado, setAlcancado] = useState(0); // passo mais longe já atingido
   const [antes, setAntes] = useState<Pedido | null>(null); // para "Cancelar" a edição de um passo feito
   const [lado, setLado] = useState<Lado>("frente"); // lado na prévia do passo Estampa
+  const [foco, setFoco] = useState({ chave: "", n: 0 }); // última posição marcada (zoom da prévia)
   const [aviso, setAviso] = useState("");
+  const [infos, setInfos] = useState<Record<string, InfoArte>>({}); // análise de cada arte, por URL
+  const [ficha, setFicha] = useState<Ficha | null>(null);
   const tituloRef = useRef<HTMLParagraphElement>(null);
+  const previaRef = useRef<HTMLDivElement>(null);
   const focar = useRef(false);
   const semGiro = usePoucoMovimento();
 
-  const { peca, cor, local, posicao, mangas, artes, tecnica, tamanhos } = pedido;
+  const { peca, cor, posicoes, tecnica, tamanhos } = pedido;
   const mudar = (parcial: Partial<Pedido>) => setPedido((p) => ({ ...p, ...parcial }));
   const modelo = modeloDe(peca);
-  const urlFrente = artes.frente?.url;
-  const urlCostas = artes.costas?.url;
+  const numeros = new Map(posicoes.map((p, i) => [p.chave, i + 1]));
+  const comQtd = tamanhos.filter((t) => t.qtd > 0);
+  const total = comQtd.reduce((s, t) => s + t.qtd, 0);
+  const listaTamanhos = comQtd.map((t) => `${t.nome} ${t.qtd}`).join(", ");
+  const temArte = posicoes.some((p) => p.arte);
 
   // Libera as URLs das artes que saíram do pedido (trocar, remover) e do rascunho do "Cancelar";
   // ao sair da página, todas.
   const urls = useRef(new Set<string>());
   useEffect(() => {
-    const usadas = new Set([pedido, antes].flatMap((p) => Object.values(p?.artes ?? {}).flatMap((a) => (a ? [a.url] : []))));
+    const usadas = new Set([pedido, antes].flatMap((p) => (p?.posicoes ?? []).flatMap((x) => (x.arte ? [x.arte.url] : []))));
     for (const u of urls.current) if (!usadas.has(u)) URL.revokeObjectURL(u);
     urls.current = usadas;
   }, [pedido, antes]);
   useEffect(() => () => urls.current.forEach((u) => URL.revokeObjectURL(u)), []);
 
-  const temFrente = local !== "Costas";
-  const temCostas = local !== "Frente";
-  const temMangas = MANGAS.some(([k]) => temArea(peca, k));
-  const usaArteFrente = temFrente || mangas.length > 0; // as mangas usam a arte da frente
-  const temArte = (usaArteFrente && !!artes.frente) || (temCostas && !!artes.costas);
-  const comQtd = tamanhos.filter((t) => t.qtd > 0);
-  const total = comQtd.reduce((s, t) => s + t.qtd, 0);
-  const listaTamanhos = comQtd.map((t) => `${t.nome} ${t.qtd}`).join(", ");
-
-  const ondeEstampa = [temFrente && `frente (${NOME[posicao.frente]})`, temCostas && `costas (${NOME[posicao.costas]})`]
-    .filter(Boolean)
-    .join(" e ");
-  const estampaTexto = `${ondeEstampa.charAt(0).toUpperCase()}${ondeEstampa.slice(1)} · ${tecnica}`;
   const resumo = [
     "Olá, Whim! Montei minha peça no site:",
-    `• Peça: ${peca}`,
-    `• Cor: ${cor.nome}`,
-    `• Estampa: ${estampaTexto}`,
-    mangas.length > 0 && `• Mangas: ${mangas.map((k) => NOME[k]).join(", ")}`,
-    temArte && "• Arte: vou anexar aqui na conversa",
-    `• Tamanhos: ${listaTamanhos || "a definir"}`,
-    `• Total: ${total} peças`,
+    `• Peça: ${peca} · Cor: ${cor.nome}`,
+    `• Técnica: ${tecnica}`,
+    posicoes.length
+      ? ["• Estampas:", ...posicoes.map((p, i) => `  ${i + 1}. ${NOME[p.chave]} (${medidaDe(p.chave)}): ${p.arte?.arquivo.name ?? "arte a enviar"}`)].join("\n")
+      : "• Estampas: a definir",
+    `• Tamanhos: ${listaTamanhos || "a definir"} · Total: ${pecas(total)}`,
+    "Vou mandar a ficha e os arquivos aqui na conversa.",
     "Podem me passar o orçamento?",
-  ]
-    .filter(Boolean)
-    .join("\n");
+  ].join("\n");
 
-  // Trocar a peça mantém cor, estampa e tamanhos; posição que a peça nova não tem volta ao padrão.
+  // Trocar a peça mantém cor, estampa e tamanhos; posição que a peça nova não tem sai, com aviso.
   function trocarPeca(nova: string) {
-    const notas: string[] = [];
-    const pos = { ...posicao };
-    for (const l of ["frente", "costas"] as const)
-      if (!temArea(nova, pos[l])) {
-        if (l === "frente" ? temFrente : temCostas)
-          notas.push(`não tem ${NOME[pos[l]].toLowerCase()}: a posição ${l === "frente" ? "da frente" : "das costas"} voltou para ${NOME[PADRAO[l]]}`);
-        pos[l] = PADRAO[l];
-      }
-    const mangasOk = mangas.filter((k) => temArea(nova, k));
-    if (mangasOk.length < mangas.length) notas.push("não tem mangas: a estampa nas mangas saiu");
-    setAviso(notas.length ? `${nova} ${notas.join("; ")}.` : "");
-    mudar({ peca: nova, posicao: pos, mangas: mangasOk });
+    const m = modeloDe(nova);
+    const saem = posicoes.filter((p) => !temPosicao(m, p.chave));
+    setAviso(saem.length ? `${nova} não tem ${juntar(saem.map((p) => NOME[p.chave].toLowerCase()))}: ${saem.length > 1 ? "essas posições saíram" : "essa posição saiu"}.` : "");
+    mudar({ peca: nova, posicoes: posicoes.filter((p) => temPosicao(m, p.chave)) });
+  }
+
+  // Mapa e lista: marcar tira o que se sobrepõe (com aviso), leva a prévia para o lado e aproxima.
+  function alternar(chave: string, l: Lado) {
+    if (numeros.has(chave)) {
+      mudar({ posicoes: posicoes.filter((p) => p.chave !== chave) });
+      setAviso("");
+      return;
+    }
+    const saem = conflitos(chave).filter((k) => numeros.has(k));
+    mudar({ posicoes: [...posicoes.filter((p) => !saem.includes(p.chave)), { chave }] });
+    setAviso(saem.length ? `${NOME[chave]} não combina com ${juntar(saem.map((k) => NOME[k]))}, que ${saem.length > 1 ? "saíram" : "saiu"}.` : "");
+    setLado(l);
+    setFoco((f) => ({ chave, n: f.n + 1 }));
+  }
+  function mudarPosicao(chave: string, parcial: Partial<Posicao>) {
+    mudar({ posicoes: posicoes.map((p) => (p.chave === chave ? { ...p, ...parcial } : p)) });
+  }
+  function anexar(chave: string, arte?: Arte, manterFundo?: boolean) {
+    mudarPosicao(chave, { arte, manterFundo });
+    if (arte && !infos[arte.url]) analisarArte(arte.url).then((info) => setInfos((x) => ({ ...x, [arte.url]: info })), () => {});
   }
 
   // ToggleGroup deixa desmarcar tudo; ignoramos o valor vazio para sempre ter uma escolha.
@@ -169,42 +155,82 @@ export function Personalizador() {
     ir(alcancado);
   }
   const editando = passo < alcancado;
+  const celular = () => matchMedia("(max-width: 1023px)").matches;
 
   // Foco no título do passo aberto; no celular a página rola até ele.
   useEffect(() => {
     const el = tituloRef.current;
     if (!focar.current || !el) return;
     focar.current = false;
-    const celular = matchMedia("(max-width: 1023px)").matches;
-    el.focus({ preventScroll: celular });
-    if (celular) el.scrollIntoView({ block: "start", behavior: semGiro ? "auto" : "smooth" });
+    el.focus({ preventScroll: celular() });
+    if (celular()) el.scrollIntoView({ block: "start", behavior: semGiro ? "auto" : "smooth" });
   }, [passo, semGiro]);
+
+  // Ficha em PNG para a equipe da Whim, gerada ao chegar no Resumo (e a cada mudança).
+  const chaveFicha =
+    passo === 4
+      ? JSON.stringify({ peca, cor: cor.pasta, tecnica, t: listaTamanhos, total, p: posicoes.map((p) => [p.chave, p.arte?.url ?? "", p.arte?.arquivo.name ?? "", !!p.manterFundo]) })
+      : "";
+  const fichaUrl = useRef("");
+  useEffect(() => {
+    if (!chaveFicha) return;
+    const d = JSON.parse(chaveFicha) as { peca: string; cor: string; tecnica: Tecnica; t: string; total: number; p: [string, string, string, boolean][] };
+    const m = modeloDe(d.peca);
+    const c = CORES.find((x) => x.pasta === d.cor) ?? CORES[0];
+    let vivo = true;
+    gerarFicha({
+      modelo: m,
+      cor: c,
+      tecnica: d.tecnica,
+      tamanhos: d.t || "a definir",
+      total: d.total,
+      tinta: tintaPara(c.hex),
+      linhas: d.p.map(([chave, url, arquivo, manterFundo], i) => ({
+        numero: i + 1,
+        chave,
+        nome: NOME[chave],
+        medida: medidaDe(chave),
+        url: url || undefined,
+        arquivo: arquivo || undefined,
+        manterFundo,
+      })),
+    }).then((blob) => {
+      if (!vivo) return;
+      const arquivo = new File([blob], nomeFicha(m.id), { type: "image/png" });
+      const url = URL.createObjectURL(blob);
+      if (fichaUrl.current) URL.revokeObjectURL(fichaUrl.current);
+      fichaUrl.current = url;
+      const compartilhavel = matchMedia("(pointer: coarse)").matches && !!navigator.canShare?.({ files: [arquivo] });
+      setFicha({ chave: chaveFicha, url, arquivo, compartilhavel });
+    }, () => {});
+    return () => {
+      vivo = false;
+    };
+  }, [chaveFicha]);
+  useEffect(() => () => URL.revokeObjectURL(fichaUrl.current), []);
+  const fichaPronta = ficha !== null && ficha.chave === chaveFicha;
+  function baixarFicha() {
+    if (!ficha) return;
+    const a = document.createElement("a");
+    a.href = ficha.url;
+    a.download = ficha.arquivo.name;
+    a.click();
+  }
 
   // Ficha do pedido: nome do passo, o valor quando feito e o texto de quando ainda vem depois.
   const passos = [
     { nome: "Peça", valor: peca, depois: "Modelo da arara" },
     { nome: "Cor", valor: cor.nome, depois: "Na vitrine da prévia" },
-    { nome: "Estampa", valor: `${estampaTexto}${mangas.length ? " + mangas" : ""}`, depois: "Local, posição e arte" },
-    { nome: "Quantidade", valor: `${total} peças${listaTamanhos ? ` · ${listaTamanhos}` : ""}`, depois: `A partir de ${MINIMO} peças` },
-    { nome: "Resumo", valor: "", depois: "Enviar pelo WhatsApp" },
+    { nome: "Estampa", valor: `${posicoes.length ? posicoes.map((p) => NOME[p.chave]).join(", ") : "A definir"} · ${tecnica}`, depois: "Posições, artes e técnica" },
+    { nome: "Quantidade", valor: `${pecas(total)}${listaTamanhos ? ` · ${listaTamanhos}` : ""}`, depois: `A partir de ${MINIMO} peças` },
+    { nome: "Resumo", valor: "", depois: "Ficha e WhatsApp" },
   ];
   const ultimo = passos.length - 1;
 
-  // Prévia no passo Estampa: o que cada lado mostra e onde o zoom aproxima.
-  const ladoEstampa = (l: Lado): LadoEstampa => {
-    const ativo = l === "frente" ? temFrente : temCostas;
-    const areas = [...(ativo ? [posicao[l]] : []), ...(l === "frente" ? mangas : [])];
-    return { areas, foco: areas[0] ?? (l === "frente" ? "frente-inteira" : "costas-inteira"), arte: l === "frente" ? urlFrente : urlCostas };
-  };
   const estampa: EstampaPrevia | undefined =
-    passo === 2 ? { lado, onLado: setLado, frente: ladoEstampa("frente"), costas: ladoEstampa("costas") } : undefined;
-
-  const avisoArte = (
-    <p className="mt-3.5 flex gap-2.5 rounded-[14px] bg-muted p-3.5 text-[13px]">
-      <InfoIcon aria-hidden className="mt-px size-4 shrink-0 text-accent" />
-      A arte aqui é só para a prévia. Na hora de enviar o pedido pelo WhatsApp, anexe o arquivo na conversa.
-    </p>
-  );
+    passo === 2
+      ? { lado, onLado: setLado, posicoes: posicoes.map((p) => ({ chave: p.chave, url: p.arte?.url, manterFundo: p.manterFundo })), tecnica, foco }
+      : undefined;
 
   function conteudo(i: number) {
     switch (i) {
@@ -233,86 +259,53 @@ export function Personalizador() {
       case 2:
         return (
           <>
-            <p className="text-sm text-muted-foreground">Onde e como vamos estampar.</p>
+            <p className="text-sm text-muted-foreground">
+              <span className="pointer-coarse:hidden">Clique onde vai a estampa.</span>
+              <span className="hidden pointer-coarse:inline">Toque onde vai a estampa.</span> Dá para marcar mais de uma posição.
+            </p>
             {aviso && (
               <p role="status" className="mt-3 rounded-[14px] bg-muted px-3.5 py-2.5 text-[13px]">
                 {aviso}
               </p>
             )}
-            <Grupo rotulo="Lado">
-              <ToggleGroup
-                aria-label="Lado"
-                value={[local]}
-                onValueChange={escolha((v) => {
-                  mudar({ local: v });
-                  if (v !== "Frente e costas") setLado(v === "Frente" ? "frente" : "costas");
-                })}
-                className="flex-wrap"
-              >
-                {LOCAIS.map((l) => (
-                  <Opcao key={l} value={l}>{l}</Opcao>
-                ))}
-              </ToggleGroup>
-            </Grupo>
-            {(["frente", "costas"] as const).map(
-              (l) =>
-                (l === "frente" ? temFrente : temCostas) && (
-                  <Grupo key={l} rotulo={l === "frente" ? "Posição na frente" : "Posição nas costas"}>
-                    <ToggleGroup
-                      aria-label={l === "frente" ? "Posição na frente" : "Posição nas costas"}
-                      value={[posicao[l]]}
-                      onValueChange={escolha((v) => {
-                        mudar({ posicao: { ...posicao, [l]: v } });
-                        setLado(l);
-                      })}
-                      className="flex-wrap"
-                    >
-                      {POSICOES[l]
-                        .filter(([k]) => temArea(peca, k))
-                        .map(([k, nome]) => (
-                          <Opcao key={k} value={k}>{nome}</Opcao>
-                        ))}
-                    </ToggleGroup>
-                  </Grupo>
-                )
-            )}
-            {temMangas && (
-              <Grupo rotulo="Mangas (opcional)">
-                <div className="flex flex-wrap gap-x-5">
-                  {MANGAS.map(([k, nome]) => (
-                    <label key={k} className="flex min-h-11 cursor-pointer items-center gap-2.5 text-[13.5px]">
-                      <Checkbox
-                        checked={mangas.includes(k)}
-                        onCheckedChange={(marcada) => {
-                          mudar({ mangas: marcada ? [...mangas, k] : mangas.filter((m) => m !== k) });
-                          setLado("frente");
-                        }}
-                        className="size-5"
-                      />
-                      {nome}
-                    </label>
+            <div className="mt-3.5">
+              <MapaPosicoes modelo={modelo} cor={cor} numeros={numeros} onAlternar={alternar} />
+            </div>
+            <ListaPosicoes modelo={modelo} numeros={numeros} onAlternar={alternar} />
+            {posicoes.length > 0 && (
+              <>
+                <ol aria-label="Posições marcadas" className="mt-5 grid gap-4 border-t border-primary/10 pt-4">
+                  {posicoes.map((p, j) => (
+                    <LinhaPosicao
+                      key={p.chave}
+                      numero={j + 1}
+                      posicao={p}
+                      area={areaDe(modelo, "frente", p.chave) ?? areaDe(modelo, "costas", p.chave)}
+                      info={p.arte && infos[p.arte.url]}
+                      tecnica={tecnica}
+                      outras={posicoes.flatMap((o, k) => (k !== j && o.arte ? [{ numero: k + 1, posicao: o }] : []))}
+                      onArte={(arte, manterFundo) => anexar(p.chave, arte, manterFundo)}
+                      onManterFundo={(manterFundo) => mudarPosicao(p.chave, { manterFundo })}
+                      onVerDTF={() => mudar({ tecnica: "DTF" })}
+                    />
                   ))}
-                </div>
-                <p className="text-[13px] text-muted-foreground">As mangas usam a arte da frente.</p>
-              </Grupo>
+                </ol>
+                <p className="mt-3 text-[13px] text-muted-foreground">Medidas de referência. A Whim confirma no orçamento.</p>
+                <p className="mt-3.5 flex gap-2.5 rounded-[14px] bg-muted p-3.5 text-[13px]">
+                  <InfoIcon aria-hidden className="mt-px size-4 shrink-0 text-accent" />
+                  A arte aqui é só para a prévia. Na hora de enviar o pedido pelo WhatsApp, anexe o arquivo na conversa.
+                </p>
+              </>
             )}
-            <Grupo rotulo="Técnica">
-              <ToggleGroup aria-label="Técnica" value={[tecnica]} onValueChange={escolha((v) => mudar({ tecnica: v }))} className="flex-wrap">
+            <div className="mt-5 grid gap-2">
+              <p className="text-[13px] font-medium">Técnica</p>
+              <ToggleGroup aria-label="Técnica" value={[tecnica]} onValueChange={escolha((v) => mudar({ tecnica: v as Tecnica }))} className="flex-wrap">
                 {TECNICAS.map((t) => (
                   <Opcao key={t} value={t}>{t}</Opcao>
                 ))}
               </ToggleGroup>
-            </Grupo>
-            <div className="mt-5 grid gap-4">
-              {usaArteFrente && (
-                <CampoArte id="arte-frente" rotulo="Arte da frente" arte={artes.frente} onArte={(a) => mudar({ artes: { ...artes, frente: a } })} />
-              )}
-              {temCostas && (
-                <CampoArte id="arte-costas" rotulo="Arte das costas" arte={artes.costas} onArte={(a) => mudar({ artes: { ...artes, costas: a } })} />
-              )}
+              <p className="text-[13px] text-muted-foreground">{FRASE_TECNICA[tecnica]}</p>
             </div>
-            <p className="mt-2 text-[13px] text-muted-foreground">PNG com fundo transparente fica melhor.</p>
-            {avisoArte}
           </>
         );
       case 3:
@@ -325,7 +318,7 @@ export function Personalizador() {
             <div aria-live="polite" className="mt-4 border-t border-primary/10 pt-3.5">
               <p className="flex justify-between font-semibold">
                 <span>Total</span>
-                <span className="tabular-nums">{total} peças</span>
+                <span className="tabular-nums">{pecas(total)}</span>
               </p>
               {total < MINIMO && (
                 <p className="mt-1 text-sm text-destructive">
@@ -338,8 +331,42 @@ export function Personalizador() {
       default:
         return (
           <>
-            <p className="rounded-2xl bg-muted p-[18px] text-sm whitespace-pre-wrap">{resumo}</p>
-            {temArte && avisoArte}
+            <p className="rounded-2xl bg-muted p-[18px] text-sm wrap-anywhere whitespace-pre-wrap">{resumo}</p>
+            <div className="mt-3.5 rounded-2xl border border-primary/12 p-3">
+              <p className="text-[13px] font-medium">Ficha da estampa para a equipe da Whim</p>
+              {fichaPronta ? (
+                <Image
+                  src={ficha.url}
+                  alt={`Ficha da estampa: ${peca}, ${cor.nome}, ${tecnica}, ${posicoes.length} ${posicoes.length === 1 ? "posição" : "posições"}`}
+                  width={1600}
+                  height={1000}
+                  unoptimized
+                  className="mt-2 h-auto w-full rounded-lg border border-primary/10"
+                />
+              ) : (
+                <Skeleton className="mt-2 aspect-[16/10] w-full rounded-lg" />
+              )}
+              <div className="mt-3 flex flex-wrap gap-2">
+                <Button variant="outline" size="xl" disabled={!fichaPronta} onClick={baixarFicha} className="flex-1">
+                  <DownloadIcon data-icon="inline-start" /> Baixar ficha
+                </Button>
+                {fichaPronta && ficha.compartilhavel && (
+                  <Button
+                    variant="outline"
+                    size="xl"
+                    onClick={() => navigator.share({ files: [ficha.arquivo], title: "Ficha da estampa" }).catch(() => {})}
+                    className="flex-1"
+                  >
+                    <Share2Icon data-icon="inline-start" /> Compartilhar ficha
+                  </Button>
+                )}
+              </div>
+            </div>
+            <ol className="mt-3.5 grid list-inside list-decimal gap-1 text-sm marker:font-semibold marker:text-accent">
+              <li>Baixe ou compartilhe a ficha.</li>
+              <li>Envie a mensagem pelo WhatsApp.</li>
+              <li>Na conversa, anexe a ficha{temArte ? " e os arquivos das artes" : ""}.</li>
+            </ol>
             <a
               href={linkWhatsApp(resumo)}
               target="_blank"
@@ -362,7 +389,7 @@ export function Personalizador() {
             Escolha na arara <Destaque>e personalize.</Destaque>
           </Titulo>
 
-          {/* Arara: atalho para a escolha da peça (no começo, leva direto ao passo da cor). */}
+          {/* Arara: um clique ou toque já escolhe a peça (no começo, leva ao passo da cor). */}
           <div className="mt-10">
             <Arara
               selecionada={peca}
@@ -374,6 +401,12 @@ export function Personalizador() {
                   setAlcancado(1);
                   setAntes(null);
                 }
+                // No celular, rola suave até a prévia se ela não estiver inteira na tela.
+                const el = previaRef.current;
+                if (el && !semGiro && celular()) {
+                  const r = el.getBoundingClientRect();
+                  if (r.top < 0 || r.bottom > innerHeight) el.scrollIntoView({ behavior: "smooth", block: "center" });
+                }
               }}
             />
           </div>
@@ -381,7 +414,9 @@ export function Personalizador() {
       </section>
 
       <Container className="grid items-start gap-8 pt-3 pb-7 sm:pt-8 sm:pb-10 lg:grid-cols-[1.2fr_0.8fr] lg:gap-[clamp(20px,4vw,48px)]">
-        <PreviaPeca modelo={modelo} cor={cor} onCor={(c) => mudar({ cor: c })} estampa={estampa} />
+        <div ref={previaRef} className="min-w-0">
+          <PreviaPeca modelo={modelo} cor={cor} onCor={(c) => mudar({ cor: c })} estampa={estampa} />
+        </div>
 
         {/* Ficha do pedido: 5 passos numa linha vertical (feito, atual, depois). */}
         <div className="min-w-0">
@@ -395,7 +430,7 @@ export function Personalizador() {
                   key={p.nome}
                   aria-current={estado === "atual" ? "step" : undefined}
                   data-estado={estado}
-                  className="grid grid-cols-[26px_1fr] gap-x-3.5 min-[601px]:grid-cols-[30px_1fr] min-[601px]:gap-x-4"
+                  className="grid grid-cols-[26px_minmax(0,1fr)] gap-x-3.5 min-[601px]:grid-cols-[30px_minmax(0,1fr)] min-[601px]:gap-x-4"
                 >
                   <div className="flex flex-col items-center">
                     <span
@@ -484,95 +519,6 @@ function Opcao(props: React.ComponentProps<typeof ToggleGroupItem>) {
       className="h-auto min-h-11 rounded-[14px] px-4 text-[13.5px] aria-pressed:border-primary"
       {...props}
     />
-  );
-}
-
-function Grupo({ rotulo, children }: { rotulo: string; children: React.ReactNode }) {
-  return (
-    <div className="mt-4 grid gap-2">
-      <p className="text-[13px] font-medium">{rotulo}</p>
-      {children}
-    </div>
-  );
-}
-
-/** Campo da arte: arrastar e soltar no PC, tocar para escolher no celular. Só fica no navegador. */
-function CampoArte({ id, rotulo, arte, onArte }: { id: string; rotulo: string; arte?: Arte; onArte: (a?: Arte) => void }) {
-  const inputRef = useRef<HTMLInputElement>(null);
-  const [erro, setErro] = useState("");
-  const [sobre, setSobre] = useState(false);
-
-  function escolher(f?: File) {
-    if (!f) return;
-    if (!ARTE_TIPOS.includes(f.type)) return setErro("Use PNG, JPG, WebP ou SVG.");
-    if (f.size > ARTE_MAX) return setErro("A arte passa de 10 MB. Mande o arquivo direto pelo WhatsApp.");
-    setErro("");
-    onArte({ arquivo: f, url: URL.createObjectURL(f) });
-  }
-  const input = (
-    <input
-      ref={inputRef}
-      id={id}
-      type="file"
-      accept={ARTE_TIPOS.join(",")}
-      className="sr-only"
-      onChange={(e) => {
-        escolher(e.target.files?.[0]);
-        e.target.value = "";
-      }}
-    />
-  );
-
-  return (
-    <div>
-      {arte ? (
-        <div className="rounded-[14px] border border-primary/12 p-2.5">
-          <p className="mb-2 text-[13px] font-medium">{rotulo}</p>
-          <div className="flex items-center gap-3">
-            <Image src={arte.url} alt="" width={48} height={48} unoptimized className="size-12 shrink-0 rounded-lg bg-muted object-contain" />
-            <p className="min-w-0 flex-1 truncate text-sm">{arte.arquivo.name}</p>
-          </div>
-          <div className="mt-2 flex gap-2">
-            <Button variant="outline" onClick={() => inputRef.current?.click()} aria-label={`Trocar ${rotulo.toLowerCase()}`} className="min-h-11 flex-1">
-              Trocar
-            </Button>
-            <Button variant="ghost" onClick={() => onArte(undefined)} aria-label={`Remover ${rotulo.toLowerCase()}`} className="min-h-11 flex-1">
-              Remover
-            </Button>
-          </div>
-          {input}
-        </div>
-      ) : (
-        <label
-          htmlFor={id}
-          onDragOver={(e) => {
-            e.preventDefault();
-            setSobre(true);
-          }}
-          onDragLeave={() => setSobre(false)}
-          onDrop={(e) => {
-            e.preventDefault();
-            setSobre(false);
-            escolher(e.dataTransfer.files[0]);
-          }}
-          className={cn(
-            "flex min-h-[88px] cursor-pointer flex-col items-center justify-center gap-1 rounded-[14px] border border-dashed border-primary/25 p-4 text-center text-[13px] text-muted-foreground has-focus-visible:ring-3 has-focus-visible:ring-ring/50",
-            sobre && "border-accent bg-accent/10"
-          )}
-        >
-          <span className="font-medium text-foreground">{rotulo}</span>
-          <UploadIcon aria-hidden className="my-0.5 size-5" />
-          <span className="pointer-coarse:hidden">Arraste a arte aqui ou clique para escolher</span>
-          <span className="hidden pointer-coarse:inline">Toque para escolher a arte</span>
-          {input}
-        </label>
-      )}
-      {erro && (
-        <p role="alert" className="mt-1.5 text-[13px] text-destructive">
-          {erro}
-        </p>
-      )}
-    </div>
   );
 }
 
