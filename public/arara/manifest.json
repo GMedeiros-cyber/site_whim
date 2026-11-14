@@ -13,62 +13,6 @@
       "coresPasta": "/arara/camiseta/cores/",
       "coresQuadros": 26,
       "costas": "costas.webp",
-      "areasEstampa": {
-        "peito-esquerdo": [
-          0.5648,
-          0.2701,
-          0.1296,
-          0.0972
-        ],
-        "peito-direito": [
-          0.3056,
-          0.2701,
-          0.1296,
-          0.0972
-        ],
-        "centro-peito": [
-          0.392,
-          0.2774,
-          0.216,
-          0.1465
-        ],
-        "frente-inteira": [
-          0.3056,
-          0.2774,
-          0.3888,
-          0.3956
-        ],
-        "manga-direita": [
-          0.1576,
-          0.2986,
-          0.0592,
-          0.0444
-        ],
-        "manga-esquerda": [
-          0.7799,
-          0.2986,
-          0.0592,
-          0.0444
-        ],
-        "nuca": [
-          0.4456,
-          0.2351,
-          0.1067,
-          0.0439
-        ],
-        "costas-em-cima": [
-          0.3229,
-          0.2644,
-          0.352,
-          0.1171
-        ],
-        "costas-inteira": [
-          0.3069,
-          0.279,
-          0.384,
-          0.4097
-        ]
-      },
       "areas": {
         "frente": {
           "peito-esquerdo": [
@@ -158,62 +102,6 @@
       "coresPasta": "/arara/polo/cores/",
       "coresQuadros": 28,
       "costas": "costas.webp",
-      "areasEstampa": {
-        "peito-esquerdo": [
-          0.5648,
-          0.2663,
-          0.1296,
-          0.0972
-        ],
-        "peito-direito": [
-          0.3056,
-          0.2663,
-          0.1296,
-          0.0972
-        ],
-        "centro-peito": [
-          0.392,
-          0.2737,
-          0.216,
-          0.1473
-        ],
-        "frente-inteira": [
-          0.3056,
-          0.2737,
-          0.3888,
-          0.3978
-        ],
-        "manga-direita": [
-          0.1597,
-          0.2956,
-          0.0583,
-          0.0437
-        ],
-        "manga-esquerda": [
-          0.7797,
-          0.2956,
-          0.0583,
-          0.0437
-        ],
-        "nuca": [
-          0.4498,
-          0.2247,
-          0.1082,
-          0.0445
-        ],
-        "costas-em-cima": [
-          0.3253,
-          0.2543,
-          0.3571,
-          0.1187
-        ],
-        "costas-inteira": [
-          0.3091,
-          0.2692,
-          0.3896,
-          0.4153
-        ]
-      },
       "areas": {
         "frente": {
           "peito-esquerdo": [
@@ -303,62 +191,6 @@
       "coresPasta": "/arara/golav/cores/",
       "coresQuadros": 21,
       "costas": "costas.webp",
-      "areasEstampa": {
-        "peito-esquerdo": [
-          0.5648,
-          0.2708,
-          0.1296,
-          0.0972
-        ],
-        "peito-direito": [
-          0.3056,
-          0.2708,
-          0.1296,
-          0.0972
-        ],
-        "centro-peito": [
-          0.392,
-          0.2782,
-          0.216,
-          0.1463
-        ],
-        "frente-inteira": [
-          0.3056,
-          0.2782,
-          0.3888,
-          0.3951
-        ],
-        "manga-direita": [
-          0.1578,
-          0.2992,
-          0.06,
-          0.045
-        ],
-        "manga-esquerda": [
-          0.78,
-          0.2992,
-          0.06,
-          0.045
-        ],
-        "nuca": [
-          0.4469,
-          0.2319,
-          0.1084,
-          0.0441
-        ],
-        "costas-em-cima": [
-          0.3222,
-          0.2612,
-          0.3579,
-          0.1175
-        ],
-        "costas-inteira": [
-          0.3059,
-          0.2759,
-          0.3904,
-          0.4111
-        ]
-      },
       "areas": {
         "frente": {
           "peito-esquerdo": [
@@ -448,50 +280,6 @@
       "coresPasta": "/arara/regata/cores/",
       "coresQuadros": 23,
       "costas": "costas.webp",
-      "areasEstampa": {
-        "peito-esquerdo": [
-          0.5648,
-          0.2678,
-          0.1296,
-          0.0972
-        ],
-        "peito-direito": [
-          0.3056,
-          0.2678,
-          0.1296,
-          0.0972
-        ],
-        "centro-peito": [
-          0.392,
-          0.2752,
-          0.216,
-          0.147
-        ],
-        "frente-inteira": [
-          0.3056,
-          0.2752,
-          0.3888,
-          0.3969
-        ],
-        "nuca": [
-          0.4447,
-          0.2359,
-          0.1096,
-          0.0438
-        ],
-        "costas-em-cima": [
-          0.3187,
-          0.2651,
-          0.3615,
-          0.1168
-        ],
-        "costas-inteira": [
-          0.3022,
-          0.2797,
-          0.3944,
-          0.4088
-        ]
-      },
       "areas": {
         "frente": {
           "peito-esquerdo": [
@@ -553,62 +341,6 @@
       "coresPasta": "/arara/babylook/cores/",
       "coresQuadros": 44,
       "costas": "costas.webp",
-      "areasEstampa": {
-        "peito-esquerdo": [
-          0.5657,
-          0.266,
-          0.1325,
-          0.0994
-        ],
-        "peito-direito": [
-          0.3006,
-          0.266,
-          0.1325,
-          0.0994
-        ],
-        "centro-peito": [
-          0.389,
-          0.2729,
-          0.2209,
-          0.1375
-        ],
-        "frente-inteira": [
-          0.3006,
-          0.2729,
-          0.3976,
-          0.3713
-        ],
-        "manga-direita": [
-          0.1435,
-          0.2889,
-          0.0675,
-          0.0506
-        ],
-        "manga-esquerda": [
-          0.7868,
-          0.2889,
-          0.0675,
-          0.0506
-        ],
-        "nuca": [
-          0.4476,
-          0.2405,
-          0.1104,
-          0.0407
-        ],
-        "costas-em-cima": [
-          0.3205,
-          0.2676,
-          0.3645,
-          0.1085
-        ],
-        "costas-inteira": [
-          0.304,
-          0.2812,
-          0.3976,
-          0.3799
-        ]
-      },
       "areas": {
         "frente": {
           "peito-esquerdo": [
@@ -698,56 +430,6 @@
       "coresPasta": "/arara/moletom/cores/",
       "coresQuadros": 24,
       "costas": "costas.webp",
-      "areasEstampa": {
-        "peito-esquerdo": [
-          0.5608,
-          0.254,
-          0.1216,
-          0.0912
-        ],
-        "peito-direito": [
-          0.3176,
-          0.254,
-          0.1216,
-          0.0912
-        ],
-        "centro-peito": [
-          0.3987,
-          0.2615,
-          0.2027,
-          0.1497
-        ],
-        "frente-inteira": [
-          0.3176,
-          0.2615,
-          0.3648,
-          0.3143
-        ],
-        "manga-direita": [
-          0.1564,
-          0.3823,
-          0.076,
-          0.057
-        ],
-        "manga-esquerda": [
-          0.7664,
-          0.3823,
-          0.076,
-          0.057
-        ],
-        "costas-em-cima": [
-          0.337,
-          0.4,
-          0.3293,
-          0.1251
-        ],
-        "costas-inteira": [
-          0.3221,
-          0.4156,
-          0.3592,
-          0.4377
-        ]
-      },
       "areas": {
         "frente": {
           "peito-esquerdo": [
