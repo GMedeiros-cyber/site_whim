@@ -87,3 +87,11 @@ Uma entrada por tarefa, sempre acrescentada no fim (nunca reescrever as anterior
 - Pedido novo em PEDIDOS.md para o Antigravity implementar.
 - Build: não rodei (só documentação e JSON).
 - Pendente: implementação pelo Antigravity.
+
+### 2026-11-13 21:02 · Nova prévia da peça e ficha do pedido (pedido de 2026-11-13)
+- Feito: `previa-peca.tsx` (painel muted, selo "Prévia", cano a 10%, camisa de frente no eixo do cano, sombra, cartão com peça + cor e vitrine das 5 cores; "Marinho" no celular); θ de −1 a 1 com espelho e crossfade, mouse/arrasto (pan-y), mola, balanço ao trocar a cor e balanço contínuo que pausa fora da tela/aba oculta; reduced-motion parado em θ = 0. Ficha vertical de 5 passos (feito/atual/depois) no lugar das abas; peça escolhida de frente na arara.
+- Decisões: o mouse/arrasto sobre o cartão não gira a camisa (senão ela ficava de lado enquanto se escolhe a cor); ao lado só a partir de 1024 px (abaixo empilha); a escolhida abre a vista no 1º toque; Figma não consultado (conector sem autorização), segui o README.
+- Teste (Playwright, produção, 360/390/768/1280 + reduced-motion): 150 checagens da prévia/ficha e 136 da arara, todas ok.
+- Comandos: `npm run lint` e `npm run build` (ok, páginas estáticas).
+- Commits: `2768000` arara, `90497f7` prévia (levou junto a remoção do `ui/tabs.tsx`), `2126945` ficha + este registro.
+- Pendente: nada deste pedido.
