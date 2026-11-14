@@ -117,3 +117,11 @@ Uma entrada por tarefa, sempre acrescentada no fim (nunca reescrever as anterior
 - Build: não rodei (só JSON, imagem e documentação).
 - Pendente: implementação pelo Antigravity; a Whim confirmar as medidas de cada posição.
 - Commit: `eb33b84`.
+
+### 2026-11-14 00:15 · Estampa 2 (Claude Code)
+- Feito: arara escolhe no 1º clique (sem Dialog; no celular rola até a prévia); θ só no arrasto + pêndulo 2D no gancho (±1,2°, ~4° na troca de cor), espelho com histerese, crossfade de 300 ms, pré-carga na vitrine; mapa clicável (alvo por ponto, 22 px de tolerância) + lista acessível, conflitos com aviso, um anexo por posição, "usar a mesma arte de", medidas, dicas da manga e das técnicas; arte com fundo liso removido, margens cortadas, deformação suave, trama, mangas giradas, 2×, Silk/DTF/Bordado simulados; ficha PNG 1600x1000 (baixar/compartilhar) e mensagem por posição; `areasEstampa` removido do manifesto.
+- Decisões: composição, preparo e análise da arte num Worker (`src/lib/estampa.worker.ts`, OffscreenCanvas) porque passava de 50 ms (pior caso 275 ms, fora da thread principal); marcador "Sua arte" feito na thread principal (usa a Poppins); impulso da troca de cor vai para o lado em que a peça já está, para chegar a ~4°.
+- Teste (Playwright, produção, 360/390/768/1024/1280 + reduced-motion): 234 checagens; 10 s parada → 0 trocas de espelho; troca de cor → salto de θ 0,000 e fade de ~298 ms; matriz de 1152 composições (6 peças × Branco/Preto × 4 técnicas × PNG/fundo branco/larga/foto JPG × frente/costas, todas as posições) sem vazar do tecido.
+- Comandos: `npm run lint` e `npm run build` (ok).
+- Commits: `38db844` arara, `464c7ef` estampa 2, `7171322` manifesto (rebase sobre `c2f69b0`, moletom).
+- Pendente: a Whim confirmar medidas e áreas; Figma não consultado (conector sem autorização), segui o README.
