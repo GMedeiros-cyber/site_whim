@@ -13,11 +13,12 @@ def key_still(im):
     a=1-np.clip((gx-kgx*0.18)/(kgx*0.37),0,1)
     rgb=np.stack([r,np.minimum(g,np.maximum(r,b)),b],-1)/255
     return rgb,a
-for p in sys.argv[1:]:
-    im=np.asarray(Image.open(f'src/{p}-frente.jpg').convert('RGB').resize((900,1200),Image.LANCZOS))
-    rgb,a=key_still(im)
-    for nome,hx in CORES.items():
-        o=tint(rgb,a,hx)
-        od=f'out/{p}/{nome}'; os.makedirs(od,exist_ok=True)
-        Image.fromarray(np.dstack([o*255,a*255]).clip(0,255).round().astype(np.uint8),'RGBA').save(f'{od}/frente.webp',quality=85,method=4)
-    print(p,'ok')
+if __name__=='__main__':
+  for p in sys.argv[1:]:
+      im=np.asarray(Image.open(f'src/{p}-frente.jpg').convert('RGB').resize((900,1200),Image.LANCZOS))
+      rgb,a=key_still(im)
+      for nome,hx in CORES.items():
+          o=tint(rgb,a,hx)
+          od=f'out/{p}/{nome}'; os.makedirs(od,exist_ok=True)
+          Image.fromarray(np.dstack([o*255,a*255]).clip(0,255).round().astype(np.uint8),'RGBA').save(f'{od}/frente.webp',quality=85,method=4)
+      print(p,'ok')

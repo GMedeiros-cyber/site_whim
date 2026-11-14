@@ -95,3 +95,9 @@ Uma entrada por tarefa, sempre acrescentada no fim (nunca reescrever as anterior
 - Comandos: `npm run lint` e `npm run build` (ok, páginas estáticas).
 - Commits: `2768000` arara, `90497f7` prévia (levou junto a remoção do `ui/tabs.tsx`), `2126945` ficha + este registro.
 - Pendente: nada deste pedido.
+
+### 2026-11-13 22:10 · Costas por cor, áreas de estampa e especificação (Claude, outra conta)
+- Feito: 6 fotos de costas no Flow (Nano Banana), recorte do verde e pintura nas 5 cores, alinhadas à frente (`public/arara/<peca>/cores/<cor>/costas.webp`, 900x1200); `areasEstampa` e `costas` no manifesto; `referencia/previa-cor/README-estampa.md`.
+- Comandos: `costas_cor.py` e `areas.py` (em `referencia/arara/scripts-cor/`); conferência em `referencia/arara/areas-estampa.jpg`.
+- Build: não rodei (só imagens, JSON e documentação).
+- Pendente: implementação pelo Antigravity; a Whim confirmar tamanhos máximos das áreas e a lista de tamanhos.
