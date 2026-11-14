@@ -102,3 +102,11 @@ Uma entrada por tarefa, sempre acrescentada no fim (nunca reescrever as anterior
 - Build: não rodei (só imagens, JSON e documentação).
 - Pendente: implementação pelo Antigravity; a Whim confirmar tamanhos máximos das áreas e a lista de tamanhos.
 - Commit: `82e78a1`.
+
+### 2026-11-13 22:50 · Estampa, tamanhos e ajustes da ficha (Claude Code)
+- Feito: giro só arrastando (para onde soltar; setas ← →); passo Estampa com posições, mangas e arte só no navegador (aviso de anexar no WhatsApp), arte nas dobras (canvas 2D: deslocamento pelo gradiente do branco, sombra, recorte pelo alfa e sem passar no cabide); Frente/Costas e zoom vertical 1–3× sem cano/selo; tamanhos com quantidade e total; "Alterar" só naquele passo (Salvar/Cancelar); na arara só a escolhida muda de cor; vitrine ≥ 64 px no PC; "Toque/Clique numa peça".
+- Decisões: no passo Estampa a camisa cresce no lugar do cartão, à esquerda da barra de zoom; "Voltar" também abre o passo anterior com Salvar/Cancelar; Figma não consultado (conector sem autorização), segui o README.
+- Teste (Playwright, produção): 364 checagens em 360/390/768/1024/1280 + reduced-motion; matriz de 184 composições (6 peças × frente/costas × Branco/Preto × PNG/JPG) sem vazar do tecido.
+- Comandos: `npm run lint` e `npm run build` (ok); `shadcn add slider checkbox` (Base UI, sem dependência nova).
+- Commits: `1f62d06` arara, `b692935` prévia, `962723c` ficha.
+- Pendente: a Whim confirmar tamanhos e áreas máximas; no celular a prévia fica acima da ficha (fora da tela enquanto se edita a Estampa).
