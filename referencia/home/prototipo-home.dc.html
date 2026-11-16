@@ -80,20 +80,25 @@ a{color:#373857}a:hover{color:#31C4EA}
 .stepsbox{position:relative;margin-top:64px}
 .steps{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:20px;position:relative}
 .trilho{position:absolute;left:23px;right:calc(20% - 23px);top:23px;height:2px;background:rgba(55,56,87,.12)}
-.trilho i{display:block;height:100%;width:0;background:#31C4EA;animation:avanca 8s linear infinite}
-@keyframes avanca{0%,6%{width:0}24%,28%{width:25%}46%,50%{width:50%}68%,72%{width:75%}90%,97%{width:100%}100%{width:100%;opacity:0}}
+.trilho i{display:block;height:100%;width:100%;background:#31C4EA}
 .steps li{position:relative;display:flex;flex-direction:column;gap:12px}
-.num{position:relative;z-index:1;width:46px;height:46px;border-radius:999px;display:grid;place-items:center;background:#FFFFFF;border:1px solid rgba(55,56,87,.16);font-weight:600;font-size:14px;transition:none}
-.s1 .num{background:#31C4EA;border-color:#31C4EA}
-.s2 .num{animation:acende2 8s linear infinite}.s3 .num{animation:acende3 8s linear infinite}.s4 .num{animation:acende4 8s linear infinite}.s5 .num{animation:acende5 8s linear infinite}
-@keyframes acende2{0%,23.9%{background:#FFFFFF;border-color:rgba(55,56,87,.16)}24%,97%{background:#31C4EA;border-color:#31C4EA}100%{background:#FFFFFF}}
-@keyframes acende3{0%,45.9%{background:#FFFFFF;border-color:rgba(55,56,87,.16)}46%,97%{background:#31C4EA;border-color:#31C4EA}100%{background:#FFFFFF}}
-@keyframes acende4{0%,67.9%{background:#FFFFFF;border-color:rgba(55,56,87,.16)}68%,97%{background:#31C4EA;border-color:#31C4EA}100%{background:#FFFFFF}}
-@keyframes acende5{0%,89.9%{background:#FFFFFF;border-color:rgba(55,56,87,.16)}90%,97%{background:#31C4EA;border-color:#31C4EA}100%{background:#FFFFFF}}
+.num{position:relative;z-index:1;width:46px;height:46px;border-radius:999px;display:grid;place-items:center;background:#31C4EA;border:1px solid #31C4EA;font-weight:600;font-size:14px}
 .fogos{position:absolute;left:23px;top:23px;width:0;height:0;z-index:0;pointer-events:none}
-.fogos b{position:absolute;left:-3px;top:-3px;width:6px;height:6px;border-radius:999px;background:#31C4EA;opacity:0;animation:estoura 8s ease-out infinite}
+.fogos b{position:absolute;left:-3px;top:-3px;width:6px;height:6px;border-radius:999px;background:#31C4EA;opacity:0}
 .fogos b:nth-child(odd){background:#373857;width:4px;height:4px;left:-2px;top:-2px}
-@keyframes estoura{0%,90%{opacity:0;transform:rotate(var(--a)) translateX(0)}91%{opacity:1}97%,100%{opacity:0;transform:rotate(var(--a)) translateX(46px)}}
+@supports (animation-timeline: view()){
+.stepsbox{view-timeline:--etapas block}
+.trilho i,.s2 .num,.s3 .num,.s4 .num,.s5 .num,.fogos b{animation-timeline:--etapas;animation-range:entry 100% cover 62%;animation-fill-mode:both;animation-duration:1ms;animation-timing-function:linear}
+.trilho i{width:0;animation-name:avanca}
+@keyframes avanca{0%,4%{width:0}22%,26%{width:25%}44%,48%{width:50%}66%,70%{width:75%}88%,100%{width:100%}}
+.s2 .num{animation-name:acende2}.s3 .num{animation-name:acende3}.s4 .num{animation-name:acende4}.s5 .num{animation-name:acende5}
+@keyframes acende2{0%,21.9%{background:#FFFFFF;border-color:rgba(55,56,87,.16)}22%,100%{background:#31C4EA;border-color:#31C4EA}}
+@keyframes acende3{0%,43.9%{background:#FFFFFF;border-color:rgba(55,56,87,.16)}44%,100%{background:#31C4EA;border-color:#31C4EA}}
+@keyframes acende4{0%,65.9%{background:#FFFFFF;border-color:rgba(55,56,87,.16)}66%,100%{background:#31C4EA;border-color:#31C4EA}}
+@keyframes acende5{0%,87.9%{background:#FFFFFF;border-color:rgba(55,56,87,.16)}88%,100%{background:#31C4EA;border-color:#31C4EA}}
+.fogos b{animation-name:estoura}
+@keyframes estoura{0%,88%{opacity:0;transform:rotate(var(--a)) translateX(0)}90%{opacity:1}100%{opacity:0;transform:rotate(var(--a)) translateX(46px)}}
+}
 .steps h3{margin:6px 0 0;font-size:21px;font-weight:600;letter-spacing:-.01em}
 .steps p{margin:0;font-size:14.5px;line-height:1.55;color:#5D6178}
 .nota-anim{margin-top:28px;font-size:12px;color:#5D6178}
@@ -174,8 +179,9 @@ a{color:#373857}a:hover{color:#31C4EA}
 .tec{flex:0 0 76%;scroll-snap-align:start}
 .tambem{grid-template-columns:minmax(0,1fr);gap:12px}
 .stepsbox{margin-top:40px}.steps{grid-template-columns:minmax(0,1fr);gap:26px}
-.trilho{left:23px;right:auto;top:23px;bottom:23px;width:2px;height:auto}.trilho i{width:100%;height:0;animation-name:desce}
-@keyframes desce{0%,6%{height:0}24%,28%{height:25%}46%,50%{height:50%}68%,72%{height:75%}90%,97%{height:100%}100%{height:100%;opacity:0}}
+.trilho{left:23px;right:auto;top:23px;bottom:23px;width:2px;height:auto}.trilho i{width:100%;height:100%}
+@supports (animation-timeline: view()){.trilho i{width:100%;height:0;animation-name:desce}}
+@keyframes desce{0%,4%{height:0}22%,26%{height:25%}44%,48%{height:50%}66%,70%{height:75%}88%,100%{height:100%}}
 .steps li{display:grid;grid-template-columns:46px 1fr;column-gap:16px;row-gap:6px}.steps li .num{grid-row:span 2}.steps h3{margin:10px 0 0}
 .marca{font-size:24px;gap:28px}.grupo{gap:28px;padding-right:28px}
 .cta{padding:80px 0 56px}.cta h2{font-size:48px}
@@ -281,7 +287,7 @@ a{color:#373857}a:hover{color:#31C4EA}
 <li class="s5"><span class="fogos" aria-hidden="true"><b style="--a: 0deg"></b><b style="--a: 30deg"></b><b style="--a: 60deg"></b><b style="--a: 90deg"></b><b style="--a: 120deg"></b><b style="--a: 150deg"></b><b style="--a: 180deg"></b><b style="--a: 210deg"></b><b style="--a: 240deg"></b><b style="--a: 270deg"></b><b style="--a: 300deg"></b><b style="--a: 330deg"></b></span><span class="num">5</span><h3>Entrega</h3><p>Retirada em Guarulhos ou envio.</p></li>
 </ol>
 </div>
-<p class="nota-anim">No site: quando a seção aparece, a linha turquesa avança e pinta cada bolinha ao passar por ela (cerca de 1,5 s por etapa, 7 s até o 5); no 5 saem fogos discretos. Uma vez só. Aqui a animação repete para você ver.</p>
+<p class="nota-anim">Role a página: a linha turquesa avança junto com a rolagem e pinta cada bolinha ao passar por ela; quando chega no 5, saem fogos discretos.</p>
 </div>
 </section>
 
