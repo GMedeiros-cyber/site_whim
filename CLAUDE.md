@@ -41,7 +41,7 @@ Comandos: `npm run dev` · `npm run build` · `npm run lint`.
 
 ## Abertura do site
 
-Fica para uma fase posterior. **Não implementar agora.**
+Entrou em 16/11 (pedido do Gabriel para a reunião com a Whim): `src/components/home/abertura.tsx`, a mesma do protótipo aprovado (símbolo pintado pela tinta e a escrita entrando), uma vez por sessão, toque pula, sem movimento reduzido. A tinta da palavra "Vista" só começa quando ela acaba (`src/lib/abertura.ts`).
 
 ## SEO
 

@@ -47,6 +47,11 @@ A versão que vale é a do Claude Design (atualizada em 15/11 com os ajustes do 
 5b. **Dúvidas frequentes** (`#duvidas`, fundo branco, entra antes do convite): à esquerda "Antes de *pedir o orçamento.*" e "As perguntas que mais chegam no WhatsApp, respondidas aqui."; à direita um acordeão (`<details>`, a primeira aberta) com as 8 perguntas e respostas do protótipo, todas tiradas do briefing (mínimo 50 peças; 20 a 30 dias; qual técnica; peças e tecidos; tamanhos e cores; posições e A3; região Guarulhos e Grande SP; preço só por orçamento, quem responde é a Caroline). Botão de +/- turquesa quando aberta. O agente 3 gera o schema `FAQPage` a partir desta lista.
 6. **Convite** (centralizado, sem camisetas nem cano): "Monte a sua *peça.*", "Peça, cor, estampa e quantidade em 5 passos. O orçamento chega pronto no WhatsApp da Whim, e quem responde é a Caroline.", botões "Monte sua peça" e "Falar no WhatsApp".
 
+## Abertura (16/11)
+
+- Antes da home, tela branca com o símbolo da Whim pintado pela tinta e a escrita entrando (~3,5 s), igual ao protótipo aprovado. Uma vez por sessão (`whim-abertura-vista`), toque ou tecla pula, com movimento reduzido não aparece. Arquivos: `src/components/home/abertura.tsx` + `.css` e `src/lib/abertura.ts`.
+- A tinta da palavra "Vista" espera a abertura acabar (`depoisDaAbertura` dentro do `PalavraTinta`). Quem mexer na tinta mantém essa espera.
+
 ## Rótulo das seções: sai o eyebrow, entra a gota (16/11, escolha do Gabriel)
 
 - O rótulo acima dos títulos (linha turquesa + texto espaçado, o `Eyebrow`) **sai do site**. O nome da seção fica só no menu.
@@ -58,7 +63,7 @@ A versão que vale é a do Claude Design (atualizada em 15/11 com os ajustes do 
 
 - Em **todas as páginas** (vai no `layout.tsx`, liberado para você neste pedido; componente novo `src/components/botao-whatsapp.tsx`, client).
 - Canto inferior direito, 24 px das bordas no PC e 16 px no celular, somando `env(safe-area-inset-bottom)`. `z-index` acima do conteúdo e abaixo de diálogos/menus.
-- Botão em pílula `bg-accent` com texto `text-primary`: ícone de conversa + "Orçamento" no PC; no celular só o ícone, 56 × 56 px. Sombra azul-marinho suave. Ícone: o oficial do WhatsApp (dos recursos de marca do WhatsApp), numa cor só, `text-primary`. `aria-label="Pedir orçamento no WhatsApp"`, foco visível.
+- Botão redondo `bg-accent`, **só o ícone do WhatsApp, sem texto**, 56 × 56 px no PC e no celular (Gabriel, 16/11). Sombra azul-marinho suave. Ícone: o oficial do WhatsApp (dos recursos de marca do WhatsApp), numa cor só, `text-primary`. `aria-label="Pedir orçamento no WhatsApp"`, foco visível.
 - Abre `CONTATO.whatsapp` (wa.me) com a mensagem padrão "Olá, Whim! Quero um orçamento." em nova aba.
 - Balão branco acima do botão, uma vez por sessão, 3 s depois de carregar: "Oi! Quer um orçamento? A Caroline responde no WhatsApp." (cantos 16/16/4/16, sombra suave, entrada com mola curta). Fecha com um × (44 px de alvo), ao clicar no botão ou depois de 8 s; guarda em `sessionStorage` (com try/catch) para não voltar.
 - **Movimento com a rolagem**: o botão balança de leve enquanto a página rola (até ±7° e −3 px, voltando ao repouso), feito com `animation-timeline: scroll(root)` dentro de `@supports`; sem suporte, fica parado. `prefers-reduced-motion`: nada se move e o balão aparece sem animação.

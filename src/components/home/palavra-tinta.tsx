@@ -2,6 +2,8 @@
 
 import { useLayoutEffect, useRef } from "react";
 
+import { depoisDaAbertura } from "@/lib/abertura";
+
 const CHAVE = "whim-vista-pintada";
 const ATRASO = 250; // ms antes de a tinta entrar
 const DURACAO = 2500; // ms da pintura inteira
@@ -105,37 +107,42 @@ export function PalavraTinta({ children }: { children: string }) {
     };
     const soltarGl = () => gl?.getExtension("WEBGL_lose_context")?.loseContext();
 
-    const cs = getComputedStyle(texto);
-    document.fonts
-      .load(`${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`, children)
-      .catch(() => {})
-      .then(() => {
-        if (cancelado) return;
-        const tinta = prepararTinta(texto, canvas);
-        if (!tinta) return pronta();
-        gl = tinta.gl;
-        try {
-          sessionStorage.setItem(CHAVE, "1");
-        } catch {}
-        canvas.dataset.ativo = "";
-        ouvir(true);
-        inicio = performance.now() + ATRASO;
-        const quadro = (agora: number) => {
-          const t = Math.min(1, Math.max(0, (agora - inicio) / DURACAO));
-          tinta.pintar(suave(t));
-          if (t < 1) {
-            raf = requestAnimationFrame(quadro);
-            return;
-          }
-          ouvir(false);
-          pronta();
-          delete canvas.dataset.ativo; // some em 300 ms por cima do texto igual
-          timer = window.setTimeout(soltarGl, 400);
-        };
-        raf = requestAnimationFrame(quadro);
-      });
+    // Com a abertura (logo pintado) tocando, a tinta espera ela acabar.
+    const comecar = () => {
+      const cs = getComputedStyle(texto);
+      document.fonts
+        .load(`${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`, children)
+        .catch(() => {})
+        .then(() => {
+          if (cancelado) return;
+          const tinta = prepararTinta(texto, canvas);
+          if (!tinta) return pronta();
+          gl = tinta.gl;
+          try {
+            sessionStorage.setItem(CHAVE, "1");
+          } catch {}
+          canvas.dataset.ativo = "";
+          ouvir(true);
+          inicio = performance.now() + ATRASO;
+          const quadro = (agora: number) => {
+            const t = Math.min(1, Math.max(0, (agora - inicio) / DURACAO));
+            tinta.pintar(suave(t));
+            if (t < 1) {
+              raf = requestAnimationFrame(quadro);
+              return;
+            }
+            ouvir(false);
+            pronta();
+            delete canvas.dataset.ativo; // some em 300 ms por cima do texto igual
+            timer = window.setTimeout(soltarGl, 400);
+          };
+          raf = requestAnimationFrame(quadro);
+        });
+    };
+    const cancelarEspera = depoisDaAbertura(comecar);
 
     return () => {
+      cancelarEspera();
       cancelado = true;
       cancelAnimationFrame(raf);
       clearTimeout(timer);

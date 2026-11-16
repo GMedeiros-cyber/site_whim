@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { Container, Destaque, Seta, Titulo, secao } from "@/components/blocos";
+import { Abertura } from "@/components/home/abertura";
 import { Carrossel } from "@/components/home/carrossel";
 import { DUVIDAS } from "@/components/home/duvidas";
 import { Etapas } from "@/components/home/etapas";
@@ -95,6 +96,7 @@ const MARCAS = [
 export default function Home() {
   return (
     <>
+      <Abertura />
       <SiteHeader />
       <main className="flex-1">
         <Topo />
