@@ -1,6 +1,6 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
+// .mjs (e não .ts): a Hostinger compila sem o SWC nativo, que não carrega lá (glibc antiga).
+/** @type {import("next").NextConfig} */
+const nextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
   poweredByHeader: false,
@@ -19,14 +19,6 @@ const nextConfig: NextConfig = {
         ],
       },
     ];
-  },
-  turbopack: {
-    rules: {
-      "*.css": {
-        loaders: ["@tailwindcss/turbopack"],
-        as: "*.css",
-      },
-    },
   },
 };
 
