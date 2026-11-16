@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
-import Image from "next/image";
 
 import manifest from "../../public/arara/manifest.json";
 import { cn } from "@/lib/utils";
@@ -82,7 +81,7 @@ function PecaGirando({ modelo, cor, deFrente, carregar, semGiro }: { modelo: Mod
     const banco: HTMLImageElement[] = [];
     bancos.current.set(pasta, banco);
     for (let i = 0; i < total; i++) {
-      const img = new window.Image(); // "Image" aqui é o do next/image
+      const img = new window.Image();
       img.fetchPriority = i === 0 || i === total - 1 ? "high" : "low";
       img.src = `${pasta}${String(i + 1).padStart(3, "0")}.webp`;
       img.decode().then(
@@ -166,14 +165,12 @@ export function Arara({ selecionada, cor, onEscolher }: { selecionada: string; c
         <div className="-mx-5 snap-x snap-proximity overflow-x-auto px-5 pb-2 min-[601px]:mx-0 min-[601px]:px-0">
           <div className="mx-auto w-max min-w-full">
             {/* Cano cromado esticado na largura da arara; o fundo branco some com multiply,
-                por isso nenhum ancestral dele pode criar stacking context. */}
-            <Image
-              src={CANO.arquivo}
-              alt=""
-              width={CANO.largura}
-              height={CANO.altura}
-              sizes="100vw"
-              className="block h-(--cano) w-full mix-blend-multiply"
+                por isso nenhum ancestral dele pode criar stacking context. É fundo CSS, não <img>,
+                porque o esticão é de propósito (o Lighthouse reprova <img> fora da proporção). */}
+            <div
+              aria-hidden
+              className="h-(--cano) w-full bg-size-[100%_100%] mix-blend-multiply"
+              style={{ backgroundImage: `url(${CANO.arquivo})` }}
             />
             <ul aria-label="Arara de modelos" className="flex justify-center px-4">
               {MODELOS.map((m, i) => (

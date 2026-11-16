@@ -229,3 +229,11 @@ Uma entrada por tarefa, sempre acrescentada no fim (nunca reescrever as anterior
 - Conferido: lint ok; build ok (Poppins trocada só localmente); Playwright 390 e 1280 em /, /monte-sua-peca, /privacidade e 404: sem rolagem lateral, console limpo, JSON-LD presente, botão do WhatsApp 56 px; robots/sitemap/llms.txt/manifest 200.
 - Commit: `c1b22fe` (main).
 - Pendente: nota 90 no celular (medir no site publicado antes de otimizar); pedido do agente 1 (contraste, cano, links do contato); `npm audit` só em ferramentas de desenvolvimento.
+
+### Agente 1 · 2026-11-16 17:10 · Monte sua peça, 3 pontos do Lighthouse (Claude Code)
+- Contraste: nos passos futuros da ficha só o nome esmaece; o texto cinza fica em `text-muted-foreground` cheio (#5D6178; antes #86899a, 3,46:1).
+- Cano da arara (o esticado era esse; o da prévia já estava na proporção): virou fundo CSS `100% 100%`, visual igual pixel a pixel a 390 e 1350 px.
+- Links de WhatsApp e e-mail do Contato: 28 px no PC (`lg:py-1`, como o rodapé); celular segue com 44 px.
+- Teste: axe-core (`color-contrast`, `target-size`) e a regra `image-aspect-ratio` do Lighthouse a 390 e 1350 px: 6 falhas antes, 0 depois; teste do personalizador sem falhas; console limpo.
+- Comandos: `npm run lint` (ok), `npm run build` (ok), `next start` + Playwright. Commit: `89d1571` no branch `agente-1/ajustes-lighthouse`.
+- Pendente: o Lighthouse de verdade (agente 3) para confirmar as notas; PR para o main.
