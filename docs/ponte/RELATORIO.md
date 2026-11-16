@@ -186,3 +186,9 @@ Uma entrada por tarefa, sempre acrescentada no fim (nunca reescrever as anterior
 - Comandos: `git worktree add`, `npm install`, `npm run lint` e `npm run build` (ok); rotas, cabeçalhos e 404 conferidos no `next start` (390 e 1280 px, sem rolagem lateral).
 - Commit: `1ce02ef`.
 - Pendente: aguarda merge dos agentes 1 e 2 (montar medição e schema no layout, link de cookies no rodapé, meta tags, Open Graph, breadcrumb/FAQ, imagens, CLS, responsividade, limpeza, PageSpeed final); da Whim: domínio, dias de funcionamento e IDs das contas.
+
+### 2026-11-16 08:45 · Revisão e merge dos agentes 1, 2 e 3 (Claude, outra conta)
+- Feito: conferi cada branch contra os pedidos e a tabela de donos (nenhum arquivo fora da área liberada); juntei no main na ordem 1 → 2 → 3, resolvendo só conflitos em PEDIDOS/RELATORIO (mantidos todos os status e blocos); tirei o Eyebrow "LGPD" da /privacidade e apaguei o `Eyebrow` do `blocos.tsx`.
+- Conferido: `npm run lint` e `tsc` ok; `npm run build` ok com a Poppins trocada só localmente (Google Fonts bloqueado aqui, não commitado); Playwright 390 e 1280 em /, /monte-sua-peca, /privacidade e 404: sem rolagem lateral, sem erro no console, 10 logos carregados nas alturas da spec, gota em todos os títulos de seção, botão do WhatsApp a 16/24 px com wa.me certo, robots/sitemap/llms.txt/manifest 200, 404 com status 404.
+- Commit: `df5d688` + merges no main.
+- Pendente: travamento da tinta (agente 2); parte 2 do checklist (agente 3); `agente-1/briefing` velho no GitHub; títulos das colunas do rodapé ainda no estilo do rótulo antigo (decisão do Gabriel).
