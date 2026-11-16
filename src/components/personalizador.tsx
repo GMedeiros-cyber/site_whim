@@ -5,7 +5,7 @@ import Image from "next/image";
 import { CheckIcon, DownloadIcon, InfoIcon, MinusIcon, PlusIcon, Share2Icon } from "lucide-react";
 
 import { Arara, CORES, MODELOS, usePoucoMovimento, type Cor } from "@/components/arara";
-import { Container, Destaque, Eyebrow, Seta, Titulo } from "@/components/blocos";
+import { Container, Destaque, Seta, Titulo } from "@/components/blocos";
 import {
   conflitos,
   juntar,
@@ -476,7 +476,6 @@ export function Personalizador() {
     <>
       <section id="personalizar" className="scroll-mt-24 pt-[132px] pb-3 sm:pt-[168px] sm:pb-8">
         <Container>
-          <Eyebrow>Monte sua peça</Eyebrow>
           <Titulo as="h1">
             Escolha na arara <Destaque>e personalize.</Destaque>
           </Titulo>

@@ -1,6 +1,6 @@
 import { StarIcon } from "lucide-react";
 
-import { Container, Destaque, Eyebrow, Titulo, secao } from "@/components/blocos";
+import { Container, Destaque, Titulo, secao } from "@/components/blocos";
 import { FormContato } from "@/components/form-contato";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
@@ -15,7 +15,6 @@ export function ContatoAvaliacoes() {
   return (
     <section id="contato" aria-labelledby="contato-titulo" className={cn(secao, "bg-muted")}>
       <Container>
-        <Eyebrow>Contato e avaliações</Eyebrow>
         <Titulo id="contato-titulo">
           Fale com <Destaque>a Whim.</Destaque>
         </Titulo>
