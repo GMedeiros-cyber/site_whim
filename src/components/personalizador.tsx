@@ -5,7 +5,7 @@ import Image from "next/image";
 import { CheckIcon, DownloadIcon, InfoIcon, MinusIcon, PlusIcon, Share2Icon } from "lucide-react";
 
 import { Arara, CORES, MODELOS, usePoucoMovimento, type Cor } from "@/components/arara";
-import { Container, Destaque, Eyebrow, Seta, Titulo } from "@/components/blocos";
+import { Container, Destaque, Seta, Titulo } from "@/components/blocos";
 import {
   conflitos,
   juntar,
@@ -33,11 +33,33 @@ import { linkWhatsApp } from "@/lib/whim";
 const PECAS = MODELOS.map((m) => m.nome);
 // As cores do tecido vêm do manifesto da arara (CORES), as mesmas dos quadros pintados.
 const MINIMO = 50;
+// Tecidos do briefing da Whim (16/11).
+const TECIDOS = [
+  "Não sei, me indiquem",
+  "Meia malha penteada 100% algodão premium",
+  "Malha fria PV antipilling",
+  "Malha mescla PA",
+  "Malha piquet PA",
+  "Moletom 3 cabos",
+  "Dry fit 100% poliéster",
+  "Dry fit 100% poliamida",
+];
+// Grades do briefing; G1 a G3 e os pares do infantil a Whim ainda confirma.
+const GRADES = {
+  Adulto: ["PP", "P", "M", "G", "GG", "G1", "G2", "G3"],
+  Infantil: ["2", "4", "6", "8", "10", "12", "14", "16"],
+};
+type Grupo = keyof typeof GRADES;
 
-type Tamanho = { nome: string; qtd: number; extra?: boolean };
+type Tamanho = { grupo: Grupo; nome: string; qtd: number; extra?: boolean };
+/** "P", "Infantil 4": o nome que vai para a mensagem, a ficha e os rótulos de leitor de tela. */
+const nomeTamanho = (t: Tamanho) => (t.grupo === "Infantil" ? `Infantil ${t.nome}` : t.nome);
 type Pedido = {
   peca: string;
-  cor: Cor;
+  tecido: string;
+  cor: Cor; // a da vitrine (é a que aparece na prévia)
+  usaOutra: boolean; // a cor do pedido é outra, escrita pelo cliente
+  outraCor: string;
   posicoes: Posicao[]; // na ordem em que foram marcadas (= números do mapa)
   tecnica: Tecnica;
   tamanhos: Tamanho[];
@@ -45,13 +67,19 @@ type Pedido = {
 
 const INICIAL: Pedido = {
   peca: PECAS[0],
+  tecido: TECIDOS[0],
   cor: CORES[1],
+  usaOutra: false,
+  outraCor: "",
   posicoes: [],
   tecnica: TECNICAS[0],
-  tamanhos: ["P", "M", "G", "GG"].map((nome) => ({ nome, qtd: 0 })),
+  tamanhos: (Object.keys(GRADES) as Grupo[]).flatMap((grupo) => GRADES[grupo].map((nome) => ({ grupo, nome, qtd: 0 }))),
 };
 
 const modeloDe = (peca: string) => MODELOS.find((m) => m.nome === peca) ?? MODELOS[0];
+// Select nativo com a mesma cara do Input (16 px no celular para o iOS não dar zoom).
+const campo =
+  "h-11 w-full min-w-0 rounded-lg border border-input bg-background px-2.5 text-base text-foreground outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:text-sm";
 type Ficha = { chave: string; url: string; arquivo: File; compartilhavel: boolean };
 
 export function Personalizador() {
@@ -69,13 +97,15 @@ export function Personalizador() {
   const focar = useRef(false);
   const semGiro = usePoucoMovimento();
 
-  const { peca, cor, posicoes, tecnica, tamanhos } = pedido;
+  const { peca, tecido, cor, usaOutra, outraCor, posicoes, tecnica, tamanhos } = pedido;
   const mudar = (parcial: Partial<Pedido>) => setPedido((p) => ({ ...p, ...parcial }));
   const modelo = modeloDe(peca);
+  const nomeCor = usaOutra ? outraCor.trim() || "outra, a combinar" : cor.nome;
   const numeros = new Map(posicoes.map((p, i) => [p.chave, i + 1]));
   const comQtd = tamanhos.filter((t) => t.qtd > 0);
   const total = comQtd.reduce((s, t) => s + t.qtd, 0);
-  const listaTamanhos = comQtd.map((t) => `${t.nome} ${t.qtd}`).join(", ");
+  // "P 10, M 20, Infantil 4: 5" (os dois-pontos separam o tamanho infantil da quantidade).
+  const listaTamanhos = comQtd.map((t) => (t.grupo === "Infantil" ? `${nomeTamanho(t)}: ${t.qtd}` : `${t.nome} ${t.qtd}`)).join(", ");
   const temArte = posicoes.some((p) => p.arte);
 
   // Libera as URLs das artes que saíram do pedido (trocar, remover) e do rascunho do "Cancelar";
@@ -90,7 +120,8 @@ export function Personalizador() {
 
   const resumo = [
     "Olá, Whim! Montei minha peça no site:",
-    `• Peça: ${peca} · Cor: ${cor.nome}`,
+    `• Peça: ${peca} · Cor: ${nomeCor}`,
+    `• Tecido: ${tecido}`,
     `• Técnica: ${tecnica}`,
     posicoes.length
       ? ["• Estampas:", ...posicoes.map((p, i) => `  ${i + 1}. ${NOME[p.chave]} (${medidaDe(p.chave)}): ${p.arte?.arquivo.name ?? "arte a enviar"}`)].join("\n")
@@ -169,18 +200,38 @@ export function Personalizador() {
   // Ficha em PNG para a equipe da Whim, gerada ao chegar no Resumo (e a cada mudança).
   const chaveFicha =
     passo === 4
-      ? JSON.stringify({ peca, cor: cor.pasta, tecnica, t: listaTamanhos, total, p: posicoes.map((p) => [p.chave, p.arte?.url ?? "", p.arte?.arquivo.name ?? "", !!p.manterFundo]) })
+      ? JSON.stringify({
+          peca,
+          tecido,
+          cor: cor.pasta,
+          // Outra cor: a ficha diz a do pedido e em que cor está a foto.
+          nomeCor: usaOutra ? `${nomeCor} (prévia em ${cor.nome})` : cor.nome,
+          tecnica,
+          t: listaTamanhos,
+          total,
+          p: posicoes.map((p) => [p.chave, p.arte?.url ?? "", p.arte?.arquivo.name ?? "", !!p.manterFundo]),
+        })
       : "";
   const fichaUrl = useRef("");
   useEffect(() => {
     if (!chaveFicha) return;
-    const d = JSON.parse(chaveFicha) as { peca: string; cor: string; tecnica: Tecnica; t: string; total: number; p: [string, string, string, boolean][] };
+    const d = JSON.parse(chaveFicha) as {
+      peca: string;
+      tecido: string;
+      cor: string;
+      nomeCor: string;
+      tecnica: Tecnica;
+      t: string;
+      total: number;
+      p: [string, string, string, boolean][];
+    };
     const m = modeloDe(d.peca);
     const c = CORES.find((x) => x.pasta === d.cor) ?? CORES[0];
     let vivo = true;
     gerarFicha({
       modelo: m,
-      cor: c,
+      cor: { nome: d.nomeCor, pasta: c.pasta },
+      tecido: d.tecido,
       tecnica: d.tecnica,
       tamanhos: d.t || "a definir",
       total: d.total,
@@ -219,8 +270,8 @@ export function Personalizador() {
 
   // Ficha do pedido: nome do passo, o valor quando feito e o texto de quando ainda vem depois.
   const passos = [
-    { nome: "Peça", valor: peca, depois: "Modelo da arara" },
-    { nome: "Cor", valor: cor.nome, depois: "Na vitrine da prévia" },
+    { nome: "Peça", valor: `${peca} · ${tecido}`, depois: "Modelo e tecido" },
+    { nome: "Cor", valor: usaOutra ? `Outra: ${nomeCor}` : cor.nome, depois: "Na vitrine da prévia" },
     { nome: "Estampa", valor: `${posicoes.length ? posicoes.map((p) => NOME[p.chave]).join(", ") : "A definir"} · ${tecnica}`, depois: "Posições, artes e técnica" },
     { nome: "Quantidade", valor: `${pecas(total)}${listaTamanhos ? ` · ${listaTamanhos}` : ""}`, depois: `A partir de ${MINIMO} peças` },
     { nome: "Resumo", valor: "", depois: "Ficha e WhatsApp" },
@@ -243,17 +294,51 @@ export function Personalizador() {
                 <Opcao key={p} value={p}>{p}</Opcao>
               ))}
             </ToggleGroup>
+            <label className="mt-5 grid gap-1.5">
+              <span className="text-[13px] font-medium">Tecido</span>
+              <select value={tecido} onChange={(e) => mudar({ tecido: e.target.value })} className={campo}>
+                {TECIDOS.map((t) => (
+                  <option key={t}>{t}</option>
+                ))}
+              </select>
+            </label>
           </>
         );
       case 1:
         return (
           <>
-            <p className="text-sm text-muted-foreground">Toque numa das camisas da vitrine para trocar a cor.</p>
-            <span className="mt-3.5 inline-flex items-center gap-2 rounded-full border border-primary/12 px-3 py-1.5 text-sm font-medium">
-              {/* Cor do tecido (dado do manifesto), não cor da interface. */}
-              <span aria-hidden className="size-4 rounded-full border border-primary/15" style={{ backgroundColor: cor.hex }} />
-              {cor.nome}
-            </span>
+            <p className="text-sm text-muted-foreground">As cores da vitrine são exemplos. Toque numa das camisas para ver na prévia.</p>
+            <ToggleGroup
+              aria-label="Cor"
+              value={[usaOutra ? "outra" : "vitrine"]}
+              onValueChange={escolha((v) => mudar({ usaOutra: v === "outra" }))}
+              className="mt-3.5 flex-wrap"
+            >
+              <Opcao value="vitrine">
+                {/* Cor do tecido (dado do manifesto), não cor da interface. */}
+                <span aria-hidden className="size-4 rounded-full border border-primary/15" style={{ backgroundColor: cor.hex }} />
+                {cor.nome}
+              </Opcao>
+              <Opcao value="outra">Outra cor</Opcao>
+            </ToggleGroup>
+            {usaOutra && (
+              <label className="mt-3.5 grid gap-1.5">
+                <span className="text-[13px] font-medium">Qual cor?</span>
+                <Input
+                  autoFocus
+                  value={outraCor}
+                  maxLength={40}
+                  placeholder="Ex.: verde-bandeira"
+                  onChange={(e) => mudar({ outraCor: e.target.value })}
+                  className="h-11"
+                />
+                <span className="text-[13px] text-muted-foreground">A prévia continua em {cor.nome}.</span>
+              </label>
+            )}
+            <p className="mt-3.5 flex gap-2.5 rounded-[14px] bg-muted p-3.5 text-[13px]">
+              <InfoIcon aria-hidden className="mt-px size-4 shrink-0 text-accent" />
+              A cor da peça é de acordo com o seu pedido.
+            </p>
           </>
         );
       case 2:
@@ -262,6 +347,7 @@ export function Personalizador() {
             <p className="text-sm text-muted-foreground">
               <span className="pointer-coarse:hidden">Clique onde vai a estampa.</span>
               <span className="hidden pointer-coarse:inline">Toque onde vai a estampa.</span> Dá para marcar mais de uma posição.
+              Tamanho máximo da estampa: A3.
             </p>
             {aviso && (
               <p role="status" className="mt-3 rounded-[14px] bg-muted px-3.5 py-2.5 text-[13px]">
@@ -337,7 +423,7 @@ export function Personalizador() {
               {fichaPronta ? (
                 <Image
                   src={ficha.url}
-                  alt={`Ficha da estampa: ${peca}, ${cor.nome}, ${tecnica}, ${posicoes.length} ${posicoes.length === 1 ? "posição" : "posições"}`}
+                  alt={`Ficha da estampa: ${peca}, ${nomeCor}, ${tecido}, ${tecnica},${posicoes.length} ${posicoes.length === 1 ? "posição" : "posições"}`}
                   width={1600}
                   height={1000}
                   unoptimized
@@ -367,6 +453,12 @@ export function Personalizador() {
               <li>Envie a mensagem pelo WhatsApp.</li>
               <li>Na conversa, anexe a ficha{temArte ? " e os arquivos das artes" : ""}.</li>
             </ol>
+            <div className="mt-3.5 grid gap-1 rounded-[14px] bg-muted p-3.5 text-[13px]">
+              <p>
+                <span className="font-semibold">Prazo de produção:</span> 20 a 30 dias, conforme quantidade e modelo.
+              </p>
+              <p>Quem responde é a Caroline.</p>
+            </div>
             <a
               href={linkWhatsApp(resumo)}
               target="_blank"
@@ -384,7 +476,6 @@ export function Personalizador() {
     <>
       <section id="personalizar" className="scroll-mt-24 pt-[132px] pb-3 sm:pt-[168px] sm:pb-8">
         <Container>
-          <Eyebrow>Monte sua peça</Eyebrow>
           <Titulo as="h1">
             Escolha na arara <Destaque>e personalize.</Destaque>
           </Titulo>
@@ -415,7 +506,7 @@ export function Personalizador() {
 
       <Container className="grid items-start gap-8 pt-3 pb-7 sm:pt-8 sm:pb-10 lg:grid-cols-[1.2fr_0.8fr] lg:gap-[clamp(20px,4vw,48px)]">
         <div ref={previaRef} className="min-w-0">
-          <PreviaPeca modelo={modelo} cor={cor} onCor={(c) => mudar({ cor: c })} estampa={estampa} />
+          <PreviaPeca modelo={modelo} cor={cor} onCor={(c) => mudar({ cor: c, usaOutra: false })} estampa={estampa} />
         </div>
 
         {/* Ficha do pedido: 5 passos numa linha vertical (feito, atual, depois). */}
@@ -522,41 +613,65 @@ function Opcao(props: React.ComponentProps<typeof ToggleGroupItem>) {
   );
 }
 
-/** Tamanhos com quantidade: − número +, e "Adicionar outro tamanho" (removível). */
+/**
+ * Tamanhos com quantidade: − número +, nos grupos Adulto e Infantil (as quantidades dos dois
+ * somam no total), e "Adicionar outro tamanho" no grupo aberto (removível).
+ */
 function Tamanhos({ tamanhos, onTamanhos }: { tamanhos: Tamanho[]; onTamanhos: (t: Tamanho[]) => void }) {
+  const [grupo, setGrupo] = useState<Grupo>("Adulto");
   const [novo, setNovo] = useState<string | null>(null);
   const nomeNovo = novo?.trim() ?? "";
-  const repetido = tamanhos.some((t) => t.nome.toLowerCase() === nomeNovo.toLowerCase());
+  const repetido = tamanhos.some((t) => t.grupo === grupo && t.nome.toLowerCase() === nomeNovo.toLowerCase());
   const mudarQtd = (i: number, qtd: number) => onTamanhos(tamanhos.map((t, j) => (j === i ? { ...t, qtd: Math.max(0, qtd) } : t)));
+  const soma = (g: Grupo) => tamanhos.reduce((s, t) => s + (t.grupo === g ? t.qtd : 0), 0);
 
   return (
     <div className="mt-3.5">
-      <ul aria-label="Tamanhos" className="grid gap-2">
-        {tamanhos.map((t, i) => (
-          <li key={t.nome} className="flex items-center gap-1.5">
-            <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-medium">{t.nome}</p>
-              {t.extra && (
-                <Button variant="link" onClick={() => onTamanhos(tamanhos.filter((_, j) => j !== i))} aria-label={`Remover tamanho ${t.nome}`} className="-ml-2 h-auto min-h-11 px-2 text-[13px]">
-                  Remover
-                </Button>
-              )}
-            </div>
-            <Button variant="outline" size="icon-lg" aria-label={`Menos ${t.nome}`} disabled={t.qtd === 0} onClick={() => mudarQtd(i, t.qtd - 1)} className="size-11 rounded-full">
-              <MinusIcon />
-            </Button>
-            <Input
-              aria-label={`Quantidade ${t.nome}`}
-              inputMode="numeric"
-              value={String(t.qtd)}
-              onChange={(e) => mudarQtd(i, Number(e.target.value.replace(/\D/g, "")) || 0)}
-              className="h-11 w-14 text-center tabular-nums"
-            />
-            <Button variant="outline" size="icon-lg" aria-label={`Mais ${t.nome}`} onClick={() => mudarQtd(i, t.qtd + 1)} className="size-11 rounded-full">
-              <PlusIcon />
-            </Button>
-          </li>
+      <ToggleGroup
+        aria-label="Grupo de tamanhos"
+        value={[grupo]}
+        onValueChange={(v: string[]) => {
+          if (!v[0]) return;
+          setGrupo(v[0] as Grupo);
+          setNovo(null);
+        }}
+        className="flex-wrap"
+      >
+        {(Object.keys(GRADES) as Grupo[]).map((g) => (
+          <Opcao key={g} value={g}>
+            {g}
+            {soma(g) > 0 && <span className="text-muted-foreground tabular-nums">· {soma(g)}</span>}
+          </Opcao>
         ))}
+      </ToggleGroup>
+      <ul aria-label={`Tamanhos ${grupo.toLowerCase()}`} className="mt-3 grid gap-2">
+        {tamanhos.map((t, i) =>
+          t.grupo !== grupo ? null : (
+            <li key={nomeTamanho(t)} className="flex items-center gap-1.5">
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-medium">{t.nome}</p>
+                {t.extra && (
+                  <Button variant="link" onClick={() => onTamanhos(tamanhos.filter((_, j) => j !== i))} aria-label={`Remover tamanho ${nomeTamanho(t)}`} className="-ml-2 h-auto min-h-11 px-2 text-[13px]">
+                    Remover
+                  </Button>
+                )}
+              </div>
+              <Button variant="outline" size="icon-lg" aria-label={`Menos ${nomeTamanho(t)}`} disabled={t.qtd === 0} onClick={() => mudarQtd(i, t.qtd - 1)} className="size-11 rounded-full">
+                <MinusIcon />
+              </Button>
+              <Input
+                aria-label={`Quantidade ${nomeTamanho(t)}`}
+                inputMode="numeric"
+                value={String(t.qtd)}
+                onChange={(e) => mudarQtd(i, Number(e.target.value.replace(/\D/g, "")) || 0)}
+                className="h-11 w-14 text-center tabular-nums"
+              />
+              <Button variant="outline" size="icon-lg" aria-label={`Mais ${nomeTamanho(t)}`} onClick={() => mudarQtd(i, t.qtd + 1)} className="size-11 rounded-full">
+                <PlusIcon />
+              </Button>
+            </li>
+          )
+        )}
       </ul>
       {novo === null ? (
         <Button variant="outline" onClick={() => setNovo("")} className="mt-3 min-h-11">
@@ -568,14 +683,14 @@ function Tamanhos({ tamanhos, onTamanhos }: { tamanhos: Tamanho[]; onTamanhos: (
           onSubmit={(e) => {
             e.preventDefault();
             if (!nomeNovo || repetido) return;
-            onTamanhos([...tamanhos, { nome: nomeNovo, qtd: 0, extra: true }]);
+            onTamanhos([...tamanhos, { grupo, nome: nomeNovo, qtd: 0, extra: true }]);
             setNovo(null);
           }}
         >
           <Input
             autoFocus
-            aria-label="Nome do tamanho"
-            placeholder="Ex.: XG ou Infantil 10"
+            aria-label={`Nome do tamanho ${grupo.toLowerCase()}`}
+            placeholder={grupo === "Adulto" ? "Ex.: G4" : "Ex.: 1"}
             value={novo}
             onChange={(e) => setNovo(e.target.value)}
             onKeyDown={(e) => e.key === "Escape" && setNovo(null)}

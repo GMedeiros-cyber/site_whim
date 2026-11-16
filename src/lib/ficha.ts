@@ -20,9 +20,10 @@ export type LinhaFicha = {
 
 export type DadosFicha = {
   modelo: { id: string; nome: string; coresPasta: string; areas: object };
-  cor: { nome: string; pasta: string };
+  cor: { nome: string; pasta: string }; // nome = a cor do pedido (pode ser "Outra cor"); pasta = a da prévia
+  tecido: string;
   tecnica: Tecnica;
-  tamanhos: string; // "P 10, M 20" ou "a definir"
+  tamanhos: string; // "P 10, M 20, Infantil 4: 5" ou "a definir"
   total: number;
   linhas: LinhaFicha[];
   tinta: string; // cor do marcador "Sua arte" (depende do tecido)
@@ -39,6 +40,18 @@ function cortar(ctx: CanvasRenderingContext2D, texto: string, max: number) {
   let ini = texto.slice(0, texto.length - fim.length);
   while (ini.length > 1 && ctx.measureText(`${ini}…${fim}`).width > max) ini = ini.slice(0, -1);
   return `${ini}…${fim}`;
+}
+
+/** Quebra a lista "a, b, c" em até `max` linhas de `largura` px; o que não couber vira "…". */
+function quebrar(ctx: CanvasRenderingContext2D, texto: string, largura: number, max: number) {
+  const linhas: string[] = [];
+  for (const item of texto.split(", ")) {
+    const junto = linhas.length ? `${linhas[linhas.length - 1]}, ${item}` : item;
+    if (linhas.length && ctx.measureText(junto).width <= largura) linhas[linhas.length - 1] = junto;
+    else linhas.push(item);
+  }
+  if (linhas.length > max) linhas.splice(max - 1, Infinity, `${linhas[max - 1]}, …`);
+  return linhas.map((l, i) => (i < linhas.length - 1 ? `${l},` : l));
 }
 
 export async function gerarFicha(d: DadosFicha): Promise<Blob> {
@@ -93,11 +106,11 @@ export async function gerarFicha(d: DadosFicha): Promise<Blob> {
   ctx.fillStyle = branco;
   ctx.fillRect(0, 0, W, H);
 
-  // Topo: logo, peça, cor, técnica, total e tamanhos.
+  // Topo: logo, peça, cor, técnica e tecido.
   if (logo) ctx.drawImage(logo, 48, 40, (logo.naturalWidth / logo.naturalHeight) * 64, 64);
   texto(`Ficha da estampa · ${d.modelo.nome}`, 400, 66, 32, 600);
   texto(`Cor: ${d.cor.nome}  ·  Técnica: ${tecnica}`, 400, 104, 22, 400, secundaria);
-  texto(`Total: ${d.total} ${d.total === 1 ? "peça" : "peças"}  ·  Tamanhos: ${d.tamanhos}`, 400, 136, 22, 400, secundaria);
+  texto(`Tecido: ${d.tecido}`, 400, 136, 22, 400, secundaria);
   ctx.fillStyle = fundo;
   ctx.fillRect(48, 164, W - 96, 2);
 
@@ -138,6 +151,11 @@ export async function gerarFicha(d: DadosFicha): Promise<Blob> {
     }
   });
   if (!d.linhas.length) texto("Nenhuma posição marcada.", tx, 276, 18, 400, secundaria);
+
+  // Embaixo das fotos: total e tamanhos (adulto e infantil podem render até 3 linhas).
+  texto(`Total: ${d.total} ${d.total === 1 ? "peça" : "peças"}`, 48, 800, 22, 600);
+  ctx.font = `400 18px ${fonte}`;
+  quebrar(ctx, `Tamanhos: ${d.tamanhos}`, 820, 3).forEach((l, i) => texto(l, 48, 830 + i * 26, 18, 400, secundaria));
 
   // Rodapé.
   ctx.fillStyle = fundo;

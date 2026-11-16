@@ -147,3 +147,18 @@ Uma entrada por tarefa, sempre acrescentada no fim (nunca reescrever as anterior
 - Build: não se aplica (só arquivos de referência e imagens).
 - Commit: `74179e1`.
 - Pendente: Whim confirmar Aurora (Coop?), unidade do Colégio Progresso e o OK para exibir os logos.
+
+### Agente 1 · 2026-11-16 00:40 · Ajustes do briefing da Whim (Claude Code)
+- Feito: Gola V fora da arara, do manifesto e do repositório (`public/arara/golav/`); Tecido no passo Peça (lista do briefing + "Não sei, me indiquem"), na mensagem e na ficha; passo Cor com as cores como exemplo, "Outra cor" com campo e a nota; tamanhos Adulto (PP a G3) e Infantil (2 a 16) somando no total, com "Adicionar outro tamanho" no grupo aberto; frente e costas inteiras "até A3 (29,7 × 42 cm)" e aviso "Tamanho máximo da estampa: A3."; Resumo com o prazo e "Quem responde é a Caroline."; técnicas seguem Silk, DTF, Bordado e "Ainda não sei".
+- Mensagem: `• Tecido: …` numa linha própria; tamanhos como "P 30, Infantil 4: 25". Ficha: tecido no topo; total e tamanhos embaixo das fotos (até 3 linhas); outra cor sai como "Verde (prévia em Turquesa)".
+- Conferido: `npm run lint` e `npm run build` ok; Playwright em produção, 360/390/768/1024/1280, 167 checagens ok (mensagem e link do WhatsApp, ficha, sem rolagem lateral, alvos de 44 px no celular, sem erro no console).
+- Commits: `283d11e` e `9291fbe` no branch `agente-1/monte-sua-peca` (worktree separado; não mexi na home nem nos compartilhados).
+- Pendente: a Whim confirmar G1 a G3, os pares do infantil e as medidas; o briefing cita "moletom gola careca", que não tem imagens na arara.
+
+### Agente 1 · 2026-11-16 01:07 · Eyebrow fora do Monte sua peça e do Contato (Claude Code)
+- Feito: `<Eyebrow>` tirado de `personalizador.tsx` e `contato-avaliacoes.tsx` (o `blocos.tsx` não foi tocado). Espaço acima dos títulos medido com e sem o `mt-4` atual do `Titulo`: h1 a 62 px ou mais abaixo do header e título do Contato a 56 px ou mais do topo da seção, então não mexi no espaçamento.
+- Botão do WhatsApp: o branch do agente 2 ainda não tem o botão, então não deu para conferir. O personalizador não tem barra nem ficha fixa (nada `fixed`/`sticky`), mas vale olhar de novo a 390 px quando entrar.
+- Branch: os trabalhos do agente 1 agora ficam em `agente-1/monte-sua-peca` (o `agente-1/briefing` ficou para trás, com os mesmos commits de antes do rebase).
+- Conferido: `npm run lint` e `npm run build` ok; Playwright em produção, 360/390/768/1024/1280, sem rótulo, sem rolagem lateral e sem erro no console.
+- Commit: `31337b7`.
+- Pendente: a /privacidade ainda tem o `<Eyebrow>LGPD</Eyebrow>` (não é arquivo do agente 1).
