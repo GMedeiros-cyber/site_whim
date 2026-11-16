@@ -9,10 +9,10 @@ Logos oficiais, convertidos para uma cor só (`#5D6178`, cinza-azulado da Whim) 
 | Santander | `santander.webp` | Wikimedia Commons, "Banco Santander Logotipo.svg" |
 | SBT | `sbt.webp` | Wikimedia Commons, versão monocromática do logo do SBT |
 | Bauducco | `bauducco.webp` | logo do cabeçalho de bauducco.com.br |
-| Aurora | `aurora.webp` | Wikimedia Commons, "Logotipo da Aurora Coop.svg" (**confirmar se é a Aurora Coop**) |
+| Aurora | `aurora.webp` | Wikimedia Commons, "Logotipo da Aurora Coop.svg" (Aurora Coop, a de alimentos; confirmado pelo Gabriel em 16/11) |
 | Electrochemical | `electrochemical.webp` | logo do cabeçalho de electrochemical.com.br (Guarulhos) |
 | Lopes Kalil Engenharia | `lopes-kalil.webp` | logo de lopeskalil.com.br (original pequeno, 130 px) |
 | Indovinya | `indovinya.webp` | logo de indovinya.indoramaventures.com |
-| Colégio Progresso | `colegio-progresso.webp` | logo de colegioprogresso.g12.br (Guarulhos, Vila Galvão) (**confirmar a unidade**) |
+| Colégio Progresso | `colegio-progresso.webp` | logo de colegioprogresso.g12.br (Guarulhos, Vila Galvão) (unidade de Guarulhos; confirmado pelo Gabriel em 16/11) |
 
-Pendente com a Whim: confirmar Aurora e Colégio Progresso e o OK para exibir os logos. Se a Whim mandar os vetores das artes que estampou, trocar por eles.
+Aurora e Colégio Progresso confirmados pelo Gabriel em 16/11. Se a Whim mandar os vetores das artes que estampou, trocar por eles.
