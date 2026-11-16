@@ -4,7 +4,7 @@ Fonte: respostas da própria Whim. Senhas e logins do PDF **não** ficam no repo
 
 - **História:** fundada em 2021 por Wallan, depois de 15 anos de experiência em confecção e estamparia. Depois de participar de outras sociedades, decidiu construir uma empresa com a visão dele: estar perto do cliente, entender cada projeto e cuidar de cada etapa da produção.
 - **Diferencial:** cuidado com cada etapa da produção; estampas de alta qualidade, tecidos de fornecedores selecionados e atenção ao acabamento.
-- **Clientes que podem ser citados:** Globo, Lollapalooza, Aurora, Santander, Eletrochemical, Lopes Kalil Engenharia, Indovinya, Bauducco, Colégio Progresso, SBT. (Escrita dos nomes conferida pela grafia oficial das marcas; logos ainda não recebidos.)
+- **Clientes que podem ser citados:** Globo, Lollapalooza, Aurora, Santander, Electrochemical, Lopes Kalil Engenharia, Indovinya, Bauducco, Colégio Progresso, SBT. (Grafia oficial; "Electrochemical" com "c", como no site e no CNPJ. Logos oficiais buscados em 16/11, ver `referencia/logos-clientes.md`.)
 - **Cliente ideal:** empresas, confecções e marcas, eventos e igrejas.
 - **Região:** Guarulhos e Grande SP.
 - **Como querem ser vistos:** qualidade, confiável e comprometida com prazos.
@@ -33,4 +33,5 @@ Fonte: respostas da própria Whim. Senhas e logins do PDF **não** ficam no repo
 
 - Dias de funcionamento (o horário 6h às 18h veio antes; não sabemos os dias).
 - Domínio exato do site (provavelmente whimconfeccao.com.br, pelo e-mail).
-- Logos dos clientes, depoimentos reais, fotos de trabalhos para portfólio.
+- Confirmar com a Whim: a Aurora é a Aurora Coop? O Colégio Progresso é o de Guarulhos (Vila Galvão)? Pode exibir os logos no site?
+- Depoimentos reais, fotos de trabalhos para portfólio.

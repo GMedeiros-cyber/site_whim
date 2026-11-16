@@ -17,9 +17,8 @@ a{color:#373857}a:hover{color:#31C4EA}
 .wrap{max-width:1200px;margin:0 auto;padding:0 40px;box-sizing:border-box}
 .sec{padding:120px 0}
 .muted{background:#F5F7FA}
-.eye{display:flex;align-items:center;gap:12px;font-size:12px;font-weight:500;letter-spacing:.18em;color:#5D6178;margin:0}
-.eye i{display:block;width:24px;height:1.5px;background:#31C4EA}
-.tit{margin:20px 0 0;font-size:52px;line-height:1.08;font-weight:600;letter-spacing:-.025em;max-width:18ch}
+.gota{display:inline-block;width:.56em;height:.56em;margin-right:.2em;vertical-align:.04em;background:#31C4EA;border-radius:54% 46% 61% 39% / 47% 60% 40% 53%}
+.tit{margin:0;font-size:52px;line-height:1.08;font-weight:600;letter-spacing:-.025em;max-width:18ch}
 .hl{background:linear-gradient(transparent 62%,rgba(49,196,234,.4) 62%,rgba(49,196,234,.4) 92%,transparent 92%);font-style:normal}
 .lead{margin:18px 0 0;font-size:17px;line-height:1.6;color:#5D6178;max-width:56ch}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:52px;padding:0 26px;border-radius:999px;font-weight:600;font-size:15px;text-decoration:none;box-sizing:border-box}
@@ -106,10 +105,10 @@ a{color:#373857}a:hover{color:#31C4EA}
 .faixa{margin-top:52px;overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent);mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent)}
 .trilha{display:flex;width:max-content;animation:rola 40s linear infinite}
 .faixa:hover .trilha{animation-play-state:paused}
-.grupo{display:flex;align-items:center;gap:56px;padding-right:56px}
+.grupo{display:flex;align-items:center;gap:72px;padding-right:72px}
 @keyframes rola{to{transform:translateX(-50%)}}
-.marca{font-size:34px;font-weight:600;letter-spacing:-.02em;color:#5D6178;display:flex;align-items:center;gap:56px;white-space:nowrap}
-.marca:after{content:"";width:8px;height:8px;border-radius:999px;background:#31C4EA}
+.marca{display:block;height:var(--h);width:auto;opacity:.85;transition:opacity .2s}
+.marca:hover{opacity:1}
 .slot{padding:16px 24px;border-radius:12px;border:1px dashed rgba(55,56,87,.28);font-size:13px;color:#5D6178;white-space:nowrap}
 /* duvidas */
 .duv{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:64px;align-items:start}
@@ -148,14 +147,27 @@ a{color:#373857}a:hover{color:#31C4EA}
 #sobre{z-index:1}#servicos{z-index:2}#processo{z-index:3}#clientes{z-index:4}#duvidas{z-index:5}.fim{z-index:6;border-radius:0;box-shadow:none;margin-top:0}
 .tinta{position:absolute;left:0;right:0;top:-58px;height:60px;width:100%;display:block;z-index:5}
 @supports (animation-timeline: view()){
-.sec .eye,.sec .tit,.sec .lead,.cta h2{animation:sobe linear both;animation-timeline:view();animation-range:entry 5% cover 28%}
+.sec .tit,.sec .lead,.cta h2{animation:sobe linear both;animation-timeline:view();animation-range:entry 5% cover 28%}
 @keyframes sobe{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:none}}
 .hero{animation:recua linear both;animation-timeline:view();animation-range:exit 0% exit 100%}
 @keyframes recua{to{transform:scale(.94);border-radius:48px;filter:brightness(.8)}}
 }
-@media (prefers-reduced-motion:reduce){.sec .eye,.sec .tit,.sec .lead,.cta h2,.hero{animation:none}}
+@media (prefers-reduced-motion:reduce){.sec .tit,.sec .lead,.cta h2,.hero{animation:none}}
+/* whatsapp flutuante */
+.zap{position:fixed;right:24px;bottom:24px;z-index:60;display:flex;align-items:flex-end;gap:10px;flex-direction:column}
+.zap-b{display:inline-flex;align-items:center;gap:10px;min-height:56px;padding:0 20px 0 16px;border-radius:999px;background:#31C4EA;color:#373857;font-weight:600;font-size:15px;text-decoration:none;box-shadow:0 18px 36px -16px rgba(55,56,87,.6);transform-origin:80% 100%}
+.zap-b:hover{color:#373857;background:#5ad0ef}
+.zap-b svg{flex:0 0 26px}
+.zap-dica{max-width:220px;padding:10px 14px;border-radius:16px 16px 4px 16px;background:#FFFFFF;color:#373857;font-size:13px;line-height:1.4;box-shadow:0 14px 30px -18px rgba(55,56,87,.55);border:1px solid rgba(55,56,87,.08);animation:dica .5s cubic-bezier(.2,.9,.3,1.3) 3s both}
+@keyframes dica{from{opacity:0;transform:translateY(8px) scale(.9)}to{opacity:1;transform:none}}
+@supports (animation-timeline: scroll()){
+.zap-b{animation:chacoalha linear both;animation-timeline:scroll(root block)}
+@keyframes chacoalha{0%{transform:none}2.5%{transform:rotate(-7deg) translateY(-3px)}5%{transform:rotate(5deg)}7.5%{transform:rotate(-4deg) translateY(-2px)}10%{transform:none}12.5%{transform:rotate(-7deg) translateY(-3px)}15%{transform:rotate(5deg)}17.5%{transform:rotate(-4deg) translateY(-2px)}20%{transform:none}22.5%{transform:rotate(-7deg) translateY(-3px)}25%{transform:rotate(5deg)}27.5%{transform:rotate(-4deg) translateY(-2px)}30%{transform:none}32.5%{transform:rotate(-7deg) translateY(-3px)}35%{transform:rotate(5deg)}37.5%{transform:rotate(-4deg) translateY(-2px)}40%{transform:none}42.5%{transform:rotate(-7deg) translateY(-3px)}45%{transform:rotate(5deg)}47.5%{transform:rotate(-4deg) translateY(-2px)}50%{transform:none}52.5%{transform:rotate(-7deg) translateY(-3px)}55%{transform:rotate(5deg)}57.5%{transform:rotate(-4deg) translateY(-2px)}60%{transform:none}62.5%{transform:rotate(-7deg) translateY(-3px)}65%{transform:rotate(5deg)}67.5%{transform:rotate(-4deg) translateY(-2px)}70%{transform:none}72.5%{transform:rotate(-7deg) translateY(-3px)}75%{transform:rotate(5deg)}77.5%{transform:rotate(-4deg) translateY(-2px)}80%{transform:none}82.5%{transform:rotate(-7deg) translateY(-3px)}85%{transform:rotate(5deg)}87.5%{transform:rotate(-4deg) translateY(-2px)}90%{transform:none}92.5%{transform:rotate(-7deg) translateY(-3px)}95%{transform:rotate(5deg)}97.5%{transform:rotate(-4deg) translateY(-2px)}100%{transform:none}}
+}
+@media (prefers-reduced-motion:reduce){.zap-b,.zap-dica{animation:none}}
 /* celular */
 @media (max-width:760px){
+.zap{right:16px;bottom:16px}.zap-b{width:56px;padding:0;justify-content:center}.zap-b span{display:none}.zap-dica{max-width:180px}
 .sec{border-radius:28px 28px 0 0;margin-top:-28px}#sobre{margin-top:0;border-radius:0}.tinta{top:-38px;height:40px}
 .wrap{padding:0 20px}.sec{padding:80px 0}
 .nav{top:14px;left:12px;right:12px;transform:none;justify-content:space-between}
@@ -183,7 +195,7 @@ a{color:#373857}a:hover{color:#31C4EA}
 @supports (animation-timeline: view()){.trilho i{width:100%;height:0;animation-name:desce}}
 @keyframes desce{0%,4%{height:0}22%,26%{height:25%}44%,48%{height:50%}66%,70%{height:75%}88%,100%{height:100%}}
 .steps li{display:grid;grid-template-columns:46px 1fr;column-gap:16px;row-gap:6px}.steps li .num{grid-row:span 2}.steps h3{margin:10px 0 0}
-.marca{font-size:24px;gap:28px}.grupo{gap:28px;padding-right:28px}
+.marca{height:calc(var(--h) * .72)}.grupo{gap:44px;padding-right:44px}
 .cta{padding:80px 0 56px}.cta h2{font-size:48px}
 .foot{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:32px}.foot .first,.foot .last{grid-column:span 2}
 .legal{flex-direction:column}
@@ -204,6 +216,10 @@ a{color:#373857}a:hover{color:#31C4EA}
 <a class="menu" href="#topo">Menu</a>
 </header>
 
+<div class="zap">
+<p class="zap-dica">Oi! Quer um orçamento? A Caroline responde no WhatsApp.</p>
+<a class="zap-b" href="#fim" aria-label="Pedir orçamento no WhatsApp"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"></path><path d="M9 10a.5.5 0 0 0 1 0V9a.5.5 0 0 0-1 0v1a5 5 0 0 0 5 5h1a.5.5 0 0 0 0-1h-1a.5.5 0 0 0 0 1"></path></svg><span>Orçamento</span></a>
+</div>
 <section id="topo" class="hero">
 <img class="hero-bg" src="/_blob/65fedce6da97c68e888774c0681e14a2" alt="Mesa longa de silk com peças estampadas em série na oficina da Whim">
 <div class="hero-tint"></div>
@@ -226,8 +242,7 @@ a{color:#373857}a:hover{color:#31C4EA}
 <section id="sobre" class="sec">
 <div class="wrap sobre">
 <div class="sobre-tx">
-<p class="eye"><i></i>Quem somos</p>
-<h2 class="tit">Uma oficina, <em class="hl">do fio à estampa.</em></h2>
+<h2 class="tit"><span class="gota" aria-hidden="true"></span>Uma oficina, <em class="hl">do fio à estampa.</em></h2>
 <p class="lead">A Whim nasceu em 2021, quando o Wallan juntou 15 anos de experiência numa oficina própria em Guarulhos. Hoje a gente faz peças para empresas, escolas e eventos com todas as etapas no mesmo lugar.</p>
 <ul class="etapas">
 <li><b>Gravação de telas</b><span>A arte vira tela para o silk.</span></li>
@@ -248,8 +263,7 @@ a{color:#373857}a:hover{color:#31C4EA}
 
 <section id="servicos" class="sec muted">
 <div class="wrap">
-<p class="eye"><i></i>O que fazemos</p>
-<h2 class="tit">Três jeitos de <em class="hl">estampar sua marca.</em></h2>
+<h2 class="tit"><span class="gota" aria-hidden="true"></span>Três jeitos de <em class="hl">estampar sua marca.</em></h2>
 <p class="lead">Cada técnica deixa a arte de um jeito. Veja como fica cada uma e para o que ela é melhor.</p>
 <div class="tecnicas">
 <article class="tec">
@@ -275,8 +289,7 @@ a{color:#373857}a:hover{color:#31C4EA}
 
 <section id="processo" class="sec">
 <div class="wrap">
-<p class="eye"><i></i>Como funciona</p>
-<h2 class="tit">Do pedido <em class="hl">à entrega.</em></h2>
+<h2 class="tit"><span class="gota" aria-hidden="true"></span>Do pedido <em class="hl">à entrega.</em></h2>
 <div class="stepsbox">
 <div class="trilho" aria-hidden="true"><i></i></div>
 <ol class="steps">
@@ -293,19 +306,17 @@ a{color:#373857}a:hover{color:#31C4EA}
 
 <section id="clientes" class="sec muted">
 <div class="wrap">
-<p class="eye"><i></i>Quem já vestiu Whim</p>
-<h2 class="tit">Marcas que <em class="hl">confiam na oficina.</em></h2>
+<h2 class="tit"><span class="gota" aria-hidden="true"></span>Marcas que <em class="hl">confiam na oficina.</em></h2>
 </div>
 <div class="faixa" aria-label="Clientes da Whim">
-<div class="trilha"><div class="grupo"><span class="marca">Globo</span><span class="marca">Lollapalooza</span><span class="marca">Santander</span><span class="marca">SBT</span><span class="marca">Bauducco</span><span class="marca">Aurora</span><span class="marca">Eletrochemical</span><span class="marca">Lopes Kalil Engenharia</span><span class="marca">Indovinya</span><span class="marca">Colégio Progresso</span></div><div class="grupo" aria-hidden="true"><span class="marca">Globo</span><span class="marca">Lollapalooza</span><span class="marca">Santander</span><span class="marca">SBT</span><span class="marca">Bauducco</span><span class="marca">Aurora</span><span class="marca">Eletrochemical</span><span class="marca">Lopes Kalil Engenharia</span><span class="marca">Indovinya</span><span class="marca">Colégio Progresso</span></div></div>
+<div class="trilha"><div class="grupo"><img class="marca" src="/_blob/bc5964568c794e17f4322bc8474a8d2e" alt="Globo" style="--h: 37px"><img class="marca" src="/_blob/439539596fd0649bd3edaadc73df24df" alt="Lollapalooza" style="--h: 35px"><img class="marca" src="/_blob/81dd57f0af88690b05d1d977444e91ab" alt="Santander" style="--h: 32px"><img class="marca" src="/_blob/42b249dfdcbcd30ac50ddc71d4e2e690" alt="SBT" style="--h: 52px"><img class="marca" src="/_blob/d556ee6f08317965140ef0275e9b8215" alt="Bauducco" style="--h: 45px"><img class="marca" src="/_blob/6bf9c921995a74aee28b7ff8ff9cb8bc" alt="Aurora" style="--h: 37px"><img class="marca" src="/_blob/06b8d9d5b460bbf4db2c54a4b1a20d11" alt="Electrochemical" style="--h: 27px"><img class="marca" src="/_blob/030af06fa4ceef8c044d4dac18f4a822" alt="Lopes Kalil Engenharia" style="--h: 52px"><img class="marca" src="/_blob/53473ba436081ff63e9b3a3f57ff434c" alt="Indovinya" style="--h: 42px"><img class="marca" src="/_blob/5e285addc418fecd507bccc0020f21ac" alt="Colégio Progresso" style="--h: 49px"></div><div class="grupo" aria-hidden="true"><img class="marca" src="/_blob/bc5964568c794e17f4322bc8474a8d2e" alt="" style="--h: 37px"><img class="marca" src="/_blob/439539596fd0649bd3edaadc73df24df" alt="" style="--h: 35px"><img class="marca" src="/_blob/81dd57f0af88690b05d1d977444e91ab" alt="" style="--h: 32px"><img class="marca" src="/_blob/42b249dfdcbcd30ac50ddc71d4e2e690" alt="" style="--h: 52px"><img class="marca" src="/_blob/d556ee6f08317965140ef0275e9b8215" alt="" style="--h: 45px"><img class="marca" src="/_blob/6bf9c921995a74aee28b7ff8ff9cb8bc" alt="" style="--h: 37px"><img class="marca" src="/_blob/06b8d9d5b460bbf4db2c54a4b1a20d11" alt="" style="--h: 27px"><img class="marca" src="/_blob/030af06fa4ceef8c044d4dac18f4a822" alt="" style="--h: 52px"><img class="marca" src="/_blob/53473ba436081ff63e9b3a3f57ff434c" alt="" style="--h: 42px"><img class="marca" src="/_blob/5e285addc418fecd507bccc0020f21ac" alt="" style="--h: 49px"></div></div>
 </div>
 </section>
 
 <section id="duvidas" class="sec">
 <div class="wrap duv">
 <div>
-<p class="eye"><i></i>Dúvidas frequentes</p>
-<h2 class="tit">Antes de <em class="hl">pedir o orçamento.</em></h2>
+<h2 class="tit"><span class="gota" aria-hidden="true"></span>Antes de <em class="hl">pedir o orçamento.</em></h2>
 <p class="lead">As perguntas que mais chegam no WhatsApp, respondidas aqui.</p>
 </div>
 <div class="lista"><details class="q" open><summary>Qual a quantidade mínima?<i aria-hidden="true"></i></summary><p>A partir de 50 peças por pedido.</p></details><details class="q"><summary>Quanto tempo leva para ficar pronto?<i aria-hidden="true"></i></summary><p>De 20 a 30 dias de produção, conforme a quantidade e o modelo.</p></details><details class="q"><summary>Qual técnica de estampa eu escolho?<i aria-hidden="true"></i></summary><p>Silk para logos de poucas cores e tiragens maiores, DTF para artes coloridas e com degradê, bordado para logo no peito de polos e uniformes. Na dúvida, mande a arte que a gente indica.</p></details><details class="q"><summary>Quais peças e tecidos vocês trabalham?<i aria-hidden="true"></i></summary><p>Camiseta, polo, regata, moletom gola careca e canguru e baby look. Tecidos: meia malha penteada 100% algodão premium, malha fria PV antipilling, malha mescla PA, malha piquet PA, moletom 3 cabos e dry fit 100% poliéster ou 100% poliamida.</p></details><details class="q"><summary>Quais tamanhos e cores?<i aria-hidden="true"></i></summary><p>Infantil do 2 ao 16 e adulto do PP ao G3. A cor da peça é de acordo com o seu pedido.</p></details><details class="q"><summary>Onde dá para estampar e qual o tamanho máximo?<i aria-hidden="true"></i></summary><p>Frente, costas e manga, com estampa de até A3.</p></details><details class="q"><summary>Vocês atendem a minha região?<i aria-hidden="true"></i></summary><p>Atendemos Guarulhos e a Grande São Paulo.</p></details><details class="q"><summary>O site mostra preço?<i aria-hidden="true"></i></summary><p>Não. O orçamento é feito pelo WhatsApp, e quem responde é a Caroline.</p></details></div>
