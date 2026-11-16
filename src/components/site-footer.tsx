@@ -11,7 +11,7 @@ import { CONTATO, EMPRESA, WHATSAPP } from "@/lib/whim";
 
 /** Links do rodapé: alvo de toque de 44px no celular/tablet, compacto no PC. */
 const link =
-  "inline-flex min-h-11 items-center gap-1 rounded-sm underline-offset-4 transition-colors hover:text-primary-foreground hover:underline focus-visible:text-primary-foreground lg:min-h-0 lg:py-1";
+  "inline-flex min-h-11 min-w-11 items-center gap-1 rounded-sm underline-offset-4 transition-colors hover:text-primary-foreground hover:underline focus-visible:text-primary-foreground lg:min-h-0 lg:min-w-0 lg:py-1";
 
 const novaAba = { target: "_blank", rel: "noopener noreferrer" } as const;
 
