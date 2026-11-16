@@ -15,11 +15,15 @@ const link =
 
 const novaAba = { target: "_blank", rel: "noopener noreferrer" } as const;
 
+/** Mapa embutido (sempre visível; citado na /privacidade). */
+const MAPA_EMBED =
+  "https://www.google.com/maps?q=Av.+Brigadeiro+Faria+Lima,+110,+Cocaia,+Guarulhos+-+SP,+07130-000&output=embed";
+
 export function SiteFooter() {
   return (
     <footer className="bg-primary pt-14 pb-[calc(env(safe-area-inset-bottom)+1.5rem)] text-sm text-primary-foreground/75 sm:pt-16">
       <Container>
-        <div className="grid gap-x-10 gap-y-10 sm:grid-cols-2 lg:grid-cols-[1.25fr_0.85fr_1.2fr_1.4fr]">
+        <div className="grid gap-x-10 gap-y-10 sm:grid-cols-2 lg:grid-cols-[1.15fr_0.8fr_1.15fr_1.7fr]">
           {/* Marca */}
           <div className="flex flex-col items-start gap-4">
             <Link href="/" aria-label="Whim Confecção e Estamparia, página inicial" className="rounded-sm">
@@ -79,12 +83,19 @@ export function SiteFooter() {
               <Linha partes={CONTATO.logradouro.split(" · ")} />
               <Linha partes={[CONTATO.bairro, CONTATO.cidade]} />
               <span>CEP {CONTATO.cep}</span>
-              <a href={CONTATO.mapa} {...novaAba} className={cn(link, "w-fit lg:mt-1")}>
-                Ver no mapa
-                <ArrowUpRightIcon aria-hidden className="size-3.5 text-accent" />
-                <span className="sr-only"> (abre em nova aba)</span>
-              </a>
             </address>
+            <iframe
+              src={MAPA_EMBED}
+              title="Mapa com a localização da Whim"
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              className="mt-1 h-[190px] w-full rounded-[18px] border border-primary-foreground/15 bg-primary-foreground/10"
+            />
+            <a href={CONTATO.mapa} {...novaAba} className={cn(link, "w-fit")}>
+              Abrir no Google Maps
+              <ArrowUpRightIcon aria-hidden className="size-3.5 text-accent" />
+              <span className="sr-only"> (abre em nova aba)</span>
+            </a>
           </Coluna>
         </div>
 
