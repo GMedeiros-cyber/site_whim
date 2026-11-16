@@ -131,3 +131,4 @@ Uma entrada por tarefa, sempre acrescentada no fim (nunca reescrever as anterior
 - Comandos: merge de `secao/header-rodape` e `secao/contato-avaliacoes`; `npm run lint`; `npx next typegen` + `npx tsc --noEmit`; Playwright em 390 e 1280 (sem erro no console, sem rolagem lateral).
 - Build: `npm run build` não roda neste container (Google Fonts bloqueado); rodar aí.
 - Pendente: revisão jurídica da /privacidade; avaliações reais do Google; `CONTATO` ganhou campos separados (logradouro, bairro, cidade, cep).
+- Commit: `2d00d74` (merges `f419b03` e `d786972`).
