@@ -198,3 +198,12 @@ Uma entrada por tarefa, sempre acrescentada no fim (nunca reescrever as anterior
 - Conferido: lint e tsc ok; build ok (Poppins trocada só localmente); Playwright 390 e 1280: abertura some aos ~3,9 s e a tinta começa logo depois, recarregar não repete, toque pula, movimento reduzido não mostra, console sem erro.
 - Commit: `690b04c`.
 - Pendente: agente 2 juntar o main no `agente-2/tinta` (aviso em PEDIDOS).
+
+### 2026-11-16 · Agente 2 · Tinta sem travar (Claude Code)
+- Feito (`agente-2/tinta`, main juntado por fast-forward em `1e5c579`): `palavra-tinta.tsx` mantém o `depoisDaAbertura` e, sem abertura, espera ociosidade; link do shader por `KHR_parallel_shader_compile`; DPR 1 e ~30 quadros/s; para ao sair da tela ou com a aba oculta; erro no WebGL mostra a palavra pronta.
+- Medido em sessão nova com a abertura (CPU 4×, 412 px): maior tarefa na janela da tinta 97–127 → 54–60 ms, bloqueio 47–77 → 4–10 ms, quadros sem engasgo. Playwright: 12 checagens ok (toque pula, rolar/aba oculta param, sem abertura começa após o load, movimento reduzido, console limpo).
+- Lighthouse 12.8 no celular, perfil limpo, 6 rodadas: Performance 80 a 83 (2 rodadas com a máquina ocupada deram 56 e 69), LCP 3,9–4,4 s, TBT 160–310 ms. A gravação acaba em ~2,9 s, antes da tinta (~4 s).
+- O que segura os 90 é o LCP: bloqueando só os logos dos clientes nada muda; bloqueando as imagens da abertura deu 93 e 85 (o `whim-simbolo.svg`, 97 KB em prioridade alta, é só o fantasma a 7%).
+- Comandos: `git merge origin/main`, `npm run lint`, `npm run build` (ok), `next start` + Lighthouse e Playwright.
+- Commit: `b8ab11e`.
+- Pendente: decidir o peso da abertura (fantasma mais leve ou com prioridade baixa) para chegar aos 90; não mexi nela.
