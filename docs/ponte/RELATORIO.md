@@ -207,3 +207,9 @@ Uma entrada por tarefa, sempre acrescentada no fim (nunca reescrever as anterior
 - Comandos: `git merge origin/main`, `npm run lint`, `npm run build` (ok), `next start` + Lighthouse e Playwright.
 - Commit: `b8ab11e`.
 - Pendente: decidir o peso da abertura (fantasma mais leve ou com prioridade baixa) para chegar aos 90; não mexi nela.
+
+### 2026-11-16 11:00 · Tinta do agente 2 no main e abertura mais leve (Claude, outra conta)
+- Feito: revisei e juntei `agente-2/tinta` no main (fast-forward, só `palavra-tinta.tsx` + docs, espera da abertura mantida); abertura passa a usar cópias reduzidas dos arquivos oficiais em `public/brand/abertura/` (fantasma 240 px cinza 13 KB com `fetchPriority="low"` no lugar do SVG de 507 KB; contorno 480 px 53 KB no lugar de 94 KB). O logo não mudou, só a resolução.
+- Conferido: lint, tsc e build ok; Playwright 1280: abertura igual à de antes, some e a tinta termina "pronta", console limpo.
+- Commit: `6a6f455`.
+- Pendente: o agente 3 medir de novo no celular (meta 90); LCP da foto do topo.
