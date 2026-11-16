@@ -147,3 +147,10 @@ Uma entrada por tarefa, sempre acrescentada no fim (nunca reescrever as anterior
 - Build: não se aplica (só arquivos de referência e imagens).
 - Commit: `74179e1`.
 - Pendente: Whim confirmar Aurora (Coop?), unidade do Colégio Progresso e o OK para exibir os logos.
+
+### Agente 1 · 2026-11-16 00:40 · Ajustes do briefing da Whim (Claude Code)
+- Feito: Gola V fora da arara, do manifesto e do repositório (`public/arara/golav/`); Tecido no passo Peça (lista do briefing + "Não sei, me indiquem"), na mensagem e na ficha; passo Cor com as cores como exemplo, "Outra cor" com campo e a nota; tamanhos Adulto (PP a G3) e Infantil (2 a 16) somando no total, com "Adicionar outro tamanho" no grupo aberto; frente e costas inteiras "até A3 (29,7 × 42 cm)" e aviso "Tamanho máximo da estampa: A3."; Resumo com o prazo e "Quem responde é a Caroline."; técnicas seguem Silk, DTF, Bordado e "Ainda não sei".
+- Mensagem: `• Tecido: …` numa linha própria; tamanhos como "P 30, Infantil 4: 25". Ficha: tecido no topo; total e tamanhos embaixo das fotos (até 3 linhas); outra cor sai como "Verde (prévia em Turquesa)".
+- Conferido: `npm run lint` e `npm run build` ok; Playwright em produção, 360/390/768/1024/1280, 167 checagens ok (mensagem e link do WhatsApp, ficha, sem rolagem lateral, alvos de 44 px no celular, sem erro no console).
+- Commits: `283d11e` e `9291fbe` no branch `agente-1/monte-sua-peca` (worktree separado; não mexi na home nem nos compartilhados).
+- Pendente: a Whim confirmar G1 a G3, os pares do infantil e as medidas; o briefing cita "moletom gola careca", que não tem imagens na arara.
