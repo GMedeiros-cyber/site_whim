@@ -155,3 +155,11 @@ Uma entrada por tarefa, sempre acrescentada no fim (nunca reescrever as anterior
 - Comandos: `npm run lint` e `npm run build` (ok).
 - Commits: `899820f` home, `8c2246e` mapa/privacidade, `90fa9b3` briefing/transições/rolagem.
 - Pendente: logos dos clientes; texto de abertura do rodapé com os novos públicos (fora do que foi liberado no rodapé); Firefox sem `animation-timeline` mostra as etapas acesas e sem transições.
+
+### 2026-11-16 · Agente 2 · Home: logos, gota e WhatsApp flutuante (Claude Code)
+- Feito: logos dos 10 clientes com `next/image` (alturas da spec, × 0,72 no celular; cópias com `alt=""` e `aria-hidden`; Electrochemical); `Eyebrow` fora da home e gota turquesa no `Titulo` (`gota={false}` desliga; sem o `mt-4`); `src/components/botao-whatsapp.tsx` no `layout.tsx` (pílula no PC, 56 px no celular, balão 1×/sessão, balanço com `scroll(root)`); rodapé com `pb` maior para o botão não tapar links.
+- Decisões: logos sem lazy e com `fetchPriority="low"` (no carrossel com overflow escondido o lazy só carregava ao entrar e o logo piscava); `unoptimized` porque os arquivos já vêm com 120 px; trabalho no worktree `C:/tmp/whim-agente2` porque o agente 3 usa a pasta principal; `merge` do main em vez de rebase (o branch já estava publicado e force push é bloqueado).
+- Conferido (Chrome, produção, 390 e 1280 + movimento reduzido, 44 checagens ok): alturas e `alt` dos logos, gota de 0,56 em em todos os títulos, botão a 16/24 px das bordas, wa.me com a mensagem em nova aba, balão abre/fecha/não volta, × de 44 px, balanço ao rolar, rodapé livre no fim, botão em /monte-sua-peca e /privacidade, console sem erro.
+- Comandos: `npm run lint` e `npm run build` (ok).
+- Commit: `7f9a0f6` (antes: merge `ca122d2` com o main).
+- Pendente: tirar o Eyebrow da /privacidade ("LGPD") e do Monte sua peça (agente 1), que agora ficam colados no título; o agente 3 tem mudanças não commitadas em `page.tsx`, `carrossel.tsx` e `duvidas.ts` que vão precisar juntar com estas.
