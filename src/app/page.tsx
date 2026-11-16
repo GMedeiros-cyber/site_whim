@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import { Container, Destaque, Eyebrow, Seta, Titulo, secao } from "@/components/blocos";
+import { Container, Destaque, Seta, Titulo, secao } from "@/components/blocos";
 import { Carrossel } from "@/components/home/carrossel";
 import { DUVIDAS } from "@/components/home/duvidas";
 import { Etapas } from "@/components/home/etapas";
@@ -25,7 +25,7 @@ const botaoContorno = cn(
 /** Seção que sobe por cima da anterior (cantos de cima, sombra e margem negativa). */
 const sobrepoe =
   "relative isolate -mt-7 rounded-t-[28px] shadow-[0_-24px_40px_-34px] shadow-primary/35 md:-mt-10 md:rounded-t-[40px]";
-/** Eyebrow, título e linha de apoio que sobem ao entrar na tela. */
+/** Título e linha de apoio que sobem ao entrar na tela. */
 const sobe = "home-sobe";
 const apoio = "mt-[18px] max-w-[56ch] text-base leading-relaxed text-pretty text-muted-foreground sm:text-[17px]";
 
@@ -76,18 +76,20 @@ const TAMBEM = [
   { nome: "Não sabe qual?", texto: "Mande a arte: a equipe indica a técnica que fica melhor." },
 ];
 
-// Clientes que a Whim autorizou citar (briefing de 16/11). Logos ainda não chegaram.
+// Clientes que a Whim autorizou citar (briefing de 16/11). Logos oficiais já em
+// cinza, 120 px de altura (fontes em referencia/logos-clientes.md).
+// `largura` = largura real do arquivo; `altura` = altura no PC (× 0,72 no celular).
 const MARCAS = [
-  "Globo",
-  "Lollapalooza",
-  "Santander",
-  "SBT",
-  "Bauducco",
-  "Aurora",
-  "Eletrochemical",
-  "Lopes Kalil Engenharia",
-  "Indovinya",
-  "Colégio Progresso",
+  { nome: "Globo", arquivo: "globo", largura: 514, altura: 37 },
+  { nome: "Lollapalooza", arquivo: "lollapalooza", largura: 568, altura: 35 },
+  { nome: "Santander", arquivo: "santander", largura: 688, altura: 32 },
+  { nome: "SBT", arquivo: "sbt", largura: 120, altura: 52 },
+  { nome: "Bauducco", arquivo: "bauducco", largura: 345, altura: 45 },
+  { nome: "Aurora", arquivo: "aurora", largura: 518, altura: 37 },
+  { nome: "Electrochemical", arquivo: "electrochemical", largura: 982, altura: 27 },
+  { nome: "Lopes Kalil Engenharia", arquivo: "lopes-kalil", largura: 120, altura: 52 },
+  { nome: "Indovinya", arquivo: "indovinya", largura: 388, altura: 42 },
+  { nome: "Colégio Progresso", arquivo: "colegio-progresso", largura: 283, altura: 49 },
 ];
 
 export default function Home() {
@@ -178,7 +180,6 @@ function QuemSomos() {
     <section id="sobre" className={cn(secao, "relative isolate bg-background")}>
       <Container className="grid gap-y-8 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-x-16 lg:gap-y-9">
         <div className="lg:self-end">
-          <Eyebrow className={sobe}>Quem somos</Eyebrow>
           <Titulo className={cn("max-w-[13ch]", sobe)}>
             Uma oficina, <Destaque>do fio à estampa.</Destaque>
           </Titulo>
@@ -238,7 +239,6 @@ function OQueFazemos() {
   return (
     <section id="servicos" className={cn(secao, sobrepoe, "bg-muted")}>
       <Container>
-        <Eyebrow className={sobe}>O que fazemos</Eyebrow>
         <Titulo className={sobe}>
           Três jeitos de <Destaque>estampar sua marca.</Destaque>
         </Titulo>
@@ -305,7 +305,6 @@ function ComoFunciona() {
   return (
     <section id="processo" className={cn(secao, sobrepoe, "bg-background")}>
       <Container>
-        <Eyebrow className={sobe}>Como funciona</Eyebrow>
         <Titulo className={sobe}>
           Do pedido <Destaque>à entrega.</Destaque>
         </Titulo>
@@ -317,21 +316,32 @@ function ComoFunciona() {
   );
 }
 
-function ListaMarcas({ className, ...props }: React.ComponentProps<"ul">) {
+/** Faixa de logos. A cópia do carrossel fica escondida do leitor de tela. */
+function ListaMarcas({ copia = false }: { copia?: boolean }) {
   return (
     <ul
+      aria-hidden={copia || undefined}
       className={cn(
-        "flex shrink-0 items-center gap-7 pr-7 sm:gap-14 sm:pr-14 motion-reduce:shrink motion-reduce:flex-wrap motion-reduce:justify-center motion-reduce:gap-y-4 motion-reduce:px-5",
-        className
+        "flex shrink-0 items-center gap-11 pr-11 md:gap-18 md:pr-18 motion-reduce:shrink motion-reduce:flex-wrap motion-reduce:justify-center motion-reduce:gap-y-8 motion-reduce:px-5",
+        copia && "motion-reduce:hidden"
       )}
-      {...props}
     >
       {MARCAS.map((m) => (
-        <li
-          key={m}
-          className="flex items-center gap-7 text-2xl font-semibold tracking-[-0.02em] whitespace-nowrap text-muted-foreground after:size-2 after:rounded-full after:bg-accent sm:gap-14 sm:text-[34px]"
-        >
-          {m}
+        <li key={m.arquivo} className="shrink-0">
+          {/* Arquivos já leves e no tamanho certo: sem otimizar de novo. Sem lazy:
+              dentro da faixa com overflow escondido, o lazy só carrega o logo quando
+              ele entra na tela e ele "pisca". Prioridade baixa para não atrasar o topo. */}
+          <Image
+            src={`/clientes/${m.arquivo}.webp`}
+            alt={copia ? "" : m.nome}
+            width={m.largura}
+            height={120}
+            unoptimized
+            loading="eager"
+            fetchPriority="low"
+            style={{ "--h": `${m.altura}px` } as React.CSSProperties}
+            className="h-[calc(var(--h)*0.72)] w-auto opacity-85 transition-opacity hover:opacity-100 md:h-(--h)"
+          />
         </li>
       ))}
     </ul>
@@ -342,14 +352,13 @@ function Clientes() {
   return (
     <section id="clientes" className={cn(secao, sobrepoe, "bg-muted")}>
       <Container>
-        <Eyebrow className={sobe}>Quem já vestiu Whim</Eyebrow>
         <Titulo className={sobe}>
           Marcas que <Destaque>confiam na oficina.</Destaque>
         </Titulo>
       </Container>
 
       {/* De ponta a ponta da tela; pausa com o mouse em cima ou com foco.
-          Uma lista já passa de 1900 px, então uma cópia basta para o laço não ter emenda. */}
+          Cada metade tem a lista duas vezes (~4000 px no PC) para telas largas não verem emenda. */}
       <div
         tabIndex={0}
         role="region"
@@ -362,7 +371,9 @@ function Clientes() {
             className="flex w-max group-hover:[animation-play-state:paused] group-focus:[animation-play-state:paused] motion-safe:animate-marquee motion-reduce:w-auto"
           >
             <ListaMarcas />
-            <ListaMarcas aria-hidden className="motion-reduce:hidden" />
+            {[1, 2, 3].map((n) => (
+              <ListaMarcas key={n} copia />
+            ))}
           </div>
         </div>
       </div>
@@ -375,7 +386,6 @@ function Duvidas() {
     <section id="duvidas" className={cn(secao, sobrepoe, "bg-background")}>
       <Container className="grid gap-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:items-start lg:gap-16">
         <div>
-          <Eyebrow className={sobe}>Dúvidas frequentes</Eyebrow>
           <Titulo className={sobe}>
             Antes de <Destaque>pedir o orçamento.</Destaque>
           </Titulo>

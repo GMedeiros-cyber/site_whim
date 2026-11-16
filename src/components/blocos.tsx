@@ -17,20 +17,33 @@ export function Eyebrow({
   );
 }
 
-/** Título de seção (h2 por padrão; h1 no topo das páginas internas). */
+/**
+ * Título de seção (h2 por padrão; h1 no topo das páginas internas).
+ * Abre com a gota de tinta turquesa; `gota={false}` desliga.
+ */
 export function Titulo({
   as: Tag = "h2",
+  gota = true,
   className,
+  children,
   ...props
-}: React.ComponentProps<"h2"> & { as?: "h1" | "h2" }) {
+}: React.ComponentProps<"h2"> & { as?: "h1" | "h2"; gota?: boolean }) {
   return (
     <Tag
       className={cn(
-        "mt-4 text-[clamp(1.625rem,4.2vw,2.875rem)] leading-[1.12] font-semibold tracking-[-0.02em] text-balance",
+        "text-[clamp(1.625rem,4.2vw,2.875rem)] leading-[1.12] font-semibold tracking-[-0.02em] text-balance",
         className
       )}
       {...props}
-    />
+    >
+      {gota && (
+        <span
+          aria-hidden
+          className="mr-[0.2em] inline-block size-[0.56em] rounded-[54%_46%_61%_39%/47%_60%_40%_53%] bg-accent align-[0.04em]"
+        />
+      )}
+      {children}
+    </Tag>
   );
 }
 
