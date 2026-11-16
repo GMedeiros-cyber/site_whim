@@ -587,8 +587,9 @@ export function Personalizador() {
                       </>
                     )}
                     {estado === "depois" && (
-                      <p className="pt-0.5 opacity-75 min-[601px]:pt-1">
-                        <span className="font-medium">{p.nome}</span>
+                      <p className="pt-0.5 min-[601px]:pt-1">
+                        {/* Só o nome esmaece; o texto cinza fica cheio para o contraste de 4,5:1. */}
+                        <span className="font-medium opacity-75">{p.nome}</span>
                         <span className="text-muted-foreground"> · {p.depois}</span>
                       </p>
                     )}

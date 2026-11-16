@@ -6,9 +6,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { CONTATO, WHATSAPP } from "@/lib/whim";
 
-/** Link dos dados de contato: alvo de toque de 44px abaixo de 1024px. */
+/** Link dos dados de contato: alvo de 44px abaixo de 1024px e de 28px no PC (como o rodapé). */
 const linkInfo =
-  "inline-flex min-h-11 w-fit items-center rounded-sm underline-offset-4 outline-none hover:underline focus-visible:ring-3 focus-visible:ring-ring/50 lg:min-h-0";
+  "inline-flex min-h-11 w-fit items-center rounded-sm underline-offset-4 outline-none hover:underline focus-visible:ring-3 focus-visible:ring-ring/50 lg:min-h-0 lg:py-1";
 
 /** Seção única "Contato + Avaliações" (direção B: claro em camadas). */
 export function ContatoAvaliacoes() {
@@ -98,7 +98,7 @@ function InfoContato() {
     {
       titulo: "WhatsApp e e-mail",
       conteudo: (
-        <span className="-my-2.5 flex flex-col lg:my-0">
+        <span className="-my-2.5 flex flex-col lg:-my-1">
           <a href={`https://wa.me/${WHATSAPP}`} className={linkInfo}>
             {CONTATO.whatsapp}
           </a>
