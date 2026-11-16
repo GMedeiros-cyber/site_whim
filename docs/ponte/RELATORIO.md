@@ -237,3 +237,9 @@ Uma entrada por tarefa, sempre acrescentada no fim (nunca reescrever as anterior
 - Teste: axe-core (`color-contrast`, `target-size`) e a regra `image-aspect-ratio` do Lighthouse a 390 e 1350 px: 6 falhas antes, 0 depois; teste do personalizador sem falhas; console limpo.
 - Comandos: `npm run lint` (ok), `npm run build` (ok), `next start` + Playwright. Commit: `89d1571` no branch `agente-1/ajustes-lighthouse`.
 - Pendente: o Lighthouse de verdade (agente 3) para confirmar as notas; PR para o main.
+
+### 2026-11-16 17:35 · Build da Hostinger e merge do agente 1 (Claude, outra conta)
+- Feito: build trocado para `next build --webpack` (a Hostinger tem glibc antiga: o SWC nativo do Next 16.4 pede GLIBC_2.30 e o Turbopack não roda), Tailwind via `@tailwindcss/postcss` + `postcss.config.mjs`, `next.config.ts` → `next.config.mjs` sem a regra do Turbopack; juntei `agente-1/ajustes-lighthouse` (sem conflito).
+- Conferido: lint ok; build webpack ok; Playwright 390/1280 nas 4 páginas igual a antes (estilos, logos, gotas, WhatsApp, console limpo). Binários nativos que ficam: tailwind/lightningcss pedem GLIBC 2.14 e o sharp 2.28, compatíveis.
+- Commit: `1b8cc56`.
+- Pendente: implantar de novo na Hostinger e conferir o log; regra para todos: não voltar para `.ts` nem usar `turbopack` no config.
