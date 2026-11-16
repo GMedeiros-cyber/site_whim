@@ -24,7 +24,7 @@ Apresentar a empresa, mostrar o catálogo e gerar pedidos de orçamento. **Não 
 - Fonte: Poppins (pesos 300 a 800, aprovada pela Whim em 12/11/2026) via `next/font/google` (`src/app/layout.tsx`), exposta como `--font-sans`.
 - Planejados para depois (não instalar antes da hora): Motion, GSAP + ScrollTrigger + Lenis, react-three-fiber + drei (personalizador 3D da camiseta), `@lucasmarkes/hairline` (ilustrações em linha) e Postgres próprio para os orçamentos.
 - Referência de estrutura aprovada pelo cliente: `referencia/prototipo/` (ler o README antes de mexer no layout).
-- Hospedagem: Hostinger (Node.js com deploy pelo GitHub). Deploy ainda não configurado.
+- Hospedagem: Hostinger, plano Unlimited (Node.js com deploy pelo GitHub a cada push no `main`). O build é `next build --webpack`: o servidor de build da Hostinger tem glibc antiga e não roda o Turbopack nem o SWC nativo. Tailwind entra pelo `postcss.config.mjs`; o config do Next é `next.config.mjs` (não usar `.ts` nem opções `turbopack`). O `npm run dev` continua com Turbopack.
 
 Comandos: `npm run dev` · `npm run build` · `npm run lint`.
 
