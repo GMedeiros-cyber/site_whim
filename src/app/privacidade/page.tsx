@@ -11,14 +11,14 @@ export const metadata: Metadata = {
     "Como a Whim Confecção e Estamparia trata os dados pessoais de quem pede orçamento pelo site, pelo WhatsApp ou por e-mail, de acordo com a LGPD.",
 };
 
-const ATUALIZACAO = "15 de novembro de 2026";
+const ATUALIZACAO = "16 de novembro de 2026";
+
+const linkTexto =
+  "font-medium text-foreground underline decoration-accent decoration-2 underline-offset-4 hover:decoration-primary";
 
 export default function Privacidade() {
   const email = (
-    <a
-      href={`mailto:${CONTATO.email}`}
-      className="font-medium text-foreground underline decoration-accent decoration-2 underline-offset-4 hover:decoration-primary"
-    >
+    <a href={`mailto:${CONTATO.email}`} className={linkTexto}>
       {CONTATO.email}
     </a>
   );
@@ -83,10 +83,25 @@ export default function Privacidade() {
 
               <h2>Cookies</h2>
               <p>
-                Hoje o site não usa cookies de rastreamento nem de publicidade. Se um dia
+                O site não usa cookies próprios de rastreamento nem de publicidade. Se um dia
                 ativarmos ferramentas de medição (como Google Analytics, Google Tag Manager ou o
                 Pixel da Meta), esta política será atualizada e o site vai pedir o seu
                 consentimento antes.
+              </p>
+              <p>
+                O rodapé de todas as páginas mostra um <strong>mapa do Google Maps</strong> com o
+                endereço da oficina. Esse mapa é carregado direto do Google, que pode usar cookies
+                e coletar dados de navegação conforme a{" "}
+                <a
+                  href="https://policies.google.com/privacy?hl=pt-BR"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={linkTexto}
+                >
+                  política de privacidade do Google
+                  <span className="sr-only"> (abre em nova aba)</span>
+                </a>
+                .
               </p>
 
               <h2>Por quanto tempo guardamos</h2>

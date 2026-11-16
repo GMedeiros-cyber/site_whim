@@ -1,126 +1,232 @@
 import Image from "next/image";
 import Link from "next/link";
-import { PanelTopIcon, PrinterIcon, ScissorsIcon, ShirtIcon } from "lucide-react";
 
-import { Container, Destaque, Eyebrow, Seta, Titulo, secao } from "@/components/blocos";
+import { Container, Destaque, Seta, Titulo, secao } from "@/components/blocos";
+import { Carrossel } from "@/components/home/carrossel";
+import { DUVIDAS } from "@/components/home/duvidas";
+import { Etapas } from "@/components/home/etapas";
+import { PalavraTinta } from "@/components/home/palavra-tinta";
+import "@/components/home/transicoes.css";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
-import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
+import { ACAO } from "@/lib/navegacao";
 import { cn } from "@/lib/utils";
+import { linkWhatsApp } from "@/lib/whim";
 
-const TAGS = ["Silk screen", "DTF", "Bordado", "Confecção", "Uniformes", "Oficina própria"];
+const WHATSAPP_ORCAMENTO = linkWhatsApp("Olá, Whim! Quero um orçamento.");
 
-const SERVICOS = [
-  { Icone: PanelTopIcon, nome: "Silk screen", texto: "Para tiragens maiores e cores chapadas, com o toque e a durabilidade da tinta na tela." },
-  { Icone: PrinterIcon, nome: "DTF", texto: "Para artes com muitas cores, degradês e pedidos menores, com acabamento fotográfico." },
-  { Icone: ScissorsIcon, nome: "Confecção", texto: "Modelagem, corte e costura da peça do zero, no tecido e no tamanho que você precisar." },
-  { Icone: ShirtIcon, nome: "Uniformes", texto: "Para empresas e escolas, com padrão de cor, logo bordado ou estampado e reposição fácil." },
+const botaoClaro = cn(buttonVariants({ variant: "secondary", size: "xl" }), "w-full sm:w-auto");
+const botaoContorno = cn(
+  buttonVariants({ size: "xl" }),
+  "w-full border-primary-foreground/40 bg-transparent hover:border-accent hover:bg-primary-foreground/10 sm:w-auto"
+);
+
+/** Seção que sobe por cima da anterior (cantos de cima, sombra e margem negativa). */
+const sobrepoe =
+  "relative isolate -mt-7 rounded-t-[28px] shadow-[0_-24px_40px_-34px] shadow-primary/35 md:-mt-10 md:rounded-t-[40px]";
+/** Título e linha de apoio que sobem ao entrar na tela. */
+const sobe = "home-sobe";
+const apoio = "mt-[18px] max-w-[56ch] text-base leading-relaxed text-pretty text-muted-foreground sm:text-[17px]";
+
+// A Whim faz silk, DTF e bordado (não faz sublimação: briefing de 16/11).
+const TECNICAS_TOPO = ["Silk", "DTF", "Bordado"];
+
+const OFICINA = [
+  { nome: "Gravação de telas", texto: "A arte vira tela para o silk." },
+  { nome: "Corte e costura", texto: "A peça nasce do tecido." },
+  { nome: "Estampa", texto: "Silk, DTF ou bordado." },
+  { nome: "Acabamento", texto: "Conferência e embalagem." },
 ];
 
-const PASSOS = [
-  { nome: "Monte a peça", texto: "Escolha peça, cor e estampa aqui no site." },
-  { nome: "Orçamento", texto: "O resumo chega para a equipe no WhatsApp." },
-  { nome: "Arte aprovada", texto: "Ajustamos a arte e enviamos para você aprovar." },
-  { nome: "Produção", texto: "Gravação da tela, impressão e acabamento." },
-  { nome: "Entrega", texto: "Retirada em Guarulhos ou envio." },
+const FOTOS = [
+  { src: "/images/f41.webp", alt: "Estampador trabalhando na mesa longa com peças azuis", legenda: "Estampa em série na mesa longa" },
+  { src: "/images/hero.webp", alt: "Mãos passando o rodo na tela de silk", legenda: "Rodo na tela de silk" },
+  { src: "/images/f35.webp", alt: "Camisetas pretas estampadas na mesa", legenda: "Peças na mesa de estampa" },
 ];
 
-// null = espaço reservado para o logo de um cliente (ainda não temos os arquivos).
-const MARCAS = ["Globo", "Lollapalooza", null, null, null, null];
+// Imagens geradas por IA: sempre com o selo "Imagem ilustrativa".
+const TECNICAS = [
+  {
+    nome: "Silk",
+    imagem: "silk",
+    alt: "Estampa em silk com cores chapadas numa camiseta azul-marinho",
+    texto: "Tinta grossa em cores chapadas, com o toque e a durabilidade da tinta na tela.",
+    bomPara: "logos de poucas cores e tiragens maiores.",
+  },
+  {
+    nome: "DTF",
+    imagem: "dtf",
+    alt: "Estampa colorida em DTF com degradê numa camiseta branca",
+    texto: "Todas as cores, degradês e fotos, com acabamento fotográfico.",
+    bomPara: "artes coloridas e pedidos menores.",
+  },
+  {
+    nome: "Bordado",
+    imagem: "bordado",
+    alt: "Logo bordado em linha numa polo azul-marinho",
+    texto: "A arte é costurada em linha, em relevo, e dura junto com a peça.",
+    bomPara: "logo no peito de polos e uniformes.",
+  },
+];
+
+const TAMBEM = [
+  { nome: "Confecção", texto: "Camiseta, polo, regata, moletom e baby look, do tecido ao acabamento, do infantil 2 ao adulto G3." },
+  { nome: "Uniformes", texto: "Para empresas e escolas, com padrão de cor, logo bordado ou estampado e reposição fácil." },
+  { nome: "Não sabe qual?", texto: "Mande a arte: a equipe indica a técnica que fica melhor." },
+];
+
+// Clientes que a Whim autorizou citar (briefing de 16/11). Logos oficiais já em
+// cinza, 120 px de altura (fontes em referencia/logos-clientes.md).
+// `largura` = largura real do arquivo; `altura` = altura no PC (× 0,72 no celular).
+const MARCAS = [
+  { nome: "Globo", arquivo: "globo", largura: 514, altura: 37 },
+  { nome: "Lollapalooza", arquivo: "lollapalooza", largura: 568, altura: 35 },
+  { nome: "Santander", arquivo: "santander", largura: 688, altura: 32 },
+  { nome: "SBT", arquivo: "sbt", largura: 120, altura: 52 },
+  { nome: "Bauducco", arquivo: "bauducco", largura: 345, altura: 45 },
+  { nome: "Aurora", arquivo: "aurora", largura: 518, altura: 37 },
+  { nome: "Electrochemical", arquivo: "electrochemical", largura: 982, altura: 27 },
+  { nome: "Lopes Kalil Engenharia", arquivo: "lopes-kalil", largura: 120, altura: 52 },
+  { nome: "Indovinya", arquivo: "indovinya", largura: 388, altura: 42 },
+  { nome: "Colégio Progresso", arquivo: "colegio-progresso", largura: 283, altura: 49 },
+];
 
 export default function Home() {
   return (
     <>
       <SiteHeader />
       <main className="flex-1">
-        <Hero />
+        <Topo />
         <QuemSomos />
         <OQueFazemos />
         <ComoFunciona />
         <Clientes />
+        <Duvidas />
+        <Convite />
       </main>
       <SiteFooter />
     </>
   );
 }
 
-function Hero() {
+function Topo() {
   return (
-    <section id="topo" className="p-2 sm:p-3">
-      <div className="relative isolate grid min-h-[calc(100svh-1rem)] grid-rows-[auto_1fr_auto_auto] gap-5 overflow-hidden rounded-3xl p-5 pt-22 text-primary-foreground md:min-h-[min(94vh,860px)] md:grid-cols-2 md:grid-rows-[1fr_auto] md:gap-0 md:rounded-[30px] md:p-[clamp(22px,4vw,48px)] md:pt-[clamp(110px,14vw,150px)]">
+    <section id="topo" className="p-2 md:p-3">
+      <div
+        className={cn(
+          "relative isolate flex min-h-[calc(100svh-1rem)] flex-col items-center justify-center overflow-hidden rounded-[24px] bg-primary px-5 pt-28 pb-24 text-center text-primary-foreground md:min-h-[min(880px,calc(100svh-1.5rem))] md:rounded-[32px] md:px-10 md:pt-32 md:pb-28",
+          "home-recua"
+        )}
+      >
         <Image
-          src="/images/hero.webp"
-          alt="Mãos passando o rodo na tela de serigrafia"
+          src="/images/hero-mesa.webp"
+          alt="Mesa longa de silk com peças estampadas em série na oficina da Whim"
           fill
           loading="eager"
           fetchPriority="high"
           sizes="100vw"
-          className="-z-20 object-cover object-[center_40%] motion-safe:animate-hero-zoom"
+          className="-z-20 object-cover object-[center_40%] grayscale-35"
         />
-        <div aria-hidden className="absolute inset-0 -z-10 bg-linear-200 from-primary/5 from-20% via-primary/35 via-55% to-primary/90" />
+        <div
+          aria-hidden
+          className="absolute inset-0 -z-10 bg-radial-[120%_90%_at_50%_45%] from-primary/60 via-primary/86 via-60% to-primary/97"
+        />
 
-        <div className="row-start-1 grid gap-2 self-start rounded-[20px] border border-primary-foreground/20 bg-primary-foreground/10 px-4 py-3.5 backdrop-blur-md md:col-start-2 md:max-w-[300px] md:justify-self-end md:px-5 md:py-[18px]">
-          <Eyebrow className="text-primary-foreground/85">Silk · DTF · Confecção</Eyebrow>
-          <p className="text-sm text-primary-foreground/90">
-            Peças para empresas, escolas e eventos, feitas numa oficina própria em Guarulhos.
-          </p>
-        </div>
-
-        <span className="absolute top-1/2 left-[clamp(14px,2vw,24px)] hidden -translate-y-1/2 rotate-180 text-[11px] tracking-[0.28em] text-primary-foreground/60 uppercase [writing-mode:vertical-rl] md:block">
-          Guarulhos · SP · desde 2021
-        </span>
-
-        <h1 className="row-start-3 self-end text-[clamp(2rem,9.4vw,2.75rem)] leading-[1.06] font-bold tracking-[-0.025em] text-balance md:col-start-1 md:row-start-2 md:text-[clamp(2.125rem,4.7vw,4.25rem)]">
-          Cada peça passa
-          <br />
-          pelas <em className="text-accent not-italic">nossas mãos.</em>
+        <Image
+          src="/brand/whim-logo-branco.svg"
+          alt="Whim Confecção e Estamparia"
+          width={444}
+          height={138}
+          loading="eager"
+          className="h-[42px] w-auto opacity-95 md:h-[58px]"
+        />
+        <h1 className="mt-1.5">
+          <PalavraTinta>Vista</PalavraTinta>{" "}
+          <span className="mt-1.5 block text-[28px] leading-[1.1] font-semibold tracking-[-0.025em] text-balance md:text-[40px]">
+            a sua marca, peça por peça.
+          </span>
         </h1>
-
-        <div className="row-start-4 grid justify-items-start gap-4 self-end md:col-start-2 md:row-start-2 md:max-w-[300px] md:justify-self-end">
-          <p className="text-[14.5px] text-primary-foreground/85">
-            Monte sua peça no site e receba o orçamento direto no WhatsApp.
-          </p>
-          <Link href="/monte-sua-peca" className={cn(buttonVariants({ variant: "secondary", size: "xl" }), "w-full sm:w-auto")}>
-            Monte sua peça <Seta />
-          </Link>
+        <p className="mt-4 max-w-[52ch] text-[15px] leading-relaxed text-pretty text-primary-foreground/80 md:text-base">
+          Uniformes, camisetas e peças com a sua marca. Silk, DTF e bordado numa oficina própria em
+          Guarulhos.
+        </p>
+        <div className="mt-7 flex w-full flex-col gap-2.5 sm:w-auto sm:flex-row">
+          <a href={WHATSAPP_ORCAMENTO} className={botaoClaro}>
+            Pedir orçamento no WhatsApp <Seta />
+          </a>
+          <a href="#servicos" className={botaoContorno}>
+            Ver o que fazemos
+          </a>
         </div>
 
-        <span className="absolute bottom-[18px] left-1/2 hidden -translate-x-1/2 text-[10.5px] tracking-[0.24em] text-primary-foreground/55 uppercase md:block">
-          role para conhecer
-        </span>
+        <div className="absolute inset-x-5 bottom-5 flex items-center justify-center text-xs md:inset-x-10 md:bottom-[30px] md:justify-between">
+          <ul aria-label="Técnicas" className="flex flex-wrap justify-center gap-2">
+            {TECNICAS_TOPO.map((t) => (
+              <li key={t} className="rounded-full border border-primary-foreground/22 px-3 py-[7px] text-primary-foreground/85">
+                {t}
+              </li>
+            ))}
+          </ul>
+          <span className="hidden text-primary-foreground/65 md:block">role para conhecer</span>
+        </div>
       </div>
     </section>
   );
 }
 
-/** Foto em pílula no meio do texto do manifesto. */
-function Chip({ src, alt }: { src: string; alt: string }) {
-  return (
-    <span className="relative mx-[0.08em] inline-block h-[1em] w-[1.9em] overflow-hidden rounded-full align-[-0.08em] transition-[width] duration-600 motion-safe:hover:w-[2.8em]">
-      <Image src={src} alt={alt} fill sizes="96px" className="object-cover" />
-    </span>
-  );
-}
-
 function QuemSomos() {
   return (
-    <section id="sobre" className={secao}>
-      <Container>
-        <Eyebrow>Quem somos</Eyebrow>
-        <p className="mt-[22px] max-w-[34ch] text-[clamp(1.3125rem,5.6vw,1.625rem)] leading-[1.3] font-medium tracking-[-0.02em] text-pretty sm:text-[clamp(1.375rem,3.8vw,2.75rem)]">
-          Fundada em 2021 por Wallan, depois de 15 anos de experiência, a Whim{" "}
-          <Chip src="/images/f42.webp" alt="Camisas azuis na mesa de silk" /> grava telas,{" "}
-          <Chip src="/images/f35.webp" alt="Camisetas pretas na mesa de estampa" /> corta, costura e estampa peças
-          para empresas, escolas e eventos, <Destaque>tudo na mesma oficina</Destaque>{" "}
-          <Chip src="/images/f41.webp" alt="Estampador trabalhando na mesa" /> em Guarulhos.
-        </p>
-        <ul className="mt-9 flex flex-wrap gap-2.5">
-          {TAGS.map((t) => (
-            <li key={t}>
-              <Badge variant="outline" className="h-auto px-3.5 py-2 tracking-[0.06em]">
-                {t}
-              </Badge>
+    <section id="sobre" className={cn(secao, "relative isolate bg-background")}>
+      <Container className="grid gap-y-8 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-x-16 lg:gap-y-9">
+        <div className="lg:self-end">
+          <Titulo className={cn("max-w-[13ch]", sobe)}>
+            Uma oficina, <Destaque>do fio à estampa.</Destaque>
+          </Titulo>
+          <p className={cn(apoio, sobe)}>
+            A Whim nasceu em 2021, quando o Wallan juntou 15 anos de experiência numa oficina
+            própria em Guarulhos. Hoje a gente faz peças para empresas, escolas e eventos com todas
+            as etapas no mesmo lugar.
+          </p>
+        </div>
+
+        {/* Mosaico no PC e no tablet; carrossel no celular. */}
+        <div className="relative lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:self-center">
+          <Carrossel
+            rotulo="Fotos da oficina"
+            className="gap-3 md:grid md:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] md:grid-rows-[260px_260px] md:gap-4"
+          >
+            {FOTOS.map((f, i) => (
+              <figure
+                key={f.src}
+                className={cn(
+                  "relative h-80 w-[80%] shrink-0 snap-start overflow-hidden rounded-[24px] bg-muted md:h-auto md:w-auto",
+                  i === 0 && "md:row-span-2"
+                )}
+              >
+                <Image
+                  src={f.src}
+                  alt={f.alt}
+                  fill
+                  sizes="(min-width: 1024px) 340px, (min-width: 768px) 50vw, 80vw"
+                  className="object-cover"
+                />
+                <figcaption className="absolute bottom-3 left-3 rounded-full bg-background/90 px-2.5 py-1.5 text-xs text-foreground">
+                  {f.legenda}
+                </figcaption>
+              </figure>
+            ))}
+          </Carrossel>
+          <span className="absolute top-4 left-4 hidden rounded-2xl bg-primary px-4 py-3 text-[13px] font-medium text-primary-foreground shadow-[0_16px_30px_-18px] shadow-primary/60 md:block lg:top-7 lg:-left-[22px]">
+            Oficina própria · Guarulhos/SP
+          </span>
+        </div>
+
+        <ul className="grid grid-cols-2 gap-x-[18px] gap-y-4 sm:gap-x-7 sm:gap-y-[22px] lg:col-start-1 lg:self-start">
+          {OFICINA.map((etapa) => (
+            <li key={etapa.nome} className="flex flex-col gap-1 border-t pt-3.5">
+              <span className="text-base font-semibold">{etapa.nome}</span>
+              <span className="text-sm leading-normal text-muted-foreground">{etapa.texto}</span>
             </li>
           ))}
         </ul>
@@ -131,20 +237,64 @@ function QuemSomos() {
 
 function OQueFazemos() {
   return (
-    <section id="servicos" className={cn(secao, "pt-0 sm:pt-0")}>
+    <section id="servicos" className={cn(secao, sobrepoe, "bg-muted")}>
       <Container>
-        <Eyebrow>O que fazemos</Eyebrow>
-        <Titulo>
-          Quatro jeitos de <Destaque>vestir sua marca.</Destaque>
+        <Titulo className={sobe}>
+          Três jeitos de <Destaque>estampar sua marca.</Destaque>
         </Titulo>
-        <div className="mt-7 grid gap-x-[clamp(24px,5vw,72px)] sm:mt-11 md:grid-cols-2">
-          {SERVICOS.map(({ Icone, nome, texto }) => (
-            <article key={nome} className="grid grid-cols-[auto_1fr] items-baseline gap-x-5 gap-y-1.5 border-t py-5 sm:py-[26px]">
-              <Icone aria-hidden strokeWidth={1.4} className="row-span-2 size-7 self-start text-accent" />
-              <h3 className="text-2xl leading-[1.15] font-semibold">{nome}</h3>
-              <p className="col-start-2 text-[14.5px] text-muted-foreground">{texto}</p>
-            </article>
-          ))}
+        <p className={cn(apoio, sobe)}>
+          Cada técnica deixa a arte de um jeito. Veja como fica cada uma e para o que ela é melhor.
+        </p>
+
+        <div className="mt-9 md:mt-14">
+          <Carrossel rotulo="Técnicas de estampa" className="gap-3 md:grid md:grid-cols-3 md:gap-5">
+            {TECNICAS.map((t) => (
+              <article
+                key={t.nome}
+                className="flex w-[76%] shrink-0 snap-start flex-col overflow-hidden rounded-[26px] border border-primary/6 bg-background md:w-auto"
+              >
+                <div className="relative aspect-[3/4]">
+                  <Image
+                    src={`/images/estilos/${t.imagem}.webp`}
+                    alt={t.alt}
+                    fill
+                    sizes="(min-width: 1024px) 380px, (min-width: 768px) 33vw, 76vw"
+                    className="object-cover"
+                  />
+                  <span className="absolute top-3 left-3 rounded-full bg-background/85 px-2.5 py-[5px] text-[11px] text-foreground">
+                    Imagem ilustrativa
+                  </span>
+                </div>
+                <div className="flex flex-col gap-2 px-[22px] pt-[22px] pb-6">
+                  <h3 className="text-2xl font-semibold tracking-[-0.02em]">{t.nome}</h3>
+                  <p className="text-[14.5px] leading-[1.55] text-muted-foreground">{t.texto}</p>
+                  <p className="mt-1.5 text-[13px] leading-normal">
+                    <strong className="font-semibold">Bom para:</strong> {t.bomPara}
+                  </p>
+                </div>
+              </article>
+            ))}
+          </Carrossel>
+        </div>
+
+        <div className="mt-3 grid gap-3 md:mt-5 md:grid-cols-3 md:gap-5">
+          {TAMBEM.map((item, i) => {
+            const destaque = i === TAMBEM.length - 1;
+            return (
+              <div
+                key={item.nome}
+                className={cn(
+                  "rounded-[22px] border border-primary/6 bg-background px-5 py-[18px] md:p-[26px]",
+                  destaque && "border-transparent bg-primary text-primary-foreground"
+                )}
+              >
+                <h3 className="text-lg font-semibold md:mb-1.5 md:text-xl">{item.nome}</h3>
+                <p className={cn("text-[14.5px] leading-[1.55] text-muted-foreground", destaque && "text-primary-foreground/80")}>
+                  {item.texto}
+                </p>
+              </div>
+            );
+          })}
         </div>
       </Container>
     </section>
@@ -153,89 +303,148 @@ function OQueFazemos() {
 
 function ComoFunciona() {
   return (
-    <section id="processo" className={cn(secao, "bg-muted")}>
+    <section id="processo" className={cn(secao, sobrepoe, "bg-background")}>
       <Container>
-        <Eyebrow>Como funciona</Eyebrow>
-        <Titulo>
+        <Titulo className={sobe}>
           Do pedido <Destaque>à entrega.</Destaque>
         </Titulo>
-        <ol className="relative mt-12 grid gap-6 min-[480px]:grid-cols-2 min-[901px]:grid-cols-5 min-[901px]:gap-4 min-[901px]:before:absolute min-[901px]:before:inset-x-0 min-[901px]:before:top-[19px] min-[901px]:before:h-px min-[901px]:before:bg-border">
-          {PASSOS.map((p, i) => (
-            <li key={p.nome} className="relative grid content-start gap-2.5">
-              <span aria-hidden className="grid size-[38px] place-items-center rounded-full border bg-background text-[13px] font-semibold tabular-nums">
-                {i + 1}
-              </span>
-              <h3 className="text-[19px] leading-[1.15] font-semibold">{p.nome}</h3>
-              <p className="text-[13.5px] text-muted-foreground">{p.texto}</p>
-            </li>
-          ))}
-        </ol>
+        <div className="mt-10 lg:mt-16">
+          <Etapas />
+        </div>
       </Container>
     </section>
   );
 }
 
-function ListaMarcas({ className, ...props }: React.ComponentProps<"ul">) {
+/** Faixa de logos. A cópia do carrossel fica escondida do leitor de tela. */
+function ListaMarcas({ copia = false }: { copia?: boolean }) {
   return (
-    <ul className={cn("flex shrink-0 items-center gap-16 pr-16 motion-reduce:flex-wrap motion-reduce:gap-y-6", className)} {...props}>
-      {MARCAS.map((m, i) =>
-        m ? (
-          <li key={i} className="flex items-center gap-16 text-[clamp(1.25rem,2.6vw,1.875rem)] font-semibold whitespace-nowrap text-muted-foreground after:size-[7px] after:rounded-full after:bg-accent">
-            {m}
-          </li>
-        ) : (
-          <li key={i} className="rounded-[10px] border border-dashed px-[22px] py-3.5 text-xs tracking-[0.14em] whitespace-nowrap text-muted-foreground uppercase">
-            logo do cliente
-          </li>
-        )
+    <ul
+      aria-hidden={copia || undefined}
+      className={cn(
+        "flex shrink-0 items-center gap-11 pr-11 md:gap-18 md:pr-18 motion-reduce:shrink motion-reduce:flex-wrap motion-reduce:justify-center motion-reduce:gap-y-8 motion-reduce:px-5",
+        copia && "motion-reduce:hidden"
       )}
+    >
+      {MARCAS.map((m) => (
+        <li key={m.arquivo} className="shrink-0">
+          {/* Arquivos já leves e no tamanho certo: sem otimizar de novo. Sem lazy:
+              dentro da faixa com overflow escondido, o lazy só carrega o logo quando
+              ele entra na tela e ele "pisca". Prioridade baixa para não atrasar o topo. */}
+          <Image
+            src={`/clientes/${m.arquivo}.webp`}
+            alt={copia ? "" : m.nome}
+            width={m.largura}
+            height={120}
+            unoptimized
+            loading="eager"
+            fetchPriority="low"
+            style={{ "--h": `${m.altura}px` } as React.CSSProperties}
+            className="h-[calc(var(--h)*0.72)] w-auto opacity-85 transition-opacity hover:opacity-100 md:h-(--h)"
+          />
+        </li>
+      ))}
     </ul>
   );
 }
 
 function Clientes() {
   return (
-    <section id="clientes" className={secao}>
+    <section id="clientes" className={cn(secao, sobrepoe, "bg-muted")}>
       <Container>
-        <Eyebrow>Quem já vestiu Whim</Eyebrow>
-        <Titulo>
-          Peças que <Destaque>já rodaram por aí.</Destaque>
+        <Titulo className={sobe}>
+          Marcas que <Destaque>confiam na oficina.</Destaque>
         </Titulo>
+      </Container>
 
-        <div className="mt-9 grid grid-cols-2 gap-3.5 md:grid-cols-[1.3fr_1fr_1fr]">
-          <div className="relative col-span-2 aspect-[16/10] overflow-hidden rounded-[22px] bg-muted md:col-span-1 md:aspect-auto">
-            <Image src="/images/f17.webp" alt="Camisetas pretas estampadas para cliente" fill sizes="(min-width: 768px) 40vw, 100vw" className="object-cover object-[center_60%]" />
-          </div>
-          <div className="relative aspect-[3/4] overflow-hidden rounded-[22px] bg-muted">
-            <Image src="/images/f35.webp" alt="Mesa de estampa com camisetas pretas" fill sizes="(min-width: 768px) 30vw, 50vw" className="object-cover" />
-          </div>
-          <div className="relative aspect-[3/4] overflow-hidden rounded-[22px] bg-muted">
-            <Image src="/images/f42.webp" alt="Camisas azuis na mesa de silk" fill sizes="(min-width: 768px) 30vw, 50vw" className="object-cover" />
+      {/* De ponta a ponta da tela; pausa com o mouse em cima ou com foco.
+          Cada metade tem a lista duas vezes (~4000 px no PC) para telas largas não verem emenda. */}
+      <div
+        tabIndex={0}
+        role="region"
+        aria-label="Clientes da Whim (o carrossel pausa com o foco)"
+        className="group mt-10 py-2 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset sm:mt-[52px]"
+      >
+        <div className="overflow-hidden [mask-image:linear-gradient(90deg,transparent,black_10%,black_90%,transparent)] motion-reduce:[mask-image:none]">
+          <div
+            style={{ animationDuration: "40s" }}
+            className="flex w-max group-hover:[animation-play-state:paused] group-focus:[animation-play-state:paused] motion-safe:animate-marquee motion-reduce:w-auto"
+          >
+            <ListaMarcas />
+            {[1, 2, 3].map((n) => (
+              <ListaMarcas key={n} copia />
+            ))}
           </div>
         </div>
+      </div>
+    </section>
+  );
+}
 
-        {/* Carrossel de marcas: duas cópias da lista para o loop não ter emenda. */}
-        <div className="mt-10 overflow-hidden [mask-image:linear-gradient(90deg,transparent,black_12%,black_88%,transparent)] motion-reduce:[mask-image:none]">
-          <div className="flex w-max motion-safe:animate-marquee motion-safe:hover:[animation-play-state:paused] motion-reduce:w-auto">
-            <ListaMarcas aria-label="Marcas atendidas" />
-            <ListaMarcas aria-hidden className="motion-reduce:hidden" />
-          </div>
+function Duvidas() {
+  return (
+    <section id="duvidas" className={cn(secao, sobrepoe, "bg-background")}>
+      <Container className="grid gap-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:items-start lg:gap-16">
+        <div>
+          <Titulo className={sobe}>
+            Antes de <Destaque>pedir o orçamento.</Destaque>
+          </Titulo>
+          <p className={cn(apoio, sobe)}>As perguntas que mais chegam no WhatsApp, respondidas aqui.</p>
         </div>
+        <div className="border-t">
+          {DUVIDAS.map((d, i) => (
+            <details key={d.pergunta} open={i === 0} className="group border-b">
+              <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-5 rounded-sm py-5 text-base font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring sm:text-lg [&::-webkit-details-marker]:hidden">
+                {d.pergunta}
+                {/* + que vira − (o traço vertical deita) com fundo turquesa quando aberta */}
+                <span
+                  aria-hidden
+                  className="relative size-7 shrink-0 rounded-full bg-muted transition-colors group-open:bg-accent before:absolute before:inset-x-2 before:top-[13px] before:h-0.5 before:rounded-full before:bg-primary after:absolute after:inset-x-2 after:top-[13px] after:h-0.5 after:rotate-90 after:rounded-full after:bg-primary after:transition-transform group-open:after:rotate-0"
+                />
+              </summary>
+              <p className="mb-[22px] max-w-[60ch] text-[15.5px] leading-[1.65] text-pretty text-muted-foreground">
+                {d.resposta}
+              </p>
+            </details>
+          ))}
+        </div>
+      </Container>
+    </section>
+  );
+}
 
-        <div className="mt-[clamp(64px,9vw,110px)] grid items-end gap-7 rounded-[22px] bg-primary px-6 py-8 text-primary-foreground sm:rounded-[28px] sm:p-[clamp(36px,6vw,72px)] md:grid-cols-[1.3fr_0.7fr]">
-          <div>
-            <Titulo className="mt-0">
-              Sua próxima peça
-              <br />
-              <em className="text-accent not-italic">começa aqui.</em>
-            </Titulo>
-            <p className="mt-3.5 text-primary-foreground/75">
-              Escolha o modelo, a cor e a estampa. O orçamento chega no seu WhatsApp.
-            </p>
+function Convite() {
+  return (
+    <section id="fim" className="relative isolate bg-primary text-primary-foreground">
+      {/* Borda de tinta: o azul-marinho escorre por cima da seção anterior. */}
+      <svg
+        aria-hidden
+        viewBox="0 0 1440 60"
+        preserveAspectRatio="none"
+        className="absolute inset-x-0 -top-[38px] h-10 w-full fill-primary md:-top-[58px] md:h-[60px]"
+      >
+        <path d="M0 60 L0 38 C 80 30 140 44 220 36 C 300 26 340 12 430 20 C 520 28 560 46 660 40 C 760 34 800 14 900 18 C 990 22 1040 40 1130 36 C 1220 32 1260 10 1340 16 C 1390 20 1420 30 1440 28 L1440 60 Z" />
+        <circle cx="318" cy="22" r="5" />
+        <circle cx="1012" cy="30" r="3.5" />
+        <circle cx="1268" cy="8" r="4" />
+      </svg>
+      <Container>
+        <div className="flex flex-col items-center border-b border-primary-foreground/15 pt-20 pb-14 text-center md:pt-30 md:pb-24">
+          <h2 className={cn("text-5xl leading-none font-bold tracking-[-0.045em] md:text-[80px]", sobe)}>
+            Monte a sua <em className="text-accent not-italic">peça.</em>
+          </h2>
+          <p className="mt-[22px] mb-8 max-w-[46ch] text-base leading-relaxed text-pretty text-primary-foreground/80 md:text-[17px]">
+            Peça, cor, estampa e quantidade em 5 passos. O orçamento chega pronto no WhatsApp da Whim,
+            e quem responde é a Caroline.
+          </p>
+          <div className="flex w-full flex-col justify-center gap-2.5 sm:w-auto sm:flex-row">
+            <Link href={ACAO.href} className={botaoClaro}>
+              Monte sua peça <Seta />
+            </Link>
+            <a href={WHATSAPP_ORCAMENTO} className={botaoContorno}>
+              Falar no WhatsApp
+            </a>
           </div>
-          <Link href="/monte-sua-peca" className={cn(buttonVariants({ variant: "secondary", size: "xl" }), "justify-self-start md:justify-self-end")}>
-            Monte sua peça <Seta />
-          </Link>
         </div>
       </Container>
     </section>

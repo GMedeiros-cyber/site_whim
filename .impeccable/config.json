@@ -2,6 +2,13 @@
   "detector": {
     "ignoreRules": [],
     "ignoreFiles": [],
-    "ignoreValues": []
+    "ignoreValues": [
+      {
+        "rule": "bounce-easing",
+        "value": "cubic-bezier(.2, .9, .3, 1.3)",
+        "createdAt": "2026-11-16T04:21:17.241Z",
+        "reason": "spec: referencia/home/README.md (Botão do WhatsApp flutuante) pede 'entrada com mola curta'; protótipo .zap-dica usa cubic-bezier(.2,.9,.3,1.3)"
+      }
+    ]
   }
 }
