@@ -192,3 +192,9 @@ Uma entrada por tarefa, sempre acrescentada no fim (nunca reescrever as anterior
 - Conferido: `npm run lint` e `tsc` ok; `npm run build` ok com a Poppins trocada só localmente (Google Fonts bloqueado aqui, não commitado); Playwright 390 e 1280 em /, /monte-sua-peca, /privacidade e 404: sem rolagem lateral, sem erro no console, 10 logos carregados nas alturas da spec, gota em todos os títulos de seção, botão do WhatsApp a 16/24 px com wa.me certo, robots/sitemap/llms.txt/manifest 200, 404 com status 404.
 - Commit: `df5d688` + merges no main.
 - Pendente: travamento da tinta (agente 2); parte 2 do checklist (agente 3); `agente-1/briefing` velho no GitHub; títulos das colunas do rodapé ainda no estilo do rótulo antigo (decisão do Gabriel).
+
+### 2026-11-16 09:55 · Abertura e WhatsApp só com ícone (Claude, outra conta)
+- Feito: abertura do protótipo aprovado portada para o Next (símbolo pintado + escrita, 1× por sessão, toque pula, sem movimento reduzido, script em linha evita piscar); tinta do "Vista" espera a abertura; botão do WhatsApp só com o ícone (56 px); CLAUDE.md e README da home atualizados.
+- Conferido: lint e tsc ok; build ok (Poppins trocada só localmente); Playwright 390 e 1280: abertura some aos ~3,9 s e a tinta começa logo depois, recarregar não repete, toque pula, movimento reduzido não mostra, console sem erro.
+- Commit: `690b04c`.
+- Pendente: agente 2 juntar o main no `agente-2/tinta` (aviso em PEDIDOS).
