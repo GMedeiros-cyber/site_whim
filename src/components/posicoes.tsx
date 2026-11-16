@@ -34,7 +34,10 @@ export type Posicao = { chave: string; arte?: Arte; manterFundo?: boolean };
 
 export const medidaDe = (chave: string) => {
   const m = MEDIDAS[chave];
-  return m ? `até ≈ ${m[0]} × ${m[1]} cm` : "";
+  if (!m) return "";
+  const [l, a] = m.map((n) => n.toLocaleString("pt-BR"));
+  // Frente e costas inteiras vão até o máximo da Whim, uma folha A3 (briefing de 16/11).
+  return m[0] === 29.7 && m[1] === 42 ? `até A3 (${l} × ${a} cm)` : `até ≈ ${l} × ${a} cm`;
 };
 export const temPosicao = (modelo: Modelo, chave: string) => !!(areaDe(modelo, "frente", chave) ?? areaDe(modelo, "costas", chave));
 export const ladoDe = (chave: string): Lado => (GRUPOS[1][1].includes(chave) ? "costas" : "frente");
