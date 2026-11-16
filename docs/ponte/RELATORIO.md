@@ -140,3 +140,11 @@ Uma entrada por tarefa, sempre acrescentada no fim (nunca reescrever as anterior
 - Observação: entre 601 e 820 px o header esconde Sobre/Serviços/Processo e não tem menu; nessa faixa eles ficam só no rodapé (como diz `navegacao.ts`).
 - Commit: `6c857d6`.
 - Pendente: revisão jurídica da /privacidade; avaliações reais do Google.
+
+### 2026-11-16 00:40 · Agente 2 · Home (Claude Code)
+- Feito: home nova seção por seção (Vista pintada por shader WebGL de tinta, uma vez por sessão, toque pula; Quem somos com mosaico/carrossel; 3 técnicas; Como funciona preso à rolagem com fogos uma vez; 10 clientes em marquee; Dúvidas; convite com borda de tinta), transições entre seções, mapa do Google no rodapé, /privacidade citando o Google Maps, Bom Clima em `whim.ts`.
+- Decisões: transições em CSS global com prefixo `home-` (a regra `"*.css"` do next.config transforma `.module.css` em global); `--home-p` registrada (começa em 4: sem suporte ou com movimento reduzido fica tudo aceso); lista das dúvidas exportada em `src/components/home/duvidas.ts` para o FAQPage.
+- Conferido (Chrome, produção, 360/390/768/1024/1280 + movimento reduzido): sem rolagem lateral, alvos de 44 px, foco visível, console sem erro; canvas final x texto em CSS com diferença média < 1/255; linha avança e volta com a rolagem, fogos 1 vez.
+- Comandos: `npm run lint` e `npm run build` (ok).
+- Commits: `899820f` home, `8c2246e` mapa/privacidade, `90fa9b3` briefing/transições/rolagem.
+- Pendente: logos dos clientes; texto de abertura do rodapé com os novos públicos (fora do que foi liberado no rodapé); Firefox sem `animation-timeline` mostra as etapas acesas e sem transições.
