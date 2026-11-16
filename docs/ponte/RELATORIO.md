@@ -223,3 +223,9 @@ Uma entrada por tarefa, sempre acrescentada no fim (nunca reescrever as anterior
 - Comandos: `git merge --ff-only origin/main`, `npm install`, `npm run lint` (ok), `npm run build` (ok), `next start` + Lighthouse e Puppeteer.
 - Commit: `9929b15`.
 - Pendente: Performance 90 no celular (home e Monte); pedido ao agente 1 (contraste, cano, alvos de toque); domínio, dias de funcionamento e IDs da Whim; PR para o main.
+
+### 2026-11-16 17:05 · Revisão e merge do agente 3, parte 2 (Claude, outra conta)
+- Feito: conferi `agente-3/qualidade-2` (arquivos dentro do que o pedido liberou: metadata e JSON-LD nas páginas, eventos no formulário e no WhatsApp, balão do WhatsApp sem CLS) e juntei no main por fast-forward.
+- Conferido: lint ok; build ok (Poppins trocada só localmente); Playwright 390 e 1280 em /, /monte-sua-peca, /privacidade e 404: sem rolagem lateral, console limpo, JSON-LD presente, botão do WhatsApp 56 px; robots/sitemap/llms.txt/manifest 200.
+- Commit: `c1b22fe` (main).
+- Pendente: nota 90 no celular (medir no site publicado antes de otimizar); pedido do agente 1 (contraste, cano, links do contato); `npm audit` só em ferramentas de desenvolvimento.
