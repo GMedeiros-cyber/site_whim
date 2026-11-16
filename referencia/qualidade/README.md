@@ -46,8 +46,9 @@ Vale para o site inteiro (home, /monte-sua-peca, /privacidade). Quem executa: **
 
 ## 6. Schema (dados estruturados)
 
-- JSON-LD no `layout.tsx`: `LocalBusiness` com nome, razão social (Gallant Clothing Ltda), CNPJ em `taxID`, endereço completo (Av. Brigadeiro Faria Lima, 110, 2º andar, Cocaia, Guarulhos/SP, 07130-000), telefone, e-mail, horário (seg. a sex.? **confirmar dias com a Whim**; hoje só temos "das 6h às 18h"), `sameAs` com o Instagram, `areaServed` Guarulhos e Grande SP só se a Whim confirmar.
-- `Service` para silk, DTF, bordado, sublimação, confecção e uniformes.
+- JSON-LD no `layout.tsx`: `LocalBusiness` com nome, razão social (Gallant Clothing Ltda), CNPJ em `taxID`, endereço completo (Av. Brigadeiro Faria Lima, 110, 2º andar, Bom Clima, Guarulhos/SP, 07130-000), telefone, e-mail, horário (seg. a sex.? **confirmar dias com a Whim**; hoje só temos "das 6h às 18h"), `sameAs` com o Instagram, `areaServed` Guarulhos e Grande São Paulo (confirmado no briefing).
+- `Service` para silk, DTF, bordado, confecção e uniformes (sem sublimação).
+- `FAQPage` com as perguntas da seção Dúvidas frequentes da home.
 - `BreadcrumbList` nas páginas internas.
 - Nada de `AggregateRating` até existirem avaliações reais.
 - Validar no Teste de Pesquisa Aprimorada do Google.
@@ -92,5 +93,4 @@ Vale para o site inteiro (home, /monte-sua-peca, /privacidade). Quem executa: **
 
 - Domínio oficial do site.
 - Dias de funcionamento (seg. a sex.? sábado?).
-- Região que atendem (só Guarulhos ou Grande SP e outras cidades).
 - IDs das contas de anúncio e medição, quando forem criadas.

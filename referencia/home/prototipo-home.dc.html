@@ -61,7 +61,7 @@ a{color:#373857}a:hover{color:#31C4EA}
 .selo{position:absolute;left:-22px;top:28px;padding:12px 16px;border-radius:16px;background:#373857;color:#FFFFFF;font-size:13px;font-weight:500;box-shadow:0 16px 30px -18px rgba(55,56,87,.6)}
 .dots{display:none}
 /* o que fazemos */
-.tecnicas{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:20px;margin-top:56px}
+.tecnicas{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;margin-top:56px}
 .tec{display:flex;flex-direction:column;border-radius:26px;background:#FFFFFF;overflow:hidden;border:1px solid rgba(55,56,87,.06)}
 .tec .ft{position:relative;aspect-ratio:3/4;overflow:hidden}
 .tec .ft img{width:100%;height:100%;object-fit:cover;display:block}
@@ -99,13 +99,24 @@ a{color:#373857}a:hover{color:#31C4EA}
 .nota-anim{margin-top:28px;font-size:12px;color:#5D6178}
 /* clientes */
 .faixa{margin-top:52px;overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent);mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent)}
-.trilha{display:flex;width:max-content;animation:rola 28s linear infinite}
+.trilha{display:flex;width:max-content;animation:rola 40s linear infinite}
 .faixa:hover .trilha{animation-play-state:paused}
 .grupo{display:flex;align-items:center;gap:56px;padding-right:56px}
 @keyframes rola{to{transform:translateX(-50%)}}
 .marca{font-size:34px;font-weight:600;letter-spacing:-.02em;color:#5D6178;display:flex;align-items:center;gap:56px;white-space:nowrap}
 .marca:after{content:"";width:8px;height:8px;border-radius:999px;background:#31C4EA}
 .slot{padding:16px 24px;border-radius:12px;border:1px dashed rgba(55,56,87,.28);font-size:13px;color:#5D6178;white-space:nowrap}
+/* duvidas */
+.duv{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:64px;align-items:start}
+.lista{display:flex;flex-direction:column;border-top:1px solid rgba(55,56,87,.12)}
+.q{border-bottom:1px solid rgba(55,56,87,.12)}
+.q summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:20px;min-height:44px;padding:20px 0;font-size:18px;font-weight:600}
+.q summary::-webkit-details-marker{display:none}
+.q summary i{position:relative;flex:0 0 28px;height:28px;border-radius:999px;background:#F5F7FA}
+.q summary i:before,.q summary i:after{content:"";position:absolute;left:8px;right:8px;top:13px;height:2px;background:#373857;border-radius:2px}
+.q summary i:after{transform:rotate(90deg);transition:transform .2s}
+.q[open] summary i{background:#31C4EA}.q[open] summary i:after{transform:rotate(0)}
+.q p{margin:0 0 22px;font-size:15.5px;line-height:1.65;color:#5D6178;max-width:60ch}
 /* convite + rodape */
 .fim{background:#373857;color:#FFFFFF}
 .cta{display:flex;flex-direction:column;align-items:center;text-align:center;padding:120px 0 96px}
@@ -129,7 +140,7 @@ a{color:#373857}a:hover{color:#31C4EA}
 /* transicoes entre secoes */
 .sec,.fim{position:relative;border-radius:40px 40px 0 0;margin-top:-40px;box-shadow:0 -24px 40px -34px rgba(55,56,87,.35)}
 #sobre{margin-top:0;box-shadow:none;border-radius:0}
-#sobre{z-index:1}#servicos{z-index:2}#processo{z-index:3}#clientes{z-index:4}.fim{z-index:5;border-radius:0;box-shadow:none;margin-top:0}
+#sobre{z-index:1}#servicos{z-index:2}#processo{z-index:3}#clientes{z-index:4}#duvidas{z-index:5}.fim{z-index:6;border-radius:0;box-shadow:none;margin-top:0}
 .tinta{position:absolute;left:0;right:0;top:-58px;height:60px;width:100%;display:block;z-index:5}
 @supports (animation-timeline: view()){
 .sec .eye,.sec .tit,.sec .lead,.cta h2{animation:sobe linear both;animation-timeline:view();animation-range:entry 5% cover 28%}
@@ -170,6 +181,7 @@ a{color:#373857}a:hover{color:#31C4EA}
 .cta{padding:80px 0 56px}.cta h2{font-size:48px}
 .foot{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:32px}.foot .first,.foot .last{grid-column:span 2}
 .legal{flex-direction:column}
+.duv{grid-template-columns:minmax(0,1fr);gap:24px}.q summary{font-size:16px}
 }
 </style>
 </helmet>
@@ -192,14 +204,14 @@ a{color:#373857}a:hover{color:#31C4EA}
 <img class="hero-logo" src="/_blob/6c13b2e132ae170323e049882394a391" alt="Whim Confecção e Estamparia">
 <p class="giant" aria-hidden="true">{{palavra}}</p>
 <h1>{{frase}}</h1>
-<p class="sub">Uniformes, camisetas e peças com a sua marca. Silk, DTF, bordado e sublimação numa oficina própria em Guarulhos.</p>
+<p class="sub">Uniformes, camisetas e peças com a sua marca. Silk, DTF e bordado numa oficina própria em Guarulhos.</p>
 <div class="row">
 <a class="btn btn-w" href="#fim">Pedir orçamento no WhatsApp
 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="m13 6 6 6-6 6"></path></svg></a>
 <a class="btn btn-o" href="#servicos">Ver o que fazemos</a>
 </div>
 <div class="hero-foot">
-<div class="tecs"><span>Silk</span><span>DTF</span><span>Bordado</span><span>Sublimação</span></div>
+<div class="tecs"><span>Silk</span><span>DTF</span><span>Bordado</span></div>
 <span class="rola">role para conhecer</span>
 </div>
 <p class="nota-intro">Abertura: a tinta turquesa pinta a palavra da esquerda para a direita (shader de tinta no site). Uma vez por sessão; parada com movimento reduzido.</p>
@@ -214,7 +226,7 @@ a{color:#373857}a:hover{color:#31C4EA}
 <ul class="etapas">
 <li><b>Gravação de telas</b><span>A arte vira tela para o silk.</span></li>
 <li><b>Corte e costura</b><span>A peça nasce do tecido.</span></li>
-<li><b>Estampa</b><span>Silk, DTF, bordado ou sublimação.</span></li>
+<li><b>Estampa</b><span>Silk, DTF ou bordado.</span></li>
 <li><b>Acabamento</b><span>Conferência e embalagem.</span></li>
 </ul>
 </div>
@@ -231,7 +243,7 @@ a{color:#373857}a:hover{color:#31C4EA}
 <section id="servicos" class="sec muted">
 <div class="wrap">
 <p class="eye"><i></i>O que fazemos</p>
-<h2 class="tit">Quatro jeitos de <em class="hl">estampar sua marca.</em></h2>
+<h2 class="tit">Três jeitos de <em class="hl">estampar sua marca.</em></h2>
 <p class="lead">Cada técnica deixa a arte de um jeito. Veja como fica cada uma e para o que ela é melhor.</p>
 <div class="tecnicas">
 <article class="tec">
@@ -246,13 +258,9 @@ a{color:#373857}a:hover{color:#31C4EA}
 <div class="ft"><img src="/_blob/dcc5b0d9ab05a7dbdc5e43c099e40f2d" alt="Logo bordado em linha numa polo azul-marinho"><span>Imagem ilustrativa</span></div>
 <div class="tx"><h3>Bordado</h3><p>A arte é costurada em linha, em relevo, e dura junto com a peça.</p><p class="bom"><b>Bom para:</b> logo no peito de polos e uniformes.</p></div>
 </article>
-<article class="tec">
-<div class="ft"><img src="/_blob/7b4ccd3d7553c68b5f7dd020f546f0f3" alt="Camiseta esportiva com estampa de sublimação na peça inteira"><span>Imagem ilustrativa</span></div>
-<div class="tx"><h3>Sublimação</h3><p>A tinta entra no tecido e pode cobrir a peça inteira, sem relevo.</p><p class="bom"><b>Bom para:</b> peças esportivas claras de poliéster.</p></div>
-</article>
 </div>
 <div class="tambem">
-<div class="tb"><h3>Confecção</h3><p>Modelagem, corte e costura da peça do zero, no tecido e no tamanho que você precisar.</p></div>
+<div class="tb"><h3>Confecção</h3><p>Camiseta, polo, regata, moletom e baby look, do tecido ao acabamento, do infantil 2 ao adulto G3.</p></div>
 <div class="tb"><h3>Uniformes</h3><p>Para empresas e escolas, com padrão de cor, logo bordado ou estampado e reposição fácil.</p></div>
 <div class="tb n"><h3>Não sabe qual?</h3><p>Mande a arte: a equipe indica a técnica que fica melhor.</p></div>
 </div>
@@ -283,7 +291,18 @@ a{color:#373857}a:hover{color:#31C4EA}
 <h2 class="tit">Marcas que <em class="hl">confiam na oficina.</em></h2>
 </div>
 <div class="faixa" aria-label="Clientes da Whim">
-<div class="trilha"><div class="grupo"><span class="marca">Globo</span><span class="marca">Lollapalooza</span><span class="slot">logo do cliente</span><span class="slot">logo do cliente</span><span class="slot">logo do cliente</span><span class="slot">logo do cliente</span></div><div class="grupo" aria-hidden="true"><span class="marca">Globo</span><span class="marca">Lollapalooza</span><span class="slot">logo do cliente</span><span class="slot">logo do cliente</span><span class="slot">logo do cliente</span><span class="slot">logo do cliente</span></div></div>
+<div class="trilha"><div class="grupo"><span class="marca">Globo</span><span class="marca">Lollapalooza</span><span class="marca">Santander</span><span class="marca">SBT</span><span class="marca">Bauducco</span><span class="marca">Aurora</span><span class="marca">Eletrochemical</span><span class="marca">Lopes Kalil Engenharia</span><span class="marca">Indovinya</span><span class="marca">Colégio Progresso</span></div><div class="grupo" aria-hidden="true"><span class="marca">Globo</span><span class="marca">Lollapalooza</span><span class="marca">Santander</span><span class="marca">SBT</span><span class="marca">Bauducco</span><span class="marca">Aurora</span><span class="marca">Eletrochemical</span><span class="marca">Lopes Kalil Engenharia</span><span class="marca">Indovinya</span><span class="marca">Colégio Progresso</span></div></div>
+</div>
+</section>
+
+<section id="duvidas" class="sec">
+<div class="wrap duv">
+<div>
+<p class="eye"><i></i>Dúvidas frequentes</p>
+<h2 class="tit">Antes de <em class="hl">pedir o orçamento.</em></h2>
+<p class="lead">As perguntas que mais chegam no WhatsApp, respondidas aqui.</p>
+</div>
+<div class="lista"><details class="q" open><summary>Qual a quantidade mínima?<i aria-hidden="true"></i></summary><p>A partir de 50 peças por pedido.</p></details><details class="q"><summary>Quanto tempo leva para ficar pronto?<i aria-hidden="true"></i></summary><p>De 20 a 30 dias de produção, conforme a quantidade e o modelo.</p></details><details class="q"><summary>Qual técnica de estampa eu escolho?<i aria-hidden="true"></i></summary><p>Silk para logos de poucas cores e tiragens maiores, DTF para artes coloridas e com degradê, bordado para logo no peito de polos e uniformes. Na dúvida, mande a arte que a gente indica.</p></details><details class="q"><summary>Quais peças e tecidos vocês trabalham?<i aria-hidden="true"></i></summary><p>Camiseta, polo, regata, moletom gola careca e canguru e baby look. Tecidos: meia malha penteada 100% algodão premium, malha fria PV antipilling, malha mescla PA, malha piquet PA, moletom 3 cabos e dry fit 100% poliéster ou 100% poliamida.</p></details><details class="q"><summary>Quais tamanhos e cores?<i aria-hidden="true"></i></summary><p>Infantil do 2 ao 16 e adulto do PP ao G3. A cor da peça é de acordo com o seu pedido.</p></details><details class="q"><summary>Onde dá para estampar e qual o tamanho máximo?<i aria-hidden="true"></i></summary><p>Frente, costas e manga, com estampa de até A3.</p></details><details class="q"><summary>Vocês atendem a minha região?<i aria-hidden="true"></i></summary><p>Atendemos Guarulhos e a Grande São Paulo.</p></details><details class="q"><summary>O site mostra preço?<i aria-hidden="true"></i></summary><p>Não. O orçamento é feito pelo WhatsApp, e quem responde é a Caroline.</p></details></div>
 </div>
 </section>
 
@@ -292,7 +311,7 @@ a{color:#373857}a:hover{color:#31C4EA}
 <div class="wrap">
 <div class="cta" id="monte">
 <h2>Monte a sua <em>peça.</em></h2>
-<p>Peça, cor, estampa e quantidade em 5 passos. O orçamento chega pronto no WhatsApp da Whim.</p>
+<p>Peça, cor, estampa e quantidade em 5 passos. O orçamento chega pronto no WhatsApp da Whim, e quem responde é a Caroline.</p>
 <div class="row" style="justify-content: center">
 <a class="btn btn-w" href="#topo">Monte sua peça
 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="m13 6 6 6-6 6"></path></svg></a>
@@ -302,7 +321,7 @@ a{color:#373857}a:hover{color:#31C4EA}
 <footer class="foot">
 <div class="first">
 <img class="logo" src="/_blob/6c13b2e132ae170323e049882394a391" alt="Whim Confecção e Estamparia">
-<p>Silk, DTF, bordado e confecção para empresas, escolas e confecções em Guarulhos/SP.</p>
+<p>Silk, DTF, bordado e confecção para empresas, confecções, marcas, eventos e igrejas em Guarulhos e na Grande SP.</p>
 </div>
 <div>
 <h4><i></i>Navegação</h4>
@@ -314,7 +333,7 @@ a{color:#373857}a:hover{color:#31C4EA}
 </div>
 <div class="last">
 <h4><i></i>Endereço</h4>
-<p>Av. Brigadeiro Faria Lima, 110 · 2º andar</p><p>Cocaia · Guarulhos/SP · CEP 07130-000</p>
+<p>Av. Brigadeiro Faria Lima, 110 · 2º andar</p><p>Bom Clima · Guarulhos/SP · CEP 07130-000</p>
 <div class="mapa" role="img" aria-label="Mapa com a localização da Whim">
 <div class="ruas"></div><div class="av"></div><div class="pin"></div>
 <div class="lbl">Mapa do Google embutido no site · Av. Brigadeiro Faria Lima, 110</div>
@@ -328,7 +347,7 @@ a{color:#373857}a:hover{color:#31C4EA}
 
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"palavra":{"editor":"text","default":"Vista"},"frase":{"editor":"text","default":"a sua marca, peça por peça."},"$preview":{"width":1440,"height":4900}}'>
+<script type="text/x-dc" data-dc-script data-props='{"palavra":{"editor":"text","default":"Vista"},"frase":{"editor":"text","default":"a sua marca, peça por peça."},"$preview":{"width":1440,"height":5600}}'>
 class Component extends DCLogic {
 renderVals() {
 return { palavra: this.props.palavra ?? 'Vista', frase: this.props.frase ?? 'a sua marca, peça por peça.' };
