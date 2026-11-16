@@ -1,0 +1,79 @@
+/*
+ * Transições da home (referencia/home/README.md, "Transições entre as seções").
+ * Presas à rolagem (animation-timeline: view()). Sem suporte ou com movimento
+ * reduzido, tudo fica parado e visível.
+ * CSS global com prefixo home-: a regra "*.css" do next.config transforma
+ * .module.css em global, então um CSS Module não teria classes com hash.
+ */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    /* Eyebrow, título e linha de apoio sobem ao entrar na tela. */
+    .home-sobe {
+      animation: home-sobe linear both;
+      animation-timeline: view();
+      animation-range: entry 5% cover 28%;
+    }
+
+    /* O cartão do topo recua de leve enquanto sai da tela. */
+    .home-recua {
+      animation: home-recua linear both;
+      animation-timeline: view();
+      animation-range: exit 0% exit 100%;
+    }
+
+    /* Como funciona: a linha anda com a rolagem, da lista inteira na tela
+       até ~o meio dela, e volta ao rolar para cima. */
+    .home-etapas {
+      animation: home-etapas linear both;
+      animation-timeline: view();
+      animation-range: entry 100% cover 62%;
+    }
+  }
+}
+
+/* Trechos percorridos pela linha das etapas (0 a 4). Começa em 4: sem
+   rolagem animada ou com movimento reduzido, tudo fica aceso. */
+@property --home-p {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 4;
+}
+
+/* Paradas curtas em cada etapa. */
+@keyframes home-etapas {
+  0%,
+  4% {
+    --home-p: 0;
+  }
+  22%,
+  26% {
+    --home-p: 1;
+  }
+  44%,
+  48% {
+    --home-p: 2;
+  }
+  66%,
+  70% {
+    --home-p: 3;
+  }
+  88%,
+  100% {
+    --home-p: 4;
+  }
+}
+
+@keyframes home-sobe {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+}
+
+@keyframes home-recua {
+  to {
+    transform: scale(0.94);
+    border-radius: 48px;
+    filter: brightness(0.8);
+  }
+}

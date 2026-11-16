@@ -17,7 +17,7 @@ const novaAba = { target: "_blank", rel: "noopener noreferrer" } as const;
 
 /** Mapa embutido (sempre visível; citado na /privacidade). */
 const MAPA_EMBED =
-  "https://www.google.com/maps?q=Av.+Brigadeiro+Faria+Lima,+110,+Cocaia,+Guarulhos+-+SP,+07130-000&output=embed";
+  "https://www.google.com/maps?q=Av.+Brigadeiro+Faria+Lima,+110,+Bom+Clima,+Guarulhos+-+SP,+07130-000&output=embed";
 
 export function SiteFooter() {
   return (

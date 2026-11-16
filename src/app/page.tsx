@@ -3,8 +3,10 @@ import Link from "next/link";
 
 import { Container, Destaque, Eyebrow, Seta, Titulo, secao } from "@/components/blocos";
 import { Carrossel } from "@/components/home/carrossel";
+import { DUVIDAS } from "@/components/home/duvidas";
 import { Etapas } from "@/components/home/etapas";
 import { PalavraTinta } from "@/components/home/palavra-tinta";
+import "@/components/home/transicoes.css";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { buttonVariants } from "@/components/ui/button";
@@ -20,12 +22,20 @@ const botaoContorno = cn(
   "w-full border-primary-foreground/40 bg-transparent hover:border-accent hover:bg-primary-foreground/10 sm:w-auto"
 );
 
-const TECNICAS_TOPO = ["Silk", "DTF", "Bordado", "Sublimação"];
+/** Seção que sobe por cima da anterior (cantos de cima, sombra e margem negativa). */
+const sobrepoe =
+  "relative isolate -mt-7 rounded-t-[28px] shadow-[0_-24px_40px_-34px] shadow-primary/35 md:-mt-10 md:rounded-t-[40px]";
+/** Eyebrow, título e linha de apoio que sobem ao entrar na tela. */
+const sobe = "home-sobe";
+const apoio = "mt-[18px] max-w-[56ch] text-base leading-relaxed text-pretty text-muted-foreground sm:text-[17px]";
+
+// A Whim faz silk, DTF e bordado (não faz sublimação: briefing de 16/11).
+const TECNICAS_TOPO = ["Silk", "DTF", "Bordado"];
 
 const OFICINA = [
   { nome: "Gravação de telas", texto: "A arte vira tela para o silk." },
   { nome: "Corte e costura", texto: "A peça nasce do tecido." },
-  { nome: "Estampa", texto: "Silk, DTF, bordado ou sublimação." },
+  { nome: "Estampa", texto: "Silk, DTF ou bordado." },
   { nome: "Acabamento", texto: "Conferência e embalagem." },
 ];
 
@@ -58,23 +68,27 @@ const TECNICAS = [
     texto: "A arte é costurada em linha, em relevo, e dura junto com a peça.",
     bomPara: "logo no peito de polos e uniformes.",
   },
-  {
-    nome: "Sublimação",
-    imagem: "sublimacao",
-    alt: "Camiseta esportiva com estampa de sublimação na peça inteira",
-    texto: "A tinta entra no tecido e pode cobrir a peça inteira, sem relevo.",
-    bomPara: "peças esportivas claras de poliéster.",
-  },
 ];
 
 const TAMBEM = [
-  { nome: "Confecção", texto: "Modelagem, corte e costura da peça do zero, no tecido e no tamanho que você precisar." },
+  { nome: "Confecção", texto: "Camiseta, polo, regata, moletom e baby look, do tecido ao acabamento, do infantil 2 ao adulto G3." },
   { nome: "Uniformes", texto: "Para empresas e escolas, com padrão de cor, logo bordado ou estampado e reposição fácil." },
   { nome: "Não sabe qual?", texto: "Mande a arte: a equipe indica a técnica que fica melhor." },
 ];
 
-// null = espaço reservado para o logo de um cliente (ainda não temos os arquivos).
-const MARCAS = ["Globo", "Lollapalooza", null, null, null, null];
+// Clientes que a Whim autorizou citar (briefing de 16/11). Logos ainda não chegaram.
+const MARCAS = [
+  "Globo",
+  "Lollapalooza",
+  "Santander",
+  "SBT",
+  "Bauducco",
+  "Aurora",
+  "Eletrochemical",
+  "Lopes Kalil Engenharia",
+  "Indovinya",
+  "Colégio Progresso",
+];
 
 export default function Home() {
   return (
@@ -86,6 +100,7 @@ export default function Home() {
         <OQueFazemos />
         <ComoFunciona />
         <Clientes />
+        <Duvidas />
         <Convite />
       </main>
       <SiteFooter />
@@ -96,7 +111,12 @@ export default function Home() {
 function Topo() {
   return (
     <section id="topo" className="p-2 md:p-3">
-      <div className="relative isolate flex min-h-[calc(100svh-1rem)] flex-col items-center justify-center overflow-hidden rounded-[24px] bg-primary px-5 pt-28 pb-24 text-center text-primary-foreground md:min-h-[min(880px,calc(100svh-1.5rem))] md:rounded-[32px] md:px-10 md:pt-32 md:pb-28">
+      <div
+        className={cn(
+          "relative isolate flex min-h-[calc(100svh-1rem)] flex-col items-center justify-center overflow-hidden rounded-[24px] bg-primary px-5 pt-28 pb-24 text-center text-primary-foreground md:min-h-[min(880px,calc(100svh-1.5rem))] md:rounded-[32px] md:px-10 md:pt-32 md:pb-28",
+          "home-recua"
+        )}
+      >
         <Image
           src="/images/hero-mesa.webp"
           alt="Mesa longa de silk com peças estampadas em série na oficina da Whim"
@@ -126,8 +146,8 @@ function Topo() {
           </span>
         </h1>
         <p className="mt-4 max-w-[52ch] text-[15px] leading-relaxed text-pretty text-primary-foreground/80 md:text-base">
-          Uniformes, camisetas e peças com a sua marca. Silk, DTF, bordado e sublimação numa
-          oficina própria em Guarulhos.
+          Uniformes, camisetas e peças com a sua marca. Silk, DTF e bordado numa oficina própria em
+          Guarulhos.
         </p>
         <div className="mt-7 flex w-full flex-col gap-2.5 sm:w-auto sm:flex-row">
           <a href={WHATSAPP_ORCAMENTO} className={botaoClaro}>
@@ -155,14 +175,14 @@ function Topo() {
 
 function QuemSomos() {
   return (
-    <section id="sobre" className={secao}>
+    <section id="sobre" className={cn(secao, "relative isolate bg-background")}>
       <Container className="grid gap-y-8 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-x-16 lg:gap-y-9">
         <div className="lg:self-end">
-          <Eyebrow>Quem somos</Eyebrow>
-          <Titulo className="max-w-[13ch]">
+          <Eyebrow className={sobe}>Quem somos</Eyebrow>
+          <Titulo className={cn("max-w-[13ch]", sobe)}>
             Uma oficina, <Destaque>do fio à estampa.</Destaque>
           </Titulo>
-          <p className="mt-[18px] max-w-[56ch] text-base leading-relaxed text-pretty text-muted-foreground sm:text-[17px]">
+          <p className={cn(apoio, sobe)}>
             A Whim nasceu em 2021, quando o Wallan juntou 15 anos de experiência numa oficina
             própria em Guarulhos. Hoje a gente faz peças para empresas, escolas e eventos com todas
             as etapas no mesmo lugar.
@@ -216,21 +236,18 @@ function QuemSomos() {
 
 function OQueFazemos() {
   return (
-    <section id="servicos" className={cn(secao, "bg-muted")}>
+    <section id="servicos" className={cn(secao, sobrepoe, "bg-muted")}>
       <Container>
-        <Eyebrow>O que fazemos</Eyebrow>
-        <Titulo>
-          Quatro jeitos de <Destaque>estampar sua marca.</Destaque>
+        <Eyebrow className={sobe}>O que fazemos</Eyebrow>
+        <Titulo className={sobe}>
+          Três jeitos de <Destaque>estampar sua marca.</Destaque>
         </Titulo>
-        <p className="mt-[18px] max-w-[56ch] text-base leading-relaxed text-pretty text-muted-foreground sm:text-[17px]">
+        <p className={cn(apoio, sobe)}>
           Cada técnica deixa a arte de um jeito. Veja como fica cada uma e para o que ela é melhor.
         </p>
 
         <div className="mt-9 md:mt-14">
-          <Carrossel
-            rotulo="Técnicas de estampa"
-            className="gap-3 md:grid md:grid-cols-2 md:gap-5 lg:grid-cols-4"
-          >
+          <Carrossel rotulo="Técnicas de estampa" className="gap-3 md:grid md:grid-cols-3 md:gap-5">
             {TECNICAS.map((t) => (
               <article
                 key={t.nome}
@@ -241,7 +258,7 @@ function OQueFazemos() {
                     src={`/images/estilos/${t.imagem}.webp`}
                     alt={t.alt}
                     fill
-                    sizes="(min-width: 1024px) 270px, (min-width: 768px) 45vw, 76vw"
+                    sizes="(min-width: 1024px) 380px, (min-width: 768px) 33vw, 76vw"
                     className="object-cover"
                   />
                   <span className="absolute top-3 left-3 rounded-full bg-background/85 px-2.5 py-[5px] text-[11px] text-foreground">
@@ -286,10 +303,10 @@ function OQueFazemos() {
 
 function ComoFunciona() {
   return (
-    <section id="processo" className={secao}>
+    <section id="processo" className={cn(secao, sobrepoe, "bg-background")}>
       <Container>
-        <Eyebrow>Como funciona</Eyebrow>
-        <Titulo>
+        <Eyebrow className={sobe}>Como funciona</Eyebrow>
+        <Titulo className={sobe}>
           Do pedido <Destaque>à entrega.</Destaque>
         </Titulo>
         <div className="mt-10 lg:mt-16">
@@ -304,44 +321,35 @@ function ListaMarcas({ className, ...props }: React.ComponentProps<"ul">) {
   return (
     <ul
       className={cn(
-        "flex shrink-0 items-center gap-7 pr-7 sm:gap-14 sm:pr-14 motion-reduce:shrink motion-reduce:flex-wrap motion-reduce:justify-center motion-reduce:gap-y-5 motion-reduce:px-5",
+        "flex shrink-0 items-center gap-7 pr-7 sm:gap-14 sm:pr-14 motion-reduce:shrink motion-reduce:flex-wrap motion-reduce:justify-center motion-reduce:gap-y-4 motion-reduce:px-5",
         className
       )}
       {...props}
     >
-      {MARCAS.map((m, i) =>
-        m ? (
-          <li
-            key={i}
-            className="flex items-center gap-7 text-2xl font-semibold tracking-[-0.02em] whitespace-nowrap text-muted-foreground after:size-2 after:rounded-full after:bg-accent sm:gap-14 sm:text-[34px]"
-          >
-            {m}
-          </li>
-        ) : (
-          <li
-            key={i}
-            className="rounded-xl border border-dashed border-primary/28 px-6 py-4 text-[13px] whitespace-nowrap text-muted-foreground"
-          >
-            logo do cliente
-          </li>
-        )
-      )}
+      {MARCAS.map((m) => (
+        <li
+          key={m}
+          className="flex items-center gap-7 text-2xl font-semibold tracking-[-0.02em] whitespace-nowrap text-muted-foreground after:size-2 after:rounded-full after:bg-accent sm:gap-14 sm:text-[34px]"
+        >
+          {m}
+        </li>
+      ))}
     </ul>
   );
 }
 
 function Clientes() {
   return (
-    <section id="clientes" className={cn(secao, "bg-muted")}>
+    <section id="clientes" className={cn(secao, sobrepoe, "bg-muted")}>
       <Container>
-        <Eyebrow>Quem já vestiu Whim</Eyebrow>
-        <Titulo>
+        <Eyebrow className={sobe}>Quem já vestiu Whim</Eyebrow>
+        <Titulo className={sobe}>
           Marcas que <Destaque>confiam na oficina.</Destaque>
         </Titulo>
       </Container>
 
       {/* De ponta a ponta da tela; pausa com o mouse em cima ou com foco.
-          Cada metade tem a lista duas vezes para cobrir telas largas sem emenda. */}
+          Uma lista já passa de 1900 px, então uma cópia basta para o laço não ter emenda. */}
       <div
         tabIndex={0}
         role="region"
@@ -350,13 +358,11 @@ function Clientes() {
       >
         <div className="overflow-hidden [mask-image:linear-gradient(90deg,transparent,black_10%,black_90%,transparent)] motion-reduce:[mask-image:none]">
           <div
-            style={{ animationDuration: "28s" }}
+            style={{ animationDuration: "40s" }}
             className="flex w-max group-hover:[animation-play-state:paused] group-focus:[animation-play-state:paused] motion-safe:animate-marquee motion-reduce:w-auto"
           >
             <ListaMarcas />
-            {[1, 2, 3].map((n) => (
-              <ListaMarcas key={n} aria-hidden className="motion-reduce:hidden" />
-            ))}
+            <ListaMarcas aria-hidden className="motion-reduce:hidden" />
           </div>
         </div>
       </div>
@@ -364,16 +370,62 @@ function Clientes() {
   );
 }
 
+function Duvidas() {
+  return (
+    <section id="duvidas" className={cn(secao, sobrepoe, "bg-background")}>
+      <Container className="grid gap-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:items-start lg:gap-16">
+        <div>
+          <Eyebrow className={sobe}>Dúvidas frequentes</Eyebrow>
+          <Titulo className={sobe}>
+            Antes de <Destaque>pedir o orçamento.</Destaque>
+          </Titulo>
+          <p className={cn(apoio, sobe)}>As perguntas que mais chegam no WhatsApp, respondidas aqui.</p>
+        </div>
+        <div className="border-t">
+          {DUVIDAS.map((d, i) => (
+            <details key={d.pergunta} open={i === 0} className="group border-b">
+              <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-5 rounded-sm py-5 text-base font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring sm:text-lg [&::-webkit-details-marker]:hidden">
+                {d.pergunta}
+                {/* + que vira − (o traço vertical deita) com fundo turquesa quando aberta */}
+                <span
+                  aria-hidden
+                  className="relative size-7 shrink-0 rounded-full bg-muted transition-colors group-open:bg-accent before:absolute before:inset-x-2 before:top-[13px] before:h-0.5 before:rounded-full before:bg-primary after:absolute after:inset-x-2 after:top-[13px] after:h-0.5 after:rotate-90 after:rounded-full after:bg-primary after:transition-transform group-open:after:rotate-0"
+                />
+              </summary>
+              <p className="mb-[22px] max-w-[60ch] text-[15.5px] leading-[1.65] text-pretty text-muted-foreground">
+                {d.resposta}
+              </p>
+            </details>
+          ))}
+        </div>
+      </Container>
+    </section>
+  );
+}
+
 function Convite() {
   return (
-    <section id="fim" className="bg-primary text-primary-foreground">
+    <section id="fim" className="relative isolate bg-primary text-primary-foreground">
+      {/* Borda de tinta: o azul-marinho escorre por cima da seção anterior. */}
+      <svg
+        aria-hidden
+        viewBox="0 0 1440 60"
+        preserveAspectRatio="none"
+        className="absolute inset-x-0 -top-[38px] h-10 w-full fill-primary md:-top-[58px] md:h-[60px]"
+      >
+        <path d="M0 60 L0 38 C 80 30 140 44 220 36 C 300 26 340 12 430 20 C 520 28 560 46 660 40 C 760 34 800 14 900 18 C 990 22 1040 40 1130 36 C 1220 32 1260 10 1340 16 C 1390 20 1420 30 1440 28 L1440 60 Z" />
+        <circle cx="318" cy="22" r="5" />
+        <circle cx="1012" cy="30" r="3.5" />
+        <circle cx="1268" cy="8" r="4" />
+      </svg>
       <Container>
         <div className="flex flex-col items-center border-b border-primary-foreground/15 pt-20 pb-14 text-center md:pt-30 md:pb-24">
-          <h2 className="text-5xl leading-none font-bold tracking-[-0.045em] md:text-[80px]">
+          <h2 className={cn("text-5xl leading-none font-bold tracking-[-0.045em] md:text-[80px]", sobe)}>
             Monte a sua <em className="text-accent not-italic">peça.</em>
           </h2>
           <p className="mt-[22px] mb-8 max-w-[46ch] text-base leading-relaxed text-pretty text-primary-foreground/80 md:text-[17px]">
-            Peça, cor, estampa e quantidade em 5 passos. O orçamento chega pronto no WhatsApp da Whim.
+            Peça, cor, estampa e quantidade em 5 passos. O orçamento chega pronto no WhatsApp da Whim,
+            e quem responde é a Caroline.
           </p>
           <div className="flex w-full flex-col justify-center gap-2.5 sm:w-auto sm:flex-row">
             <Link href={ACAO.href} className={botaoClaro}>

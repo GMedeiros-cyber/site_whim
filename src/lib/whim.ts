@@ -3,7 +3,7 @@
 export const WHATSAPP = "5511945448802";
 
 const logradouro = "Av. Brigadeiro Faria Lima, 110 · 2º andar";
-const bairro = "Cocaia";
+const bairro = "Bom Clima"; // decisão do Gabriel em 16/11 (o contrato dizia Cocaia)
 const cidade = "Guarulhos/SP";
 const cep = "07130-000";
 
