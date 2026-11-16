@@ -140,3 +140,10 @@ Uma entrada por tarefa, sempre acrescentada no fim (nunca reescrever as anterior
 - Observação: entre 601 e 820 px o header esconde Sobre/Serviços/Processo e não tem menu; nessa faixa eles ficam só no rodapé (como diz `navegacao.ts`).
 - Commit: `6c857d6`.
 - Pendente: revisão jurídica da /privacidade; avaliações reais do Google.
+
+### 2026-11-16 01:00 · Logos, rótulo e WhatsApp (Claude, outra conta)
+- Feito: logos oficiais dos 10 clientes em cinza em `public/clientes/` (fontes em `referencia/logos-clientes.md`); grafia corrigida para Electrochemical; eyebrow sai e o título ganha a gota turquesa; spec do botão flutuante do WhatsApp; protótipo atualizado.
+- Comandos: download dos originais, conversão para uma cor em Python/rsvg, `git commit`.
+- Build: não se aplica (só arquivos de referência e imagens).
+- Commit: `74179e1`.
+- Pendente: Whim confirmar Aurora (Coop?), unidade do Colégio Progresso e o OK para exibir os logos.
