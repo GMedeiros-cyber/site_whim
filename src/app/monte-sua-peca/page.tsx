@@ -4,7 +4,7 @@ import { Container, Destaque, Eyebrow, Titulo, secao } from "@/components/blocos
 import { FormContato } from "@/components/form-contato";
 import { Personalizador } from "@/components/personalizador";
 import { SiteFooter } from "@/components/site-footer";
-import { SiteHeader, type ItemNav } from "@/components/site-header";
+import { SiteHeader } from "@/components/site-header";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { CONTATO, WHATSAPP } from "@/lib/whim";
@@ -15,17 +15,10 @@ export const metadata: Metadata = {
     "Escolha a peça, a cor e a estampa e receba o orçamento da Whim no WhatsApp.",
 };
 
-const LINKS: ItemNav[] = [
-  { label: "Início", href: "/" },
-  { label: "Personalizar", href: "#personalizar" },
-  { label: "Contato", href: "#contato" },
-  { label: "Avaliações", href: "#avaliacoes", opcional: true },
-];
-
 export default function MonteSuaPeca() {
   return (
     <>
-      <SiteHeader links={LINKS} cta={{ label: "Orçamento", href: "#contato" }} />
+      <SiteHeader />
       <main className="flex-1">
         <Personalizador />
         <Contato />

@@ -4,18 +4,10 @@ import { PanelTopIcon, PrinterIcon, ScissorsIcon, ShirtIcon } from "lucide-react
 
 import { Container, Destaque, Eyebrow, Seta, Titulo, secao } from "@/components/blocos";
 import { SiteFooter } from "@/components/site-footer";
-import { SiteHeader, type ItemNav } from "@/components/site-header";
+import { SiteHeader } from "@/components/site-header";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-
-const LINKS: ItemNav[] = [
-  { label: "Início", href: "#topo" },
-  { label: "Sobre", href: "#sobre", opcional: true },
-  { label: "Serviços", href: "#servicos", opcional: true },
-  { label: "Processo", href: "#processo", opcional: true },
-  { label: "Clientes", href: "#clientes" },
-];
 
 const TAGS = ["Silk screen", "DTF", "Bordado", "Confecção", "Uniformes", "Oficina própria"];
 
@@ -40,7 +32,7 @@ const MARCAS = ["Globo", "Lollapalooza", null, null, null, null];
 export default function Home() {
   return (
     <>
-      <SiteHeader links={LINKS} cta={{ label: "Monte sua peça", href: "/monte-sua-peca" }} />
+      <SiteHeader />
       <main className="flex-1">
         <Hero />
         <QuemSomos />
