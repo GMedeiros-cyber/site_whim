@@ -1,22 +1,6 @@
 import { ArrowRightIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-/** Rótulo pequeno em caixa-alta com o traço turquesa antes. */
-export function Eyebrow({
-  className,
-  ...props
-}: React.ComponentProps<"p">) {
-  return (
-    <p
-      className={cn(
-        "flex items-center gap-2.5 text-[11.5px] font-medium uppercase tracking-[0.22em] text-muted-foreground before:h-px before:w-[22px] before:bg-accent",
-        className
-      )}
-      {...props}
-    />
-  );
-}
-
 /**
  * Título de seção (h2 por padrão; h1 no topo das páginas internas).
  * Abre com a gota de tinta turquesa; `gota={false}` desliga.

@@ -7,7 +7,7 @@
  */
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
-    /* Eyebrow, título e linha de apoio sobem ao entrar na tela. */
+    /* Título e linha de apoio sobem ao entrar na tela. */
     .home-sobe {
       animation: home-sobe linear both;
       animation-timeline: view();

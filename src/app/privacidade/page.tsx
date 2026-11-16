@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { Container, Eyebrow, Titulo } from "@/components/blocos";
+import { Container, Titulo } from "@/components/blocos";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { CONTATO, EMPRESA } from "@/lib/whim";
@@ -30,7 +30,6 @@ export default function Privacidade() {
         <Container className="pt-32 pb-20 sm:pt-40 sm:pb-28">
           <article className="mx-auto max-w-[72ch]">
             <header className="border-b pb-8">
-              <Eyebrow>LGPD</Eyebrow>
               <Titulo as="h1">Política de privacidade</Titulo>
               <p className="mt-5 text-lg leading-relaxed text-muted-foreground text-pretty">
                 Esta página explica, em português simples, quais dados pessoais recebemos de
