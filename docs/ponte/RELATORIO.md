@@ -132,3 +132,11 @@ Uma entrada por tarefa, sempre acrescentada no fim (nunca reescrever as anterior
 - Build: `npm run build` não roda neste container (Google Fonts bloqueado); rodar aí.
 - Pendente: revisão jurídica da /privacidade; avaliações reais do Google; `CONTATO` ganhou campos separados (logradouro, bairro, cidade, cep).
 - Commit: `2d00d74` (merges `f419b03` e `d786972`).
+
+### 2026-11-15 22:55 · Conferência do header, rodapé, /privacidade e Contato + Avaliações (Claude Code)
+- Build: `npm run lint` e `npm run build` ok aqui (Google Fonts liberado); o `"use cache"` + `cacheLife("days")` do ano não quebra: /, /monte-sua-peca e /privacidade saem estáticas com revalidação de 1 dia.
+- Conferido (Playwright, produção, 360/390/768/1024/1280, 132 checagens ok): header igual nas 3 páginas; "Monte sua peça" com `aria-current` só em /monte-sua-peca; "Sobre" e "Clientes" levam a /#sobre e /#clientes com a seção no topo; rodapé com endereço, Cocaia, CEP, razão social, CNPJ, ano e link da política abrindo /privacidade; formulário abre o WhatsApp com "Olá, Whim! Sou … da …. …" (e "Quero um orçamento." sem mensagem; não envia sem nome); WhatsApp e e-mail da seção; sem rolagem lateral; alvos de 44 px no celular.
+- Corrigido: links "Início" e "Sobre" do rodapé tinham 37 e 41 px de largura no celular → `min-w-11` abaixo de 1024 px, sem mudar o visual.
+- Observação: entre 601 e 820 px o header esconde Sobre/Serviços/Processo e não tem menu; nessa faixa eles ficam só no rodapé (como diz `navegacao.ts`).
+- Commit: `6c857d6`.
+- Pendente: revisão jurídica da /privacidade; avaliações reais do Google.
