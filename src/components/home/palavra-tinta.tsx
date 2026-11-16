@@ -7,6 +7,7 @@ import { depoisDaAbertura } from "@/lib/abertura";
 const CHAVE = "whim-vista-pintada";
 const ATRASO = 250; // ms antes de a tinta entrar
 const DURACAO = 2500; // ms da pintura inteira
+const QUADRO = 30; // ms mínimos entre desenhos: ~30 quadros/s bastam para a tinta
 
 const VERT = `
 attribute vec2 a_pos;
@@ -95,29 +96,37 @@ export function PalavraTinta({ children }: { children: string }) {
     let raf = 0;
     let timer = 0;
     let inicio = 0;
+    let ultimo = 0;
     let gl: WebGLRenderingContext | null = null;
+    // Pular = o próximo quadro já é o último. Toque, tecla, resize, aba oculta
+    // ou o topo saindo da tela.
     const pular = () => {
       inicio = -Infinity;
     };
+    const fora = new IntersectionObserver(([e]) => e.isIntersecting || pular());
     const ouvir = (liga: boolean) => {
-      for (const ev of ["pointerdown", "keydown", "resize"]) {
+      for (const ev of ["pointerdown", "keydown", "resize", "visibilitychange"]) {
         if (liga) window.addEventListener(ev, pular);
         else window.removeEventListener(ev, pular);
       }
+      if (liga) fora.observe(texto);
+      else fora.disconnect();
     };
     const soltarGl = () => gl?.getExtension("WEBGL_lose_context")?.loseContext();
 
-    // Com a abertura (logo pintado) tocando, a tinta espera ela acabar.
     const comecar = () => {
+      if (cancelado) return;
+      const r = texto.getBoundingClientRect();
+      if (r.bottom < 0 || r.top > innerHeight) return pronta(); // já rolou para longe
       const cs = getComputedStyle(texto);
       document.fonts
         .load(`${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`, children)
         .catch(() => {})
-        .then(() => {
-          if (cancelado) return;
-          const tinta = prepararTinta(texto, canvas);
+        .then(() => (cancelado ? null : prepararTinta(texto, canvas)))
+        .then((tinta) => {
+          gl = tinta?.gl ?? null;
+          if (cancelado) return soltarGl();
           if (!tinta) return pronta();
-          gl = tinta.gl;
           try {
             sessionStorage.setItem(CHAVE, "1");
           } catch {}
@@ -126,20 +135,30 @@ export function PalavraTinta({ children }: { children: string }) {
           inicio = performance.now() + ATRASO;
           const quadro = (agora: number) => {
             const t = Math.min(1, Math.max(0, (agora - inicio) / DURACAO));
-            tinta.pintar(suave(t));
             if (t < 1) {
               raf = requestAnimationFrame(quadro);
+              if (agora - ultimo < QUADRO) return;
+              ultimo = agora;
+              tinta.pintar(suave(t));
               return;
             }
+            tinta.pintar(1);
             ouvir(false);
             pronta();
             delete canvas.dataset.ativo; // some em 300 ms por cima do texto igual
             timer = window.setTimeout(soltarGl, 400);
           };
           raf = requestAnimationFrame(quadro);
-        });
+        })
+        .catch(pronta); // se o WebGL falhar no meio, a palavra não pode ficar invisível
     };
-    const cancelarEspera = depoisDaAbertura(comecar);
+    // Espera a abertura (logo pintado) acabar e, sem ela, a página ficar ociosa
+    // depois da hidratação: o preparo não disputa a thread com o carregamento.
+    const cancelarEspera = depoisDaAbertura(() =>
+      "requestIdleCallback" in window
+        ? requestIdleCallback(comecar, { timeout: 2000 })
+        : setTimeout(comecar, 500)
+    );
 
     return () => {
       cancelarEspera();
@@ -170,8 +189,14 @@ export function PalavraTinta({ children }: { children: string }) {
   );
 }
 
-/** Mede a palavra, desenha a máscara das letras e monta o WebGL. */
-function prepararTinta(texto: HTMLElement, canvas: HTMLCanvasElement) {
+const proximoQuadro = () => new Promise((r) => requestAnimationFrame(r));
+
+/**
+ * Mede a palavra, desenha a máscara das letras e monta o WebGL.
+ * Canvas e máscara em 1 pixel por pixel CSS (DPR 1): menos trabalho por quadro;
+ * no fim o texto nítido em CSS assume.
+ */
+async function prepararTinta(texto: HTMLElement, canvas: HTMLCanvasElement) {
   const no = texto.firstChild;
   const gl = canvas.getContext("webgl", { premultipliedAlpha: true, antialias: false });
   if (!gl || !(no instanceof Text)) return null;
@@ -184,7 +209,6 @@ function prepararTinta(texto: HTMLElement, canvas: HTMLCanvasElement) {
   const y0 = Math.floor(caixa.top) - pad;
   const w = Math.ceil(caixa.right) + pad - x0;
   const h = Math.ceil(caixa.bottom) + pad - y0;
-  const dpr = Math.min(window.devicePixelRatio || 1, 2);
   const pai = (canvas.offsetParent ?? texto).getBoundingClientRect();
   Object.assign(canvas.style, {
     left: `${x0 - pai.left}px`,
@@ -192,16 +216,15 @@ function prepararTinta(texto: HTMLElement, canvas: HTMLCanvasElement) {
     width: `${w}px`,
     height: `${h}px`,
   });
-  canvas.width = Math.round(w * dpr);
-  canvas.height = Math.round(h * dpr);
+  canvas.width = w;
+  canvas.height = h;
 
   // Cada letra vai para onde o navegador a pôs (respeita kerning e tracking).
   const mascara = document.createElement("canvas");
-  mascara.width = canvas.width;
-  mascara.height = canvas.height;
+  mascara.width = w;
+  mascara.height = h;
   const ctx = mascara.getContext("2d");
   if (!ctx) return null;
-  ctx.scale(dpr, dpr);
   ctx.font = `${cs.fontStyle} ${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
   const faixa = document.createRange();
   for (let i = 0; i < no.length; i++) {
@@ -227,6 +250,13 @@ function prepararTinta(texto: HTMLElement, canvas: HTMLCanvasElement) {
   gl.attachShader(prog, vs);
   gl.attachShader(prog, fs);
   gl.linkProgram(prog);
+  // Ler o LINK_STATUS logo após o link trava a thread até a GPU terminar.
+  // Com KHR_parallel_shader_compile, pergunta a cada quadro se já acabou;
+  // sem ela, ao menos dá um quadro para a GPU compilar antes de perguntar.
+  const paralelo = gl.getExtension("KHR_parallel_shader_compile");
+  do {
+    await proximoQuadro();
+  } while (paralelo && !gl.getProgramParameter(prog, paralelo.COMPLETION_STATUS_KHR));
   if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) return null;
   gl.useProgram(prog);
 
