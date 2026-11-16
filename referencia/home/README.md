@@ -5,11 +5,9 @@ Design aprovado para comparação em dois lugares:
 - **Figma**: arquivo `R7ktItBlmotu5xei7SuZE5`, frames `5:3` (PC 1440) e `5:233` (celular 390). Print: `figma-home-pc.png` (as fotos aparecem cinzas porque o plano gratuito do Figma bloqueou o envio).
 - Inspiração do topo: `inspiracao-hero.jpg` (palavra gigante atrás de um objeto recortado, cartão de vidro num canto, texto curto no outro).
 
-O Gabriel escolhe qual das duas versões vale; o que muda entre elas é detalhe. A estrutura abaixo vale para as duas.
+A versão que vale é a do Claude Design (atualizada em 15/11 com os ajustes do Gabriel). O Figma ficou na versão anterior.
 
-## Ritmo de fundo (o motivo da mudança)
-
-Hoje as faixas brancas e cinzas aparecem sem lógica. A home passa a alternar assim, de cima para baixo:
+## Ritmo de fundo
 
 | Seção | id | Fundo |
 |---|---|---|
@@ -18,23 +16,37 @@ Hoje as faixas brancas e cinzas aparecem sem lógica. A home passa a alternar as
 | O que fazemos | `servicos` | `bg-muted` (#F5F7FA) |
 | Como funciona | `processo` | branco |
 | Clientes | `clientes` | `bg-muted` |
-| Convite "Monte a sua peça" | `monte` | `bg-primary` (azul-marinho), colado no rodapé, que já é azul-marinho |
+| Convite "Monte a sua peça" + rodapé | `fim` | `bg-primary` (azul-marinho) |
 
-## Seções
+## Seções (versão de 15/11, revisada pelo Gabriel)
 
-1. **Topo (hero)**, em camadas, de trás para frente:
-   - foto `public/images/hero-mesa.webp` (mesa longa de silk, recorte novo da f42) com gradiente azul-marinho de 62% em cima a 96% embaixo;
-   - a palavra gigante **"estampa"** (Poppins 800, ~300 px no PC, ~96 px no celular, branca, letter-spacing −0,06em, `aria-hidden`);
-   - o cano `public/arara/cano.webp` e a camiseta turquesa `public/arara/camiseta/cores/turquesa/frente.webp` pendurada nele, **na frente** da palavra (a camiseta cobre parte das letras: é o efeito de profundidade da inspiração), com sombra;
-   - embaixo à direita: H1 "Cada peça passa pelas *nossas mãos.*" (o destaque em turquesa), uma linha de apoio e os botões "Monte sua peça" (branco) e "Falar no WhatsApp" (contorno);
-   - embaixo à esquerda: cartão de vidro "Monte sua peça": "Escolha a peça, a cor e a estampa. O orçamento chega no WhatsApp.", as 5 bolinhas de cor (das cores do manifesto da arara) e "6 modelos · a partir de 50 peças".
-   - Celular: palavra e camiseta no alto, H1 + botões e o cartão empilhados embaixo, tudo dentro do cartão escuro.
-   - Movimento: a camiseta pode balançar de leve (como a prévia do Monte sua peça); parada com `prefers-reduced-motion`. Nada além disso.
-2. **Quem somos**: o manifesto atual (com as fotos em pílula no meio do texto) e, embaixo, 3 fotos grandes com legenda: "Rodo na tela de silk" (`hero.webp`), "Peças na mesa de estampa" (`f35.webp`), "Estampa em série na mesa longa" (`f41.webp`).
-3. **O que fazemos**: título "Quatro jeitos de *vestir sua marca.*" e um bento de 5 cartões: Silk (grande, com foto), DTF, Confecção, Uniformes (largo, com foto `f17.webp`) e um cartão azul-marinho "A gente indica." ("Monte a peça e mande a arte: a equipe diz qual técnica fica melhor."). Textos dos serviços: os de hoje (`SERVICOS` em `page.tsx`). Celular: um embaixo do outro.
-4. **Como funciona**: "Do pedido *à entrega.*", 5 etapas numa linha com o traço por trás (no celular, vertical). A etapa 1 em turquesa com o link "Começar agora" para `/monte-sua-peca`.
-5. **Clientes**: "Marcas que *confiam na oficina.*", Globo e Lollapalooza como texto, mais os espaços tracejados "logo do cliente" até a Whim mandar os logos.
-6. **Convite**: "Monte a sua *peça.*", "Peça, cor, estampa e quantidade em 5 passos. O orçamento chega pronto no WhatsApp da Whim.", botões "Monte sua peça" e "Falar no WhatsApp", e à direita duas camisetas penduradas num pedaço de cano (branca e turquesa). Encosta no rodapé.
+1. **Topo (hero)**: nada que lembre o Monte sua peça (sem camiseta, sem cano, sem cartão de cores).
+   - Fundo: `public/images/hero-mesa.webp` em tons mais frios, com tinta azul-marinho radial (mais clara no centro).
+   - No centro, de cima para baixo: o logo branco (`whim-logo-branco.svg`), a palavra gigante **"Vista"** (Poppins 800, ~330 px no PC, ~120 px no celular), o H1 "a sua marca, peça por peça." e a linha "Uniformes, camisetas e peças com a sua marca. Silk, DTF, bordado e sublimação numa oficina própria em Guarulhos."
+   - Botões: "Pedir orçamento no WhatsApp" (branco, abre o wa.me) e "Ver o que fazemos" (contorno, rola até `#servicos`). No celular, os dois em largura total.
+   - Rodapé do topo: as 4 técnicas em pílulas à esquerda e "role para conhecer" à direita (some no celular).
+   - **Abertura**: um shader de tinta turquesa pinta a palavra "Vista" da esquerda para a direita (~2,5 s); no fim a palavra fica branca com o começo em turquesa. Uma vez por sessão (`sessionStorage`), um toque pula. Com `prefers-reduced-motion`, a palavra aparece pronta. Pode ser WebGL leve (sem biblioteca nova sem pedir) ou, se ficar pesado, máscara SVG animada; o protótipo usa CSS só para mostrar a ideia.
+2. **Quem somos**: o manifesto (com as fotos em pílula no texto). PC: 3 fotos lado a lado com legenda. **Celular: carrossel** com scroll-snap, 1 foto e um pedaço da próxima, e bolinhas de posição embaixo (a ativa alonga em turquesa). Fotos: `hero.webp` "Rodo na tela de silk", `f35.webp` "Peças na mesa de estampa", `f41.webp` "Estampa em série na mesa longa".
+3. **O que fazemos**: título "Quatro jeitos de *estampar sua marca.*" e a linha "Cada técnica deixa a arte de um jeito. Veja como fica cada uma e para o que ela é melhor."
+   - 4 cartões com imagem 3:4 gerada por IA, cada uma com o selo "Imagem ilustrativa" (obrigatório: não é trabalho real da Whim): `public/images/estilos/silk.webp`, `dtf.webp`, `bordado.webp`, `sublimacao.webp`. Textos:
+     - Silk: "Tinta grossa em cores chapadas, com o toque e a durabilidade da tinta na tela." Bom para: logos de poucas cores e tiragens maiores.
+     - DTF: "Todas as cores, degradês e fotos, com acabamento fotográfico." Bom para: artes coloridas e pedidos menores.
+     - Bordado: "A arte é costurada em linha, em relevo, e dura junto com a peça." Bom para: logo no peito de polos e uniformes.
+     - Sublimação: "A tinta entra no tecido e pode cobrir a peça inteira, sem relevo." Bom para: peças esportivas claras de poliéster.
+   - Embaixo, 3 cartões só de texto: Confecção, Uniformes (textos de hoje) e o azul-marinho "Não sabe qual? Mande a arte: a equipe indica a técnica que fica melhor."
+   - PC: 4 colunas. **Celular: os 4 cartões viram carrossel** (~1,3 cartão visível); os 3 de texto ficam empilhados e compactos.
+4. **Como funciona**: 5 etapas com o traço por trás.
+   - A etapa 1 já começa turquesa. Quando a seção entra na tela (IntersectionObserver, uma vez), o traço vai enchendo de turquesa até a 2, 3, 4 e 5, e cada bolinha acende ao ser alcançada: ~1,3 s por trecho, com uma pausa curta em cada etapa, ~6 s no total.
+   - Quando chega no 5: **fogos discretos atrás da bolinha**, do tamanho dela (12 pontinhos turquesa e azul-marinho que saem do centro até ~46 px e somem, ~0,6 s). Uma vez só.
+   - Celular: o traço é vertical e enche de cima para baixo. Movimento reduzido: tudo já aceso, sem fogos.
+5. **Clientes**: "Marcas que *confiam na oficina.*", Globo e Lollapalooza em texto e os espaços "logo do cliente".
+6. **Convite** (centralizado, sem camisetas nem cano): "Monte a sua *peça.*", "Peça, cor, estampa e quantidade em 5 passos. O orçamento chega pronto no WhatsApp da Whim.", botões "Monte sua peça" e "Falar no WhatsApp".
+
+## Rodapé: mapa (tarefa do agente 2, liberada pelo Gabriel)
+
+- No `site-footer.tsx` (compartilhado, mas este ajuste fica com o agente 2), coluna Endereço: o **mapa do Google sempre visível**, embutido com `<iframe src="https://www.google.com/maps?q=Av.+Brigadeiro+Faria+Lima,+110,+Cocaia,+Guarulhos+-+SP,+07130-000&output=embed" title="Mapa com a localização da Whim" loading="lazy" referrerpolicy="no-referrer-when-downgrade">`, cantos de 18 px, ~190 px de altura, largura da coluna (4ª coluna mais larga no PC; largura total no celular). Embaixo, o link "Abrir no Google Maps" (`CONTATO.mapa`, nova aba).
+- Escolha do Gabriel: mapa sempre visível. Isso carrega o Google Maps (que pode usar cookies), então **atualize a /privacidade**: na parte de cookies, dizer que o rodapé mostra um mapa do Google Maps, que o Google pode coletar dados de navegação conforme a política dele, e linkar a política de privacidade do Google. Atualize a data "Última atualização".
+- Tire do rodapé qualquer imagem de camiseta ou cano (no site de hoje não há; só não acrescente).
 
 Regras de sempre: só as classes do tema (sem hex solto), Poppins, logo nunca redesenhado, nada inventado (avaliações, números, clientes), PC e celular em cada componente, alvos de toque de 44 px, foco visível.
 
@@ -51,6 +63,10 @@ Regras de sempre: só as classes do tema (sem hex solto), Poppins, logo nunca re
 | 0c1349c5… | `public/images/f41.webp` |
 | e23cd7b4… | `public/images/hero.webp` |
 | 6c13b2e1… | `public/brand/whim-logo-branco.svg` |
+| a782de32… | `public/images/estilos/silk.webp` |
+| a17489e8… | `public/images/estilos/dtf.webp` |
+| dcc5b0d9… | `public/images/estilos/bordado.webp` |
+| 7b4ccd3d… | `public/images/estilos/sublimacao.webp` |
 | fc911543… | `public/brand/whim-simbolo.webp` |
 
 ## Quem mexe em quê (para os agentes não se atrapalharem)
@@ -58,7 +74,7 @@ Regras de sempre: só as classes do tema (sem hex solto), Poppins, logo nunca re
 | Agente | Pode editar | Não pode editar |
 |---|---|---|
 | **Agente 1 · Monte sua peça** | `src/app/monte-sua-peca/`, `personalizador.tsx`, `previa-peca.tsx`, `arara.tsx`, `contato-avaliacoes.tsx`, `form-contato.tsx`, `src/lib/estampa.ts`, `public/arara/` | a home |
-| **Agente 2 · Home** | `src/app/page.tsx`, componentes novos em `src/components/home/`, `public/images/` | tudo do Monte sua peça |
+| **Agente 2 · Home** | `src/app/page.tsx`, componentes novos em `src/components/home/`, `public/images/`, e só o mapa em `site-footer.tsx` + o texto de cookies em `src/app/privacidade/page.tsx` | tudo do Monte sua peça |
 | **Ninguém sem pedir** | `site-header.tsx`, `site-footer.tsx`, `link-nav.tsx`, `blocos.tsx`, `src/components/ui/`, `src/lib/whim.ts`, `src/lib/navegacao.ts`, `globals.css`, `layout.tsx`, `next.config.ts`, `package.json` | |
 
 - Cada agente trabalha no próprio branch (`agente-1/...`, `agente-2/home`), faz `git pull --rebase origin main` antes de subir e só faz commit dos próprios arquivos.
