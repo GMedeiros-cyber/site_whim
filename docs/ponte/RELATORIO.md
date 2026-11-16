@@ -178,3 +178,11 @@ Uma entrada por tarefa, sempre acrescentada no fim (nunca reescrever as anterior
 - Comandos: `npm run lint` e `npm run build` (ok).
 - Commit: `7f9a0f6` (antes: merge `ca122d2` com o main).
 - Pendente: tirar o Eyebrow da /privacidade ("LGPD") e do Monte sua peça (agente 1), que agora ficam colados no título; o agente 3 tem mudanças não commitadas em `page.tsx`, `carrossel.tsx` e `duvidas.ts` que vão precisar juntar com estas.
+
+### 2026-11-16 01:35 · Agente 3 · Qualidade, parte 1 (Claude Code)
+- Feito (worktree `../site_whim-agente3`, branch `agente-3/qualidade` a partir do main): robots, sitemap, `/llms.txt` e URLs por `NEXT_PUBLIC_SITE_URL`; manifest e ícones do símbolo da Whim (sai o favicon do Next); 404; cabeçalhos de segurança e sem `X-Powered-By`; `.env.example`. Pixels (`src/components/medicao.tsx`: consentimento + 1ª interação, IDs por env) e LocalBusiness/Service (`src/lib/schema.tsx`, Bom Clima) prontos, ainda não montados.
+- PageSpeed (Lighthouse 12.8 local, build de produção com os agentes 1 e 2 juntos; celular/PC): home 36/90, Monte sua peça 76/98, privacidade 94/100; Acessibilidade 97 a 100, Boas práticas 96 a 100, SEO 100, CLS 0 em tudo.
+- Travamento da home: `PalavraTinta` (com a tinta TBT 380 a 950 ms, sem ela 60 a 110 ms) → pedido ao agente 2 em PEDIDOS.md. Monte sua peça: contraste de `text-muted-foreground`, proporção da imagem do cano e alvos dos links do contato no PC (para o agente 1 depois do merge).
+- Comandos: `git worktree add`, `npm install`, `npm run lint` e `npm run build` (ok); rotas, cabeçalhos e 404 conferidos no `next start` (390 e 1280 px, sem rolagem lateral).
+- Commit: `1ce02ef`.
+- Pendente: aguarda merge dos agentes 1 e 2 (montar medição e schema no layout, link de cookies no rodapé, meta tags, Open Graph, breadcrumb/FAQ, imagens, CLS, responsividade, limpeza, PageSpeed final); da Whim: domínio, dias de funcionamento e IDs das contas.

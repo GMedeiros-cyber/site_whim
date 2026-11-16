@@ -42,3 +42,4 @@ next-env.d.ts
 
 # cache do hook do impeccable
 .impeccable/hook.cache.json
+!.env.example
