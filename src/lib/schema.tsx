@@ -37,8 +37,7 @@ export const NEGOCIO = {
   email: CONTATO.email,
   address: {
     "@type": "PostalAddress",
-    // Bairro decidido pelo Gabriel em 16/11 (o contrato dizia Cocaia).
-    streetAddress: "Av. Brigadeiro Faria Lima, 110, 2º andar, Bom Clima",
+    streetAddress: `${CONTATO.logradouro.replace(" · ", ", ")}, ${CONTATO.bairro}`,
     addressLocality: "Guarulhos",
     addressRegion: "SP",
     postalCode: CONTATO.cep,
@@ -64,3 +63,28 @@ export const NEGOCIO = {
     ],
   },
 };
+
+/** FAQPage com as perguntas da seção Dúvidas frequentes. */
+export function perguntas(itens: { pergunta: string; resposta: string }[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: itens.map((d) => ({
+      "@type": "Question",
+      name: d.pergunta,
+      acceptedAnswer: { "@type": "Answer", text: d.resposta },
+    })),
+  };
+}
+
+/** BreadcrumbList de uma página interna: Início › nome. */
+export function migalhas(nome: string, caminho: string) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Início", item: `${SITE_URL}/` },
+      { "@type": "ListItem", position: 2, name: nome, item: `${SITE_URL}${caminho}` },
+    ],
+  };
+}

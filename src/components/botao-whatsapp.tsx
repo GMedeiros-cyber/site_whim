@@ -11,7 +11,7 @@ const LINK = linkWhatsApp("Olá, Whim! Quero um orçamento.");
 
 /**
  * Botão flutuante do WhatsApp, em todas as páginas (layout.tsx).
- * Só o ícone do WhatsApp, 56 px (PC e celular), sem texto (pedido do Gabriel em 16/11).
+ * Só o ícone do WhatsApp, 56 px (PC e celular), sem texto.
  * Balão uma vez por sessão, 3 s depois de carregar; some em 8 s, no × ou no clique.
  */
 export function BotaoWhatsApp() {
@@ -38,7 +38,8 @@ export function BotaoWhatsApp() {
   return (
     <div className="pointer-events-none fixed right-4 bottom-[calc(env(safe-area-inset-bottom)+1rem)] z-40 flex flex-col items-end gap-2.5 md:right-6 md:bottom-[calc(env(safe-area-inset-bottom)+1.5rem)]">
       {dica && (
-        <div className="pointer-events-auto flex max-w-[210px] items-start rounded-[16px_16px_4px_16px] border border-primary/8 bg-background py-0.5 pr-0.5 pl-3.5 text-[13px] leading-snug text-foreground shadow-[0_14px_30px_-18px] shadow-primary/55 duration-500 ease-[cubic-bezier(.2,.9,.3,1.3)] animate-in fade-in zoom-in-90 slide-in-from-bottom-2 motion-reduce:animate-none md:max-w-[250px]">
+        // Por cima do botão (absolute): se entrasse no fluxo, o bloco fixo cresceria e contaria como CLS.
+        <div className="pointer-events-auto absolute right-0 bottom-[calc(100%+0.625rem)] flex w-max max-w-[210px] items-start rounded-[16px_16px_4px_16px] border border-primary/8 bg-background py-0.5 pr-0.5 pl-3.5 text-[13px] leading-snug text-foreground shadow-[0_14px_30px_-18px] shadow-primary/55 duration-500 ease-[cubic-bezier(.2,.9,.3,1.3)] animate-in fade-in zoom-in-90 slide-in-from-bottom-2 motion-reduce:animate-none md:max-w-[250px]">
           <p className="py-2">Oi! Quer um orçamento? A Caroline responde no WhatsApp.</p>
           <button
             type="button"

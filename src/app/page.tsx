@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -12,8 +13,16 @@ import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { buttonVariants } from "@/components/ui/button";
 import { ACAO } from "@/lib/navegacao";
+import { JsonLd, perguntas } from "@/lib/schema";
+import { metadados } from "@/lib/site";
 import { cn } from "@/lib/utils";
 import { linkWhatsApp } from "@/lib/whim";
+
+export const metadata: Metadata = metadados(
+  "Whim Confecção e Estamparia | Silk, DTF, bordado e uniformes em Guarulhos",
+  "Uniformes, camisetas e peças com a sua marca. Silk, DTF e bordado numa oficina própria em Guarulhos/SP, para empresas, escolas e eventos. Orçamento pelo WhatsApp.",
+  "/"
+);
 
 const WHATSAPP_ORCAMENTO = linkWhatsApp("Olá, Whim! Quero um orçamento.");
 
@@ -108,6 +117,7 @@ export default function Home() {
         <Convite />
       </main>
       <SiteFooter />
+      <JsonLd dados={perguntas(DUVIDAS)} />
     </>
   );
 }

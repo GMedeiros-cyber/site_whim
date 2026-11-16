@@ -1,6 +1,7 @@
 "use client";
 
 import { Seta } from "@/components/blocos";
+import { medir } from "@/components/medicao";
 import { Button } from "@/components/ui/button";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
@@ -18,6 +19,7 @@ export function FormContato({ className }: { className?: string }) {
     const campo = (nome: string) => String(dados.get(nome) ?? "").trim();
     const empresa = campo("empresa");
     const texto = `Olá, Whim! Sou ${campo("nome")}${empresa ? ` da ${empresa}` : ""}. ${campo("mensagem") || "Quero um orçamento."}`;
+    medir("contato_whatsapp", { origem: "formulario" });
     window.open(linkWhatsApp(texto), "_blank", "noopener,noreferrer");
   }
 

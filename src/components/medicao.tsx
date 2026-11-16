@@ -26,6 +26,7 @@ export function medir(evento: string, dados: Record<string, string> = {}) {
 
 /** De onde veio o clique no WhatsApp, pela seção da página. */
 function origem(el: Element) {
+  if (el.closest(".botao-whatsapp")) return "flutuante"; // botão fixo de todas as páginas
   if (el.closest("header")) return "header";
   if (el.closest("footer")) return "rodape";
   const secao = el.closest("section[id]")?.id ?? "";
@@ -135,30 +136,31 @@ export function Medicao() {
   const { gtm, ga4, gads, meta, clarity } = MEDICAO;
   const gtag = ga4 ?? gads;
 
+  // Ids com prefixo: um <script id="clarity"> vira window.clarity e o snippet acha que já carregou.
   return (
     <>
       {escolha === "aceito" && interagiu && (
         <>
           {gtm && (
-            <Script id="gtm" strategy="lazyOnload">
+            <Script id="whim-gtm" strategy="lazyOnload">
               {`(function(w,d,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':Date.now(),event:'gtm.js'});var s=d.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtm.js?id='+i;d.head.appendChild(s);})(window,document,'dataLayer','${gtm}');`}
             </Script>
           )}
           {gtag && (
             <>
               <Script src={`https://www.googletagmanager.com/gtag/js?id=${gtag}`} strategy="lazyOnload" />
-              <Script id="gtag" strategy="lazyOnload">
+              <Script id="whim-gtag" strategy="lazyOnload">
                 {`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());${ga4 ? `gtag('config','${ga4}');` : ""}${gads ? `gtag('config','${gads}');` : ""}`}
               </Script>
             </>
           )}
           {meta && (
-            <Script id="meta-pixel" strategy="lazyOnload">
+            <Script id="whim-meta" strategy="lazyOnload">
               {`!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init','${meta}');fbq('track','PageView');`}
             </Script>
           )}
           {clarity && (
-            <Script id="clarity" strategy="lazyOnload">
+            <Script id="whim-clarity" strategy="lazyOnload">
               {`(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src='https://www.clarity.ms/tag/'+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,'clarity','script','${clarity}');`}
             </Script>
           )}

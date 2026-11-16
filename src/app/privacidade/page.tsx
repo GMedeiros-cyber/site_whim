@@ -3,15 +3,42 @@ import type { Metadata } from "next";
 import { Container, Titulo } from "@/components/blocos";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { JsonLd, migalhas } from "@/lib/schema";
+import { MEDICAO, TEM_MEDICAO, metadados } from "@/lib/site";
 import { CONTATO, EMPRESA } from "@/lib/whim";
 
 export const metadata: Metadata = {
-  title: "Política de privacidade | Whim Confecção e Estamparia",
-  description:
+  ...metadados(
+    "Política de privacidade | Whim Confecção e Estamparia",
     "Como a Whim Confecção e Estamparia trata os dados pessoais de quem pede orçamento pelo site, pelo WhatsApp ou por e-mail, de acordo com a LGPD.",
+    "/privacidade"
+  ),
+  robots: { index: true },
 };
 
+// Atualizar a data quando entrar o primeiro ID de medição (a seção Cookies muda sozinha).
 const ATUALIZACAO = "16 de novembro de 2026";
+
+const GOOGLE = "https://policies.google.com/privacy?hl=pt-BR";
+
+/** Ferramentas de medição configuradas (variáveis de ambiente), com a política de cada uma. */
+const FERRAMENTAS = [
+  { ativa: MEDICAO.gtm, nome: "Google Tag Manager", uso: "organiza as ferramentas abaixo", politica: GOOGLE },
+  { ativa: MEDICAO.ga4, nome: "Google Analytics", uso: "conta visitas e cliques, sem identificar você", politica: GOOGLE },
+  { ativa: MEDICAO.gads, nome: "Google Ads", uso: "mede os resultados dos anúncios no Google", politica: GOOGLE },
+  {
+    ativa: MEDICAO.meta,
+    nome: "Pixel da Meta",
+    uso: "mede os resultados dos anúncios no Instagram e no Facebook",
+    politica: "https://www.facebook.com/privacy/policy/",
+  },
+  {
+    ativa: MEDICAO.clarity,
+    nome: "Microsoft Clarity",
+    uso: "mostra como as páginas são usadas (cliques e rolagem), para melhorar o site",
+    politica: "https://privacy.microsoft.com/pt-br/privacystatement",
+  },
+].filter((f) => f.ativa);
 
 const linkTexto =
   "font-medium text-foreground underline decoration-accent decoration-2 underline-offset-4 hover:decoration-primary";
@@ -77,22 +104,51 @@ export default function Privacidade() {
               <h2>Com quem compartilhamos</h2>
               <p>
                 Só com quem é necessário para atender você (por exemplo, o WhatsApp, que é o canal
-                da conversa) e quando a lei exigir. <strong>Não vendemos dados.</strong>
+                da conversa) e quando a lei exigir.
+                {TEM_MEDICAO && " Com o seu consentimento, também com as ferramentas listadas em Cookies."}{" "}
+                <strong>Não vendemos dados.</strong>
               </p>
 
               <h2>Cookies</h2>
-              <p>
-                O site não usa cookies próprios de rastreamento nem de publicidade. Se um dia
-                ativarmos ferramentas de medição (como Google Analytics, Google Tag Manager ou o
-                Pixel da Meta), esta política será atualizada e o site vai pedir o seu
-                consentimento antes.
-              </p>
+              {TEM_MEDICAO ? (
+                <>
+                  <p>
+                    <strong>Só com o seu consentimento</strong> (art. 7º, inciso I, da LGPD), dado
+                    no aviso de cookies, o site carrega estas ferramentas de medição, que gravam
+                    cookies e coletam dados de navegação:
+                  </p>
+                  <ul>
+                    {FERRAMENTAS.map((f) => (
+                      <li key={f.nome}>
+                        <strong>{f.nome}</strong>: {f.uso} (
+                        <a href={f.politica} target="_blank" rel="noopener noreferrer" className={linkTexto}>
+                          política de privacidade
+                          <span className="sr-only"> de {f.nome} (abre em nova aba)</span>
+                        </a>
+                        ).
+                      </li>
+                    ))}
+                  </ul>
+                  <p>
+                    Se você escolher <strong>“Só o necessário”</strong>, nenhuma delas é carregada.
+                    Você pode mudar a escolha quando quiser no link “Preferências de cookies”, no
+                    rodapé.
+                  </p>
+                </>
+              ) : (
+                <p>
+                  O site não usa cookies próprios de rastreamento nem de publicidade. Se um dia
+                  ativarmos ferramentas de medição (como Google Analytics, Google Tag Manager ou o
+                  Pixel da Meta), esta política será atualizada e o site vai pedir o seu
+                  consentimento antes.
+                </p>
+              )}
               <p>
                 O rodapé de todas as páginas mostra um <strong>mapa do Google Maps</strong> com o
                 endereço da oficina. Esse mapa é carregado direto do Google, que pode usar cookies
                 e coletar dados de navegação conforme a{" "}
                 <a
-                  href="https://policies.google.com/privacy?hl=pt-BR"
+                  href={GOOGLE}
                   target="_blank"
                   rel="noopener noreferrer"
                   className={linkTexto}
@@ -142,6 +198,7 @@ export default function Privacidade() {
         </Container>
       </main>
       <SiteFooter />
+      <JsonLd dados={migalhas("Política de privacidade", "/privacidade")} />
     </>
   );
 }

@@ -1,3 +1,4 @@
+import { DUVIDAS } from "@/components/home/duvidas";
 import { SITE_URL } from "@/lib/site";
 import { CONTATO, EMPRESA } from "@/lib/whim";
 
@@ -20,12 +21,16 @@ export function GET() {
 - [Monte sua peça](${SITE_URL}/monte-sua-peca): escolha peça, cor, estampa e tamanhos e envie o pedido de orçamento pelo WhatsApp.
 - [Política de privacidade](${SITE_URL}/privacidade): como a Whim trata os dados pessoais (LGPD).
 
+## Dúvidas frequentes
+
+${DUVIDAS.map((d) => `- ${d.pergunta} ${d.resposta}`).join("\n")}
+
 ## Contato
 
 - WhatsApp (orçamentos): ${CONTATO.whatsapp}
 - E-mail: ${CONTATO.email}
 - Instagram: ${CONTATO.instagramUrl}
-- Endereço: ${CONTATO.logradouro.replace(" · ", ", ")}, Bom Clima, ${CONTATO.cidade}, CEP ${CONTATO.cep}
+- Endereço: ${CONTATO.logradouro.replace(" · ", ", ")}, ${CONTATO.bairro}, ${CONTATO.cidade}, CEP ${CONTATO.cep}
 - Horário: ${CONTATO.horario.toLowerCase()}
 - ${EMPRESA.razaoSocial}, CNPJ ${EMPRESA.cnpj}
 `;

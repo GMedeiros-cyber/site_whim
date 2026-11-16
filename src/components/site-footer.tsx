@@ -5,6 +5,7 @@ import { ArrowUpRightIcon } from "lucide-react";
 
 import { Container } from "@/components/blocos";
 import { LinkNav } from "@/components/link-nav";
+import { PreferenciasCookies } from "@/components/medicao";
 import { ACAO, NAVEGACAO } from "@/lib/navegacao";
 import { cn } from "@/lib/utils";
 import { CONTATO, EMPRESA, WHATSAPP } from "@/lib/whim";
@@ -105,9 +106,12 @@ export function SiteFooter() {
           <p>
             © <Ano /> {EMPRESA.marca} · {EMPRESA.razaoSocial} · CNPJ {EMPRESA.cnpj}
           </p>
-          <Link href="/privacidade" className={cn(link, "shrink-0")}>
-            Política de privacidade
-          </Link>
+          <div className="flex shrink-0 flex-wrap gap-x-6">
+            <Link href="/privacidade" className={link}>
+              Política de privacidade
+            </Link>
+            <PreferenciasCookies className={cn(link, "cursor-pointer")} />
+          </div>
         </div>
       </Container>
     </footer>

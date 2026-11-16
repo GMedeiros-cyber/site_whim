@@ -1,5 +1,5 @@
 // Dúvidas frequentes da home, todas tiradas do briefing da Whim
-// (referencia/briefing-whim.md). Exportadas para o schema FAQPage (agente 3).
+// (referencia/briefing-whim.md). Também viram o FAQPage (JSON-LD) e o /llms.txt.
 
 export const DUVIDAS = [
   {
