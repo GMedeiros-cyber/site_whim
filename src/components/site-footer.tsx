@@ -76,8 +76,9 @@ export function SiteFooter() {
 
           <Coluna id="endereco" titulo="Endereço">
             <address className="flex flex-col gap-1 not-italic">
-              <Linha partes={[...CONTATO.logradouro.split(" · "), CONTATO.bairro]} />
-              <Linha partes={[CONTATO.cidade, `CEP ${CONTATO.cep}`]} />
+              <Linha partes={CONTATO.logradouro.split(" · ")} />
+              <Linha partes={[CONTATO.bairro, CONTATO.cidade]} />
+              <span>CEP {CONTATO.cep}</span>
               <a href={CONTATO.mapa} {...novaAba} className={cn(link, "w-fit lg:mt-1")}>
                 Ver no mapa
                 <ArrowUpRightIcon aria-hidden className="size-3.5 text-accent" />
