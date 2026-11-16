@@ -26,7 +26,11 @@ A versão que vale é a do Claude Design (atualizada em 15/11 com os ajustes do 
    - Botões: "Pedir orçamento no WhatsApp" (branco, abre o wa.me) e "Ver o que fazemos" (contorno, rola até `#servicos`). No celular, os dois em largura total.
    - Rodapé do topo: as 4 técnicas em pílulas à esquerda e "role para conhecer" à direita (some no celular).
    - **Abertura**: um shader de tinta turquesa pinta a palavra "Vista" da esquerda para a direita (~2,5 s); no fim a palavra fica branca com o começo em turquesa. Uma vez por sessão (`sessionStorage`), um toque pula. Com `prefers-reduced-motion`, a palavra aparece pronta. Pode ser WebGL leve (sem biblioteca nova sem pedir) ou, se ficar pesado, máscara SVG animada; o protótipo usa CSS só para mostrar a ideia.
-2. **Quem somos**: o manifesto (com as fotos em pílula no texto). PC: 3 fotos lado a lado com legenda. **Celular: carrossel** com scroll-snap, 1 foto e um pedaço da próxima, e bolinhas de posição embaixo (a ativa alonga em turquesa). Fotos: `hero.webp` "Rodo na tela de silk", `f35.webp` "Peças na mesa de estampa", `f41.webp` "Estampa em série na mesa longa".
+2. **Quem somos** (refeito em 15/11): duas colunas no PC.
+   - Esquerda: "Uma oficina, *do fio à estampa.*" e o texto "A Whim nasceu em 2021, quando o Wallan juntou 15 anos de experiência numa oficina própria em Guarulhos. Hoje a gente faz peças para empresas, escolas e eventos com todas as etapas no mesmo lugar." Embaixo, as etapas da oficina em 2 colunas, cada uma com um fio em cima: Gravação de telas ("A arte vira tela para o silk."), Corte e costura ("A peça nasce do tecido."), Estampa ("Silk, DTF, bordado ou sublimação."), Acabamento ("Conferência e embalagem.").
+   - Direita: mosaico de fotos (a `f41.webp` alta à esquerda; `hero.webp` e `f35.webp` empilhadas à direita), cantos de 24 px, legenda em pílula branca em cada uma, e o selo azul-marinho "Oficina própria · Guarulhos/SP" saindo da borda.
+   - Celular: texto em cima, as 3 fotos num carrossel (scroll-snap, ~80% de largura cada, bolinhas de posição), e as etapas em 2 colunas.
+   - O manifesto antigo com fotos em pílula sai.
 3. **O que fazemos**: título "Quatro jeitos de *estampar sua marca.*" e a linha "Cada técnica deixa a arte de um jeito. Veja como fica cada uma e para o que ela é melhor."
    - 4 cartões com imagem 3:4 gerada por IA, cada uma com o selo "Imagem ilustrativa" (obrigatório: não é trabalho real da Whim): `public/images/estilos/silk.webp`, `dtf.webp`, `bordado.webp`, `sublimacao.webp`. Textos:
      - Silk: "Tinta grossa em cores chapadas, com o toque e a durabilidade da tinta na tela." Bom para: logos de poucas cores e tiragens maiores.
@@ -36,10 +40,10 @@ A versão que vale é a do Claude Design (atualizada em 15/11 com os ajustes do 
    - Embaixo, 3 cartões só de texto: Confecção, Uniformes (textos de hoje) e o azul-marinho "Não sabe qual? Mande a arte: a equipe indica a técnica que fica melhor."
    - PC: 4 colunas. **Celular: os 4 cartões viram carrossel** (~1,3 cartão visível); os 3 de texto ficam empilhados e compactos.
 4. **Como funciona**: 5 etapas com o traço por trás.
-   - A etapa 1 já começa turquesa. Quando a seção entra na tela (IntersectionObserver, uma vez), o traço vai enchendo de turquesa até a 2, 3, 4 e 5, e cada bolinha acende ao ser alcançada: ~1,3 s por trecho, com uma pausa curta em cada etapa, ~6 s no total.
-   - Quando chega no 5: **fogos discretos atrás da bolinha**, do tamanho dela (12 pontinhos turquesa e azul-marinho que saem do centro até ~46 px e somem, ~0,6 s). Uma vez só.
+   - A etapa 1 já começa turquesa. Quando a seção entra na tela (IntersectionObserver, uma vez), **a linha turquesa avança e pinta cada bolinha no instante em que passa por ela**: ~1,5 s por trecho, com uma pausa curta em cada etapa, ~7 s até o 5. As bolinhas ainda não alcançadas ficam brancas com borda cinza.
+   - Quando a linha chega no 5: **fogos discretos atrás da bolinha**, do tamanho dela (12 pontinhos turquesa e azul-marinho que saem do centro até ~46 px e somem, ~0,6 s). Uma vez só (no protótipo a animação repete só para dar para ver).
    - Celular: o traço é vertical e enche de cima para baixo. Movimento reduzido: tudo já aceso, sem fogos.
-5. **Clientes**: "Marcas que *confiam na oficina.*", Globo e Lollapalooza em texto e os espaços "logo do cliente".
+5. **Clientes**: "Marcas que *confiam na oficina.*" e um **carrossel contínuo** (marquee) de ponta a ponta da tela, com as bordas esmaecendo: Globo e Lollapalooza em texto, separados por um ponto turquesa, e os espaços "logo do cliente" até a Whim mandar os logos (aí entram os logos em cinza). Rola devagar (~28 s por volta), pausa com o mouse em cima e com foco; com movimento reduzido fica parado e quebra linha. Lista duplicada com `aria-hidden` na cópia.
 6. **Convite** (centralizado, sem camisetas nem cano): "Monte a sua *peça.*", "Peça, cor, estampa e quantidade em 5 passos. O orçamento chega pronto no WhatsApp da Whim.", botões "Monte sua peça" e "Falar no WhatsApp".
 
 ## Rodapé: mapa (tarefa do agente 2, liberada pelo Gabriel)
