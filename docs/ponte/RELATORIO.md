@@ -125,3 +125,9 @@ Uma entrada por tarefa, sempre acrescentada no fim (nunca reescrever as anterior
 - Comandos: `npm run lint` e `npm run build` (ok).
 - Commits: `38db844` arara, `464c7ef` estampa 2, `7171322` manifesto (rebase sobre `c2f69b0`, moletom).
 - Pendente: a Whim confirmar medidas e áreas; Figma não consultado (conector sem autorização), segui o README.
+
+### 2026-11-15 23:10 · Header universal, rodapé, /privacidade e Contato + Avaliações (Claude, outra conta, com 2 agentes em paralelo)
+- Feito: header igual em todas as páginas (`src/lib/navegacao.ts`, `link-nav.tsx`); rodapé completo (navegação, atendimento, Instagram, endereço com Cocaia e CEP, mapa, razão social e CNPJ); página /privacidade (LGPD); seção única Contato + Avaliações na direção B (`contato-avaliacoes.tsx`), avaliações só como lugar reservado.
+- Comandos: merge de `secao/header-rodape` e `secao/contato-avaliacoes`; `npm run lint`; `npx next typegen` + `npx tsc --noEmit`; Playwright em 390 e 1280 (sem erro no console, sem rolagem lateral).
+- Build: `npm run build` não roda neste container (Google Fonts bloqueado); rodar aí.
+- Pendente: revisão jurídica da /privacidade; avaliações reais do Google; `CONTATO` ganhou campos separados (logradouro, bairro, cidade, cep).
