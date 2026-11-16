@@ -5,10 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { cn } from "@/lib/utils";
 import { linkWhatsApp } from "@/lib/whim";
 
+const estiloCampo = "rounded-xl bg-background px-3.5";
+
 /** Monta a mensagem e abre a conversa com a Whim no WhatsApp. */
-export function FormContato() {
+export function FormContato({ className }: { className?: string }) {
   function enviar(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const dados = new FormData(e.currentTarget);
@@ -19,25 +22,29 @@ export function FormContato() {
   }
 
   return (
-    <form onSubmit={enviar} className="mt-7">
-      <FieldGroup>
+    <form onSubmit={enviar} className={className}>
+      <FieldGroup className="gap-5">
         <Field>
           <FieldLabel htmlFor="c-nome">Nome</FieldLabel>
-          <Input id="c-nome" name="nome" autoComplete="name" placeholder="Seu nome" required className="h-11 bg-background" />
+          <Input id="c-nome" name="nome" autoComplete="name" placeholder="Seu nome" required className={cn(estiloCampo, "h-12")} />
         </Field>
         <Field>
           <FieldLabel htmlFor="c-empresa">Empresa ou escola</FieldLabel>
-          <Input id="c-empresa" name="empresa" autoComplete="organization" placeholder="Opcional" className="h-11 bg-background" />
+          <Input id="c-empresa" name="empresa" autoComplete="organization" placeholder="Opcional" className={cn(estiloCampo, "h-12")} />
         </Field>
         <Field>
           <FieldLabel htmlFor="c-mensagem">O que você precisa?</FieldLabel>
-          <Textarea id="c-mensagem" name="mensagem" rows={3} placeholder="Ex.: 80 camisetas para um evento em março" className="bg-background" />
+          <Textarea
+            id="c-mensagem"
+            name="mensagem"
+            rows={3}
+            placeholder="Ex.: 80 camisetas para um evento em março"
+            className={cn(estiloCampo, "min-h-24 py-3")}
+          />
         </Field>
-        <div>
-          <Button type="submit" size="xl">
-            Enviar pelo WhatsApp <Seta />
-          </Button>
-        </div>
+        <Button type="submit" size="xl" className="mt-1 w-full">
+          Enviar pelo WhatsApp <Seta />
+        </Button>
       </FieldGroup>
     </form>
   );
