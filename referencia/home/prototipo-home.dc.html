@@ -126,8 +126,21 @@ a{color:#373857}a:hover{color:#31C4EA}
 .legal{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:22px 0 40px;border-top:1px solid rgba(255,255,255,.14);font-size:12px;color:rgba(255,255,255,.6)}
 .legal a{color:rgba(255,255,255,.7)}
 @media (prefers-reduced-motion:reduce){.trilha{animation:none;flex-wrap:wrap;width:auto}.giant,.trilho i,.num,.fogos b{animation:none}.giant{clip-path:none;background-position:0 0}.trilho i{width:100%}.num{background:#31C4EA;border-color:#31C4EA}}
+/* transicoes entre secoes */
+.sec,.fim{position:relative;border-radius:40px 40px 0 0;margin-top:-40px;box-shadow:0 -24px 40px -34px rgba(55,56,87,.35)}
+#sobre{margin-top:0;box-shadow:none;border-radius:0}
+#sobre{z-index:1}#servicos{z-index:2}#processo{z-index:3}#clientes{z-index:4}.fim{z-index:5;border-radius:0;box-shadow:none;margin-top:0}
+.tinta{position:absolute;left:0;right:0;top:-58px;height:60px;width:100%;display:block;z-index:5}
+@supports (animation-timeline: view()){
+.sec .eye,.sec .tit,.sec .lead,.cta h2{animation:sobe linear both;animation-timeline:view();animation-range:entry 5% cover 28%}
+@keyframes sobe{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:none}}
+.hero{animation:recua linear both;animation-timeline:view();animation-range:exit 0% exit 100%}
+@keyframes recua{to{transform:scale(.94);border-radius:48px;filter:brightness(.8)}}
+}
+@media (prefers-reduced-motion:reduce){.sec .eye,.sec .tit,.sec .lead,.cta h2,.hero{animation:none}}
 /* celular */
 @media (max-width:760px){
+.sec{border-radius:28px 28px 0 0;margin-top:-28px}#sobre{margin-top:0;border-radius:0}.tinta{top:-38px;height:40px}
 .wrap{padding:0 20px}.sec{padding:80px 0}
 .nav{top:14px;left:12px;right:12px;transform:none;justify-content:space-between}
 .nav a.l,.nav .btn{display:none}.menu{display:inline-flex;min-height:44px;padding:0 18px;border-radius:999px;background:#373857;color:#FFFFFF;align-items:center;font-size:14px;font-weight:600;text-decoration:none}
@@ -275,6 +288,7 @@ a{color:#373857}a:hover{color:#31C4EA}
 </section>
 
 <section id="fim" class="fim">
+<svg class="tinta" viewBox="0 0 1440 60" preserveAspectRatio="none" aria-hidden="true"><path d="M0 60 L0 38 C 80 30 140 44 220 36 C 300 26 340 12 430 20 C 520 28 560 46 660 40 C 760 34 800 14 900 18 C 990 22 1040 40 1130 36 C 1220 32 1260 10 1340 16 C 1390 20 1420 30 1440 28 L1440 60 Z" fill="#373857"></path><circle cx="318" cy="22" r="5" fill="#373857"></circle><circle cx="1012" cy="30" r="3.5" fill="#373857"></circle><circle cx="1268" cy="8" r="4" fill="#373857"></circle></svg>
 <div class="wrap">
 <div class="cta" id="monte">
 <h2>Monte a sua <em>peça.</em></h2>

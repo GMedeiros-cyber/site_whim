@@ -46,6 +46,14 @@ A versão que vale é a do Claude Design (atualizada em 15/11 com os ajustes do 
 5. **Clientes**: "Marcas que *confiam na oficina.*" e um **carrossel contínuo** (marquee) de ponta a ponta da tela, com as bordas esmaecendo: Globo e Lollapalooza em texto, separados por um ponto turquesa, e os espaços "logo do cliente" até a Whim mandar os logos (aí entram os logos em cinza). Rola devagar (~28 s por volta), pausa com o mouse em cima e com foco; com movimento reduzido fica parado e quebra linha. Lista duplicada com `aria-hidden` na cópia.
 6. **Convite** (centralizado, sem camisetas nem cano): "Monte a sua *peça.*", "Peça, cor, estampa e quantidade em 5 passos. O orçamento chega pronto no WhatsApp da Whim.", botões "Monte sua peça" e "Falar no WhatsApp".
 
+## Transições entre as seções (15/11)
+
+- Cada seção depois do Quem somos sobe por cima da anterior: cantos de cima arredondados (40 px no PC, 28 px no celular), `margin-top` negativo do mesmo tamanho e uma sombra suave azul-marinho para cima. Como os fundos alternam branco e claro, os cantos mostram a seção de baixo.
+- Entrada no convite azul-marinho: uma **borda de tinta** (SVG com contorno ondulado e 3 respingos) no topo do bloco, como se a tinta escorresse da seção de clientes.
+- Ao rolar, o cartão do topo recua de leve (escala 0,94, cantos maiores, um pouco mais escuro) enquanto sai da tela.
+- Eyebrow, título e linha de apoio de cada seção sobem 28 px e aparecem quando entram na tela, uma vez. Só eles: nada de animar cada cartão.
+- Use CSS de rolagem (`animation-timeline: view()`) com `@supports`; sem suporte, tudo aparece parado. Com `prefers-reduced-motion`, nada se move. Sem biblioteca nova.
+
 ## Rodapé: mapa (tarefa do agente 2, liberada pelo Gabriel)
 
 - No `site-footer.tsx` (compartilhado, mas este ajuste fica com o agente 2), coluna Endereço: o **mapa do Google sempre visível**, embutido com `<iframe src="https://www.google.com/maps?q=Av.+Brigadeiro+Faria+Lima,+110,+Cocaia,+Guarulhos+-+SP,+07130-000&output=embed" title="Mapa com a localização da Whim" loading="lazy" referrerpolicy="no-referrer-when-downgrade">`, cantos de 18 px, ~190 px de altura, largura da coluna (4ª coluna mais larga no PC; largura total no celular). Embaixo, o link "Abrir no Google Maps" (`CONTATO.mapa`, nova aba).
