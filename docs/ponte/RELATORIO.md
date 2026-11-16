@@ -141,6 +141,13 @@ Uma entrada por tarefa, sempre acrescentada no fim (nunca reescrever as anterior
 - Commit: `6c857d6`.
 - Pendente: revisão jurídica da /privacidade; avaliações reais do Google.
 
+### 2026-11-16 01:00 · Logos, rótulo e WhatsApp (Claude, outra conta)
+- Feito: logos oficiais dos 10 clientes em cinza em `public/clientes/` (fontes em `referencia/logos-clientes.md`); grafia corrigida para Electrochemical; eyebrow sai e o título ganha a gota turquesa; spec do botão flutuante do WhatsApp; protótipo atualizado.
+- Comandos: download dos originais, conversão para uma cor em Python/rsvg, `git commit`.
+- Build: não se aplica (só arquivos de referência e imagens).
+- Commit: `74179e1`.
+- Pendente: Whim confirmar Aurora (Coop?), unidade do Colégio Progresso e o OK para exibir os logos.
+
 ### 2026-11-16 00:40 · Agente 2 · Home (Claude Code)
 - Feito: home nova seção por seção (Vista pintada por shader WebGL de tinta, uma vez por sessão, toque pula; Quem somos com mosaico/carrossel; 3 técnicas; Como funciona preso à rolagem com fogos uma vez; 10 clientes em marquee; Dúvidas; convite com borda de tinta), transições entre seções, mapa do Google no rodapé, /privacidade citando o Google Maps, Bom Clima em `whim.ts`.
 - Decisões: transições em CSS global com prefixo `home-` (a regra `"*.css"` do next.config transforma `.module.css` em global); `--home-p` registrada (começa em 4: sem suporte ou com movimento reduzido fica tudo aceso); lista das dúvidas exportada em `src/components/home/duvidas.ts` para o FAQPage.
