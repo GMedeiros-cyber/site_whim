@@ -61,9 +61,9 @@ export function Abertura() {
       <div ref={ref} id="abertura" className="abertura" aria-hidden="true" title="Toque para pular">
         <div className="abertura-palco">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img className="abertura-fantasma" src="/brand/whim-simbolo.svg" alt="" />
+          <img className="abertura-fantasma" src="/brand/abertura/fantasma.webp" alt="" fetchPriority="low" />
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img className="abertura-tinta1" src="/brand/whim-simbolo-contorno.webp" alt="" />
+          <img className="abertura-tinta1" src="/brand/abertura/contorno.webp" alt="" />
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img className="abertura-tinta2" src="/brand/whim-simbolo-camiseta.webp" alt="" />
           {/* eslint-disable-next-line @next/next/no-img-element */}
