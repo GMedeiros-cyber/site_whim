@@ -249,3 +249,11 @@ Uma entrada por tarefa, sempre acrescentada no fim (nunca reescrever as anterior
 - Conferido: lint, tsc e build webpack ok antes do push (`171a1bc`).
 - Commit: `37dd59c`.
 - Pendente: os três pedidos de 17/11; Search Console; cores e foto original com a Whim.
+
+### 2026-11-17 01:40 · Agente 3 · Contatos no banco e tela de erro (Claude Code)
+- Feito (`agente-3/contatos`): `POST /api/contatos` com `mysql2` (tabela `contatos` criada na 1ª chamada, sem IP, campo isca, limite por minuto, só envios do próprio site; sem `DB_*` responde 200 sem gravar); `src/lib/contatos.ts` (`enviarContato`, UTMs/gclid/fbclid da página de chegada, `generate_lead` e "Lead" na Meta ao gravar); `CampoIsca`; /privacidade com o que fica guardado, onde, 24 meses e como apagar; `.env.example` com as `DB_*`.
+- Tela "This page couldn't load": não era deploy. O `el.remove()` da `abertura.tsx` quebra toda ida da home para outra página por link (100% das vezes, PC e celular). Entraram `error.tsx` e `global-error.tsx` com o visual da Whim, recarregando sozinhos uma vez por minuto no máximo (esse erro e o de JS de deploy antigo). A correção de raiz foi pedida ao agente 2.
+- Conferido: rota contra um MySQL 9.7 de verdade (`mysql-memory-server`, sem Docker): 20 checagens ok (gravação com acento/emoji/UTMs, 9 inválidos recusados, isca, outro site 403, GET 405, limite 429, horário de Brasília). Navegador a 1280 e 390: home → Monte sua peça e JS sumido abrem depois do recarregamento; tela de erro sem laço; UTMs da chegada guardadas.
+- Comandos: `git switch -c agente-3/contatos origin/main`, `npm install`, `npm install mysql2`, `npm run lint` (ok), `npm run build` (webpack, ok), `next start` + Puppeteer.
+- Commit: `1f4daa8`.
+- Pendente: agente 2 corrigir a abertura; agente 1 ligar os formulários (`enviarContato` + `CampoIsca`); a Whim confirmar os 24 meses; rótulo de conversão do Google Ads; texto da autorização se os dados forem usados em anúncios ou prospecção.
