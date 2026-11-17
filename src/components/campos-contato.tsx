@@ -76,7 +76,8 @@ export function CamposContato({
   };
   return (
     <>
-      {campo("nome", "Nome", { autoComplete: "name", placeholder: "Seu nome" })}
+      {/* Limites iguais aos da rota /api/contatos. */}
+      {campo("nome", "Nome", { autoComplete: "name", placeholder: "Seu nome", maxLength: 120 })}
       {campo("telefone", "Telefone (WhatsApp)", {
         type: "tel",
         inputMode: "tel",
@@ -84,7 +85,7 @@ export function CamposContato({
         placeholder: "(11) 98765-4321",
         onChange: (e) => onValor({ ...valor, telefone: mascararTelefone(e.target.value) }),
       })}
-      {campo("email", "E-mail", { type: "email", inputMode: "email", autoComplete: "email", placeholder: "nome@empresa.com.br" })}
+      {campo("email", "E-mail", { type: "email", inputMode: "email", autoComplete: "email", placeholder: "nome@empresa.com.br", maxLength: 254 })}
     </>
   );
 }

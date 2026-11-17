@@ -6,7 +6,16 @@ import { CheckIcon, DownloadIcon, InfoIcon, MinusIcon, PlusIcon, Share2Icon } fr
 
 import { Arara, CORES, MODELOS, usePoucoMovimento, type Cor } from "@/components/arara";
 import { Container, Destaque, Seta, Titulo } from "@/components/blocos";
-import { Autorizacao, CamposContato, CONTATO_VAZIO, contatoValido, errosContato, type DadosContato } from "@/components/campos-contato";
+import { CampoIsca } from "@/components/campo-isca";
+import {
+  Autorizacao,
+  CamposContato,
+  CONTATO_VAZIO,
+  contatoValido,
+  errosContato,
+  TEXTO_AUTORIZACAO,
+  type DadosContato,
+} from "@/components/campos-contato";
 import {
   conflitos,
   juntar,
@@ -27,6 +36,7 @@ import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { areaDe, FRASE_TECNICA, TECNICAS, type InfoArte, type Lado, type Tecnica } from "@/lib/estampa";
+import { enviarContato } from "@/lib/contatos";
 import { analisarArte } from "@/lib/estampa-cliente";
 import { gerarFicha, nomeFicha } from "@/lib/ficha";
 import { cn } from "@/lib/utils";
@@ -454,11 +464,13 @@ export function Personalizador() {
         return (
           <>
             <p className="text-sm text-muted-foreground">Nome, telefone e e-mail para a equipe da Whim responder.</p>
-            <div className="mt-3.5 grid gap-4">
+            {/* Quem envia é o botão do resumo; o Enter num campo não manda nada. */}
+            <form id={FORM_DADOS} noValidate onSubmit={(e) => e.preventDefault()} className="relative mt-3.5 grid gap-4">
+              <CampoIsca />
               <CamposContato id="pedido" valor={contato} onValor={setContato} mostrarErros={false} />
               {/* O que falta aparece no resumo, ao lado do botão. */}
               <Autorizacao id="pedido" valor={contato} onValor={setContato} mostrarErros={false} />
-            </div>
+            </form>
             <div className="mt-5 rounded-2xl border border-primary/12 p-3">
               <p className="text-[13px] font-medium">Ficha da estampa para a equipe da Whim</p>
               {fichaPronta ? (
@@ -504,11 +516,27 @@ export function Personalizador() {
     }
   }
 
+  // Grava o contato (sem esperar) e o link abre o WhatsApp no mesmo clique.
+  function pedir() {
+    const form = document.getElementById(FORM_DADOS) as HTMLFormElement | null;
+    const isca = form?.elements.namedItem("site");
+    enviarContato({
+      origem: "monte-sua-peca",
+      nome: contato.nome.trim(),
+      email: contato.email.trim(),
+      telefone: contato.telefone,
+      pedido: resumo,
+      consentimento: true,
+      consentimento_texto: TEXTO_AUTORIZACAO,
+      site: isca instanceof HTMLInputElement ? isca.value : "",
+    });
+  }
   const resumoProps = {
     itens: itensResumo,
     aceso,
     falta: alcancado >= ultimo && faltam.length ? faltam : [],
     href: linkWhatsApp(resumo),
+    onPedir: pedir,
   };
 
   return (
@@ -653,6 +681,7 @@ export function Personalizador() {
 }
 
 // Telas grandes (27" Full HD e 2K): a página abre mais em vez de ficar no meio com sobra dos lados.
+const FORM_DADOS = "pedido-dados";
 const LARGO = "min-[112.5rem]:max-w-[1520px]"; // a partir de 1800 px; o Contato usa o mesmo
 // A coluna da prévia + resumo fica parada ao rolar só quando cabe inteira na altura da tela.
 const FIXA = "lg:[@media(min-height:1000px)]:sticky lg:top-24";
@@ -663,12 +692,14 @@ function ResumoPedido({
   aceso,
   falta,
   href,
+  onPedir,
   className,
 }: {
   itens: { rotulo: string; valor: string }[];
   aceso: boolean;
   falta: string[];
   href: string;
+  onPedir: () => void;
   className?: string;
 }) {
   const botao = "inline-flex h-12 items-center justify-center gap-2 rounded-full px-5 text-sm font-semibold max-[600px]:w-full";
@@ -691,7 +722,7 @@ function ResumoPedido({
           {falta.length > 0 && <p className="mt-1 font-medium text-primary-foreground">Para pedir, falta: {juntar(falta)}.</p>}
         </div>
         {aceso ? (
-          <a href={href} target="_blank" rel="noopener noreferrer" className={cn(botao, "bg-accent text-primary outline-none hover:bg-accent/90 focus-visible:ring-3 focus-visible:ring-accent/50")}>
+          <a href={href} target="_blank" rel="noopener noreferrer" onClick={onPedir} className={cn(botao, "bg-accent text-primary outline-none hover:bg-accent/90 focus-visible:ring-3 focus-visible:ring-accent/50")}>
             Pedir orçamento no WhatsApp
           </a>
         ) : (
