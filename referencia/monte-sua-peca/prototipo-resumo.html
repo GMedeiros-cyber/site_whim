@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><title>Protótipo · resumo embaixo da vitrine</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
+<style>
+body{margin:0}
+.p{font-family:Poppins,system-ui,sans-serif;color:#373857;background:#FFFFFF;box-sizing:border-box}
+.p *{box-sizing:border-box}
+.grid{display:grid;grid-template-columns:minmax(0,640px) minmax(0,1fr);gap:56px;align-items:start}
+.esq{position:sticky;top:24px;display:flex;flex-direction:column;gap:16px}
+.palco{position:relative;border-radius:28px;background:#F5F7FA;border:2px solid #31C4EA55;padding:18px 18px 0;overflow:hidden}
+.alterna{display:inline-flex;padding:4px;border-radius:999px;background:#FFFFFF;border:1px solid rgba(55,56,87,.1);font-size:12px;font-weight:600}
+.alterna span{padding:6px 14px;border-radius:999px}
+.alterna .on{background:#373857;color:#FFFFFF}
+.previa{position:absolute;top:18px;right:18px;font-size:11px;padding:4px 10px;border-radius:999px;background:#FFFFFF;border:1px solid rgba(55,56,87,.12)}
+.cano{display:block;width:62%;margin:14px auto 0;height:18px;object-fit:fill}
+.camisa{position:relative;width:340px;margin:-6px auto 0}
+.camisa img.peca{display:block;width:100%}
+.arte{position:absolute;mix-blend-mode:multiply;opacity:.92}
+.miniatura{position:absolute;right:18px;bottom:96px;width:92px;border-radius:14px;background:#FFFFFF;border:1px solid rgba(55,56,87,.12);padding:6px;text-align:center;font-size:10px;color:#5D6178}
+.miniatura div{position:relative}
+.miniatura img.peca{width:100%;display:block}
+.vitrine{display:flex;gap:18px;align-items:flex-end;justify-content:center;background:#FFFFFF;border-radius:20px;margin:6px -2px 0;padding:14px 16px 12px}
+.cor{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:11px;color:#5D6178}
+.cor i{display:block;width:38px;height:38px;border-radius:999px;border:1px solid rgba(55,56,87,.15)}
+.cor.on{color:#373857;font-weight:600}
+.cor.on i{outline:2px solid #31C4EA;outline-offset:3px}
+.resumo{border-radius:24px;background:#373857;color:#FFFFFF;padding:18px 20px 20px}
+.resumo h4{margin:0 0 12px;font-size:13px;font-weight:600;color:#FFFFFF;opacity:.85}
+.linhas{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.item{border-radius:14px;background:rgba(255,255,255,.08);padding:10px 12px;min-height:64px}
+.item b{display:block;font-size:11px;font-weight:500;opacity:.7;margin-bottom:3px}
+.item span{font-size:13px;font-weight:600;line-height:1.3}
+.item.vazio span{opacity:.45;font-weight:500}
+.rodape{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:14px}
+.rodape p{margin:0;font-size:12px;opacity:.75}
+.botao{display:inline-flex;align-items:center;gap:8px;height:46px;padding:0 20px;border-radius:999px;background:#31C4EA;color:#373857;font-weight:600;font-size:14px}
+.botao.off{background:rgba(255,255,255,.14);color:rgba(255,255,255,.55)}
+.ficha h2{margin:0;font-size:26px;font-weight:600;letter-spacing:-.02em}
+.ficha .sub{margin:6px 0 22px;font-size:13px;color:#5D6178}
+.passo{display:grid;grid-template-columns:28px 1fr auto;gap:12px;padding:12px 0;border-bottom:1px solid rgba(55,56,87,.08);font-size:13px}
+.passo .n{width:28px;height:28px;border-radius:999px;background:#373857;color:#FFFFFF;display:grid;place-items:center;font-size:12px}
+.passo .n.atual{background:#FFFFFF;color:#373857;border:2px solid #31C4EA}
+.passo .n.depois{background:#FFFFFF;color:#5D6178;border:1px solid rgba(55,56,87,.2)}
+.passo b{display:block;font-weight:600;font-size:14px}
+.passo small{color:#5D6178}
+.passo a{font-size:12px;color:#373857;text-decoration:underline}
+.caixa{margin:4px 0 0 40px;border:1px solid rgba(55,56,87,.12);border-radius:18px;padding:14px}
+.tam{display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:13px}
+.tam .q{display:flex;gap:6px;align-items:center}
+.tam .q i{width:32px;height:32px;border-radius:999px;border:1px solid rgba(55,56,87,.15);display:grid;place-items:center;font-style:normal}
+.tam .q em{width:44px;height:32px;border-radius:10px;border:1px solid rgba(55,56,87,.15);display:grid;place-items:center;font-style:normal}
+.nota{font-size:13px;color:#5D6178;max-width:62ch;margin:0 0 28px;line-height:1.55}
+.etq{display:inline-block;font-size:11px;font-weight:600;color:#373857;background:#D6F3FB;border-radius:6px;padding:3px 8px;margin-right:6px}
+</style></head><body>
+<div class="p" style="width: 1440px; padding: 56px 72px 72px">
+<p class="nota"><span class="etq">Protótipo</span>Resumo do pedido embaixo da vitrine, na horizontal, ocupando o vão. Ele preenche conforme a pessoa avança e o botão só acende no fim. A prévia mantém a arte depois do passo Estampa (frente aqui; a miniatura mostra as costas e troca com um clique).</p>
+<div class="grid">
+<div class="esq">
+<div class="palco">
+<div class="alterna"><span class="on">Frente</span><span>Costas</span></div>
+<span class="previa">Prévia</span>
+<img class="cano" src="../../public/arara/cano.webp" alt="">
+<div class="camisa">
+<img class="peca" src="../../public/arara/camiseta/cores/branco/frente.webp" alt="Camiseta branca">
+<img class="arte" src="arte-exemplo-1.webp" alt="" style="left: 58%; top: 27%; width: 17%">
+</div>
+<div class="miniatura"><div><img class="peca" src="../../public/arara/camiseta/cores/branco/costas.webp" alt=""><img class="arte" src="arte-exemplo-2.webp" alt="" style="left: 27%; top: 30%; width: 46%"></div>Costas</div>
+<div class="vitrine">
+<div class="cor on"><i style="background: #FFFFFF"></i>Branco</div>
+<div class="cor"><i style="background: #373857"></i>Azul-marinho</div>
+<div class="cor"><i style="background: #31C4EA"></i>Turquesa</div>
+<div class="cor"><i style="background: #F5F7FA"></i>Mescla</div>
+<div class="cor"><i style="background: #5D6178"></i>Outra cor</div>
+</div>
+</div>
+<div class="resumo">
+<h4>Resumo do pedido</h4>
+<div class="linhas">
+<div class="item"><b>Peça</b><span>Camiseta · Malha fria PV</span></div>
+<div class="item"><b>Cor</b><span>Branco</span></div>
+<div class="item"><b>Estampa</b><span>3 posições · técnica a definir</span></div>
+<div class="item vazio"><b>Quantidade</b><span>Falta escolher</span></div>
+</div>
+<div class="rodape">
+<p>Mínimo de 50 peças · produção em 20 a 30 dias</p>
+<span class="botao off">Pedir orçamento no WhatsApp</span>
+</div>
+</div>
+</div>
+<div class="ficha">
+<h2>Seu pedido</h2>
+<p class="sub">Monte em 5 passos e receba o orçamento pelo WhatsApp.</p>
+<div class="passo"><span class="n">✓</span><div><b>Peça</b><small>Camiseta · Malha fria PV antipilling</small></div><a>Alterar</a></div>
+<div class="passo"><span class="n">✓</span><div><b>Cor</b><small>Branco</small></div><a>Alterar</a></div>
+<div class="passo"><span class="n">✓</span><div><b>Estampa</b><small>Peito direito, Nuca, Costas em cima</small></div><a>Alterar</a></div>
+<div class="passo" style="border-bottom: 0"><span class="n atual">4</span><div><b>Quantidade</b><small>Pedido mínimo de 50 peças.</small></div><span></span></div>
+<div class="caixa">
+<div class="tam"><span>P</span><span class="q"><i>−</i><em>10</em><i>+</i></span></div>
+<div class="tam"><span>M</span><span class="q"><i>−</i><em>20</em><i>+</i></span></div>
+<div class="tam"><span>G</span><span class="q"><i>−</i><em>20</em><i>+</i></span></div>
+<div class="tam"><span>GG</span><span class="q"><i>−</i><em>0</em><i>+</i></span></div>
+</div>
+<div class="passo" style="margin-top: 8px"><span class="n depois">5</span><div><b>Seus dados</b><small>Nome, telefone e e-mail para a equipe responder</small></div><span></span></div>
+</div>
+</div>
+</div>
+</body></html>
