@@ -263,7 +263,7 @@ Uma entrada por tarefa, sempre acrescentada no fim (nunca reescrever as anterior
 - (6) `agente-3/contatos` juntado; nome, telefone (máscara) e e-mail obrigatórios + autorização e link da privacidade no passo 5 e no Contato; `enviarContato` + WhatsApp no mesmo clique; `CampoIsca` nos dois `<form>`.
 - Conferido (Playwright, 390/1280/1920/2560, rota interceptada): 1 falha no axe a 1280 px, no cabeçalho (fora do meu escopo, pedido ao agente 2); o resto sem falha (fluxo, envio, WhatsApp, alvos de 44 px, sem rolagem lateral, console limpo). Teste do Lighthouse de 16/11 sem falha.
 - Comandos: `git switch -c agente-1/ajustes-17-11 origin/main`, `git merge origin/main` (protótipo) e `origin/agente-3/contatos`, `npm install`, `npm run lint` (ok), `npm run build` (webpack, ok), trace do Chrome.
-- Commits: `6a65b04` e `2c68a8f` no `agente-1/ajustes-17-11`.
+- Commits: `6a65b04` e `9ef57e0` no `agente-1/ajustes-17-11` (o `pull --rebase` reaplicou os 2 do agente 3 como `7e9ca83` e `8ab302e`, mesmas mudanças).
 - Pendente: texto da autorização se os dados forem para anúncios/prospecção (Gabriel); agente 2: contraste do menu sobre blocos escuros e largura do rodapé em telas grandes.
 
 ### 2026-11-17 02:17 · Agente 2 · Ajustes da home de 17/11 (Claude Code)
