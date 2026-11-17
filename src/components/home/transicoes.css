@@ -132,16 +132,11 @@
   }
 }
 
-/* Telas grandes (27" Full HD e 2K): a home cresce por igual a partir do layout de PC
-   (larguras, espaços e textos juntos). Fica fora o "Vista", que a tinta mede na tela
-   e tem tamanho próprio. */
+/* Telas grandes (27" Full HD e 2K): a partir de 1800 px a home cresce por igual até
+   os 1180 px do layout de PC virarem 1520 px, a largura do rodapé e do Monte sua peça.
+   Fica fora o "Vista", que a tinta mede na tela e tem tamanho próprio. */
 @media (min-width: 1800px) {
   .home-grande {
-    zoom: 1.2;
-  }
-}
-@media (min-width: 2400px) {
-  .home-grande {
-    zoom: 1.5;
+    zoom: 1.2881; /* 1520 / 1180 */
   }
 }

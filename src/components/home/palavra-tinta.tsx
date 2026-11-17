@@ -185,7 +185,7 @@ export function PalavraTinta({ children }: { children: string }) {
         ref={textoRef}
         // O padding (desfeito pela margem) deixa o pingo do "i" e o fim do "a"
         // dentro da caixa: o bg-clip-text não pinta o que passa dela.
-        className="-mx-[0.08em] -my-[0.1em] block bg-linear-to-r/srgb from-accent from-8% to-primary-foreground to-42% bg-clip-text px-[0.08em] py-[0.1em] text-[clamp(7.5rem,26vw,20.625rem)] leading-[0.82] min-[1800px]:text-[26rem] min-[2400px]:text-[32rem] font-extrabold tracking-[-0.065em] whitespace-nowrap text-transparent motion-safe:opacity-0 data-[estado=pronta]:opacity-100"
+        className="-mx-[0.08em] -my-[0.1em] block bg-linear-to-r/srgb from-accent from-8% to-primary-foreground to-42% bg-clip-text px-[0.08em] py-[0.1em] text-[clamp(5.25rem,18.2vw,14.4375rem)] leading-[0.82] min-[1800px]:text-[18.2rem] min-[2400px]:text-[22.4rem] font-extrabold tracking-[-0.065em] whitespace-nowrap text-transparent motion-safe:opacity-0 data-[estado=pronta]:opacity-100"
       >
         {children}
       </span>

@@ -1,25 +1,44 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { usePathname, useRouter } from "next/navigation";
 
 import "./transicao-pinta.css";
 import { ACAO } from "@/lib/navegacao";
 
-/** Fecha a espera da transição aberta, quando a rota nova já está na tela. */
+const EVENTO_FIM = "whim:pinta-fim";
+
+let andando = false;
+/** Fecha a espera da troca de rota, quando a rota nova já está na tela. */
 let rotaTrocou: (() => void) | null = null;
 
 /**
+ * Roda `fn` quando a transição de tinta terminar (ou já, se nenhuma estiver passando).
+ * Para trabalho pesado da página de destino (ex.: decodificar os quadros da arara),
+ * que não deve disputar a tela com a tinta. Devolve o cancelamento.
+ */
+export function depoisDaTransicao(fn: () => void): () => void {
+  if (!andando) {
+    fn();
+    return () => {};
+  }
+  window.addEventListener(EVENTO_FIM, fn, { once: true });
+  return () => window.removeEventListener(EVENTO_FIM, fn);
+}
+
+const quadro = () => new Promise((r) => requestAnimationFrame(r));
+
+/**
  * Transição "a página se pinta" (no layout), só ao ir para o Monte sua peça ou sair dele.
- * Usa a View Transitions API direto: o clique num link interno que entra ou sai do Monte
- * sua peça abre a transição, navega por baixo e a captura nova sai quando a rota troca.
- * (O <ViewTransition> do React esconde a captura da página inteira e só anima trechos
- * nomeados; a tinta precisa cobrir a tela toda.) A tinta está em transicao-pinta.css.
- * Sem a API, com movimento reduzido, clique com tecla ou link externo: navegação normal.
+ * Uma faixa de tinta (azul-marinho com a frente turquesa e pingos atrás) sobe pela tela só
+ * com transform, no compositor: cobre a página, a rota troca por baixo e ela termina de
+ * passar revelando a nova. O trabalho pesado da página nova pode esperar `depoisDaTransicao`.
+ * Movimento reduzido, clique com tecla ou link externo: navegação normal.
  */
 export function TransicaoPinta() {
   const router = useRouter();
   const pathname = usePathname();
+  const tintaRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     rotaTrocou?.();
@@ -27,6 +46,39 @@ export function TransicaoPinta() {
   }, [pathname]);
 
   useEffect(() => {
+    const passar = async (destino: string) => {
+      const tinta = tintaRef.current;
+      if (!tinta) return router.push(destino);
+      andando = true;
+      router.prefetch(destino);
+      tinta.dataset.ativa = "";
+      const opcoes = { fill: "forwards" } as const;
+      // 1) cobre a tela (a frente passa do topo)
+      await tinta.animate([{ transform: "translateY(0)" }, { transform: "translateY(-68.5%)" }], {
+        ...opcoes,
+        duration: 360,
+        easing: "cubic-bezier(.55,0,.8,.3)",
+      }).finished;
+      // 2) troca a rota por baixo e espera a página nova pintar (rota lenta: segue em 3 s)
+      await new Promise<void>((pronto) => {
+        rotaTrocou = pronto;
+        setTimeout(pronto, 3000);
+        router.push(destino);
+      });
+      await quadro();
+      await quadro();
+      // 3) termina de passar, revelando a página nova
+      await tinta.animate([{ transform: "translateY(-68.5%)" }, { transform: "translateY(-162%)" }], {
+        ...opcoes,
+        duration: 460,
+        easing: "cubic-bezier(.2,.75,.35,1)",
+      }).finished;
+      delete tinta.dataset.ativa;
+      tinta.getAnimations().forEach((a) => a.cancel());
+      andando = false;
+      window.dispatchEvent(new Event(EVENTO_FIM));
+    };
+
     // Captura: roda antes do onClick do Link, que respeita o preventDefault.
     const clique = (e: MouseEvent) => {
       if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
@@ -35,20 +87,13 @@ export function TransicaoPinta() {
       const url = new URL(a.href);
       if (url.origin !== location.origin) return;
       if ((location.pathname === ACAO.href) === (url.pathname === ACAO.href)) return;
-      if (!document.startViewTransition || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
       e.preventDefault();
-      document.startViewTransition(
-        () =>
-          new Promise<void>((pronto) => {
-            rotaTrocou = pronto;
-            setTimeout(pronto, 3000); // rota lenta não deixa a tela congelada
-            router.push(url.pathname + url.search + url.hash);
-          })
-      );
+      if (!andando) void passar(url.pathname + url.search + url.hash);
     };
     document.addEventListener("click", clique, true);
     return () => document.removeEventListener("click", clique, true);
   }, [router]);
 
-  return null;
+  return <div ref={tintaRef} aria-hidden className="pinta-tinta" />;
 }
