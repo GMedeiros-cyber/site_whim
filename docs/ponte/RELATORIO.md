@@ -330,3 +330,8 @@ Uma entrada por tarefa, sempre acrescentada no fim (nunca reescrever as anterior
 - Comandos: `npm run lint`, `npx tsc --noEmit`, `npm run build` (webpack, ok), `next start` + Playwright e screencast do CDP. Prints antes/depois guardados localmente.
 - Commit: `557fa5f`.
 - Pendente: aviso ao agente 1 sobre o arrasto da prévia com zoom (0,85×/0,75× da distância do mouse); texto do Monte sua peça fica com 11–13 px a 1920/2560, se ficar pequeno, decisão do Gabriel.
+### 2026-11-17 17:45 · Claude · depoimento real e foto das dúvidas
+- Depoimento da Patricia (Electrochemical) no "O que dizem de nós", texto exato, sem estrelas; 2 cartões vazios completam a linha.
+- Foto das dúvidas: `camiseta-whim-mesa.webp` (IA + logo oficial `whim-logo-branco.svg` aplicado com textura do tecido); grade `lg:items-stretch`, foto com a altura das perguntas.
+- Comandos: lint, tsc, `npm run build` (troca temporária da Poppins, desfeita); Playwright a 1280 e 390: sem rolagem lateral, console limpo.
+- Pendente: merge com as branches dos agentes 1, 2 e 3 desta rodada.
