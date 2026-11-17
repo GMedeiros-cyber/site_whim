@@ -5,7 +5,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { JsonLd, migalhas } from "@/lib/schema";
 import { MEDICAO, TEM_MEDICAO, metadados } from "@/lib/site";
-import { CONTATO, EMPRESA } from "@/lib/whim";
+import { CONTATO, EMPRESA, linkWhatsApp } from "@/lib/whim";
 
 export const metadata: Metadata = {
   ...metadados(
@@ -49,6 +49,16 @@ export default function Privacidade() {
       {CONTATO.email}
     </a>
   );
+  const whatsappSair = (
+    <a
+      href={linkWhatsApp("Olá, Whim! Quero sair da lista de novidades e ofertas.")}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={linkTexto}
+    >
+      WhatsApp<span className="sr-only"> (abre em nova aba)</span>
+    </a>
+  );
 
   return (
     <>
@@ -80,7 +90,9 @@ export default function Privacidade() {
               <ul>
                 <li>
                   <strong>No formulário de contato e no “Monte sua peça”</strong>, você informa nome,
-                  e-mail e telefone e marca a autorização. Guardamos esses dados, a sua mensagem ou o
+                  e-mail e telefone e marca a autorização para responder ao seu contato; a de
+                  novidades e ofertas é opcional e começa desmarcada. Guardamos esses dados, as
+                  autorizações que você marcou (com o texto de cada uma), a sua mensagem ou o
                   resumo do pedido, a página de onde enviou, a data e, se você chegou por um anúncio ou
                   link de campanha, a origem dessa visita (códigos como utm_source, gclid ou fbclid).
                   Não guardamos o seu IP. Em seguida, o site abre o WhatsApp com a mensagem pronta; o
@@ -98,9 +110,29 @@ export default function Privacidade() {
 
               <h2>Por que podemos usar esses dados</h2>
               <p>
-                Os dados do formulário e do “Monte sua peça” são guardados com o seu consentimento,
-                dado na caixa de autorização (art. 7º, inciso I, da LGPD), para responder ao seu
-                contato. Você pode retirar esse consentimento quando quiser.
+                Os dados do formulário e do “Monte sua peça” têm duas finalidades, cada uma com a sua
+                autorização (consentimento, art. 7º, inciso I, da LGPD):
+              </p>
+              <ul>
+                <li>
+                  <strong>Responder ao seu contato</strong> (obrigatória para enviar): a equipe da
+                  Whim usa nome, e-mail e telefone para responder, fazer o orçamento e acompanhar o
+                  pedido.
+                </li>
+                <li>
+                  <strong>Enviar novidades e ofertas</strong> (opcional, só para quem marcou “Quero
+                  receber novidades e ofertas da Whim.”): mandamos novidades e ofertas da Whim por
+                  WhatsApp e e-mail e podemos incluir o seu e-mail e telefone em públicos de anúncios
+                  do Google e da Meta (Instagram e Facebook), para mostrar anúncios da Whim a você.
+                  Nesses públicos, os dados vão de forma codificada (hash), e quem não marcou fica de
+                  fora.
+                </li>
+              </ul>
+              <p>
+                <strong>Para sair das novidades e ofertas</strong>, peça pelo {whatsappSair} ou pelo
+                e-mail {email}: tiramos você da lista e dos públicos de anúncios, sem mudar o
+                atendimento do seu pedido. Você também pode retirar a autorização de resposta quando
+                quiser.
               </p>
               <p>
                 Usamos os dados para os procedimentos antes do contrato, feitos a seu pedido (como
@@ -118,7 +150,9 @@ export default function Privacidade() {
               <h2>Com quem compartilhamos</h2>
               <p>
                 Só com quem é necessário para atender você (por exemplo, o WhatsApp, que é o canal
-                da conversa, e a Hostinger, que guarda os dados) e quando a lei exigir.
+                da conversa, e a Hostinger, que guarda os dados) e quando a lei exigir. Para quem
+                marcou a autorização de ofertas, também com o Google e a Meta, nos públicos de
+                anúncios, de forma codificada.
                 {TEM_MEDICAO && " Com o seu consentimento, também com as ferramentas listadas em Cookies."}{" "}
                 <strong>Não vendemos dados.</strong>
               </p>
@@ -177,8 +211,9 @@ export default function Privacidade() {
               {/* 24 meses: prazo proposto, a Whim precisa confirmar. */}
               <p>
                 Os dados do formulário e do “Monte sua peça” ficam guardados por até 24 meses depois
-                do envio, ou até você pedir para apagar, o que vier antes. Os demais, pelo tempo
-                necessário para o atendimento e para cumprir as obrigações legais e fiscais.
+                do envio, ou até você pedir para apagar, o que vier antes. A autorização de novidades
+                e ofertas vale até você pedir para sair, dentro desse mesmo prazo. Os demais, pelo
+                tempo necessário para o atendimento e para cumprir as obrigações legais e fiscais.
               </p>
               <p>
                 <strong>Para apagar</strong> os dados que você enviou pelo site, escreva para{" "}

@@ -518,7 +518,7 @@ export function PreviaPeca({
       onPointerUp={soltar}
       onPointerCancel={soltar}
       className={cn(
-        "group/painel relative mx-auto aspect-[358/530] w-full overflow-hidden rounded-[22px] border border-primary/10 bg-muted outline-none select-none focus-visible:ring-3 focus-visible:ring-ring/50 min-[601px]:aspect-[662/640] min-[601px]:max-w-[662px] min-[601px]:rounded-[26px] lg:max-w-none",
+        "group/painel relative mx-auto aspect-[358/530] w-full overflow-hidden rounded-[22px] border border-primary/10 bg-muted outline-none select-none focus-visible:ring-3 focus-visible:ring-ring/50 min-[601px]:aspect-[662/640] min-[601px]:max-w-[662px] min-[601px]:rounded-[26px] lg:aspect-[4/5] lg:max-h-[calc(100svh-8rem)] lg:min-h-[30rem] lg:max-w-none",
         editar && limpo ? "cursor-grab touch-none data-arrastando:cursor-grabbing" : "touch-pan-y",
         gira && "cursor-grab data-arrastando:cursor-grabbing"
       )}
@@ -527,7 +527,8 @@ export function PreviaPeca({
         ref={palcoRef}
         className="absolute inset-0 origin-top-left bg-muted group-data-arrastando/painel:transition-none motion-safe:transition-transform motion-safe:duration-300"
       >
-        {/* Cano a 10% do topo; a curva do gancho (42/640 do quadro) cai no eixo dele. */}
+        {/* A curva do gancho (42/640 do quadro) cai no eixo do cano; no PC o eixo fica preso a ela
+            (12,08% do topo), em qualquer proporção da prévia. */}
         <Image
           src={CANO.arquivo}
           alt=""
@@ -535,7 +536,7 @@ export function PreviaPeca({
           height={CANO.altura}
           sizes="(min-width: 601px) 380px, 55vw"
           className={cn(
-            "absolute top-[10%] left-[22.5%] h-auto w-[55%] mix-blend-multiply transition-opacity min-[601px]:left-[21.5%] min-[601px]:w-[57%]",
+            "absolute top-[10%] left-[22.5%] h-auto w-[55%] mix-blend-multiply transition-opacity min-[601px]:top-[12.08%] min-[601px]:left-[21.5%] min-[601px]:w-[57%] min-[601px]:-translate-y-1/2",
             limpo && "opacity-0"
           )}
         />

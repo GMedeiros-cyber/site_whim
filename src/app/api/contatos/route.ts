@@ -26,8 +26,27 @@ const CRIAR_TABELA = `CREATE TABLE IF NOT EXISTS contatos (
   fbclid VARCHAR(500) NULL,
   consentimento TINYINT(1) NOT NULL,
   consentimento_texto VARCHAR(500) NOT NULL,
+  ofertas TINYINT(1) NOT NULL DEFAULT 0,
+  ofertas_texto VARCHAR(500) NULL,
   INDEX (criado_em)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`;
+
+// Colunas que vieram depois da 1ª versão da tabela: entram por ALTER TABLE onde ela já existe.
+// (O MySQL não tem ADD COLUMN IF NOT EXISTS; por isso a consulta antes.)
+const COLUNAS_NOVAS: [string, string][] = [
+  ["ofertas", "ofertas TINYINT(1) NOT NULL DEFAULT 0 AFTER consentimento_texto"],
+  ["ofertas_texto", "ofertas_texto VARCHAR(500) NULL AFTER ofertas"],
+];
+
+async function prepararTabela(db: mysql.Pool) {
+  await db.query(CRIAR_TABELA);
+  const [colunas] = await db.query<mysql.RowDataPacket[]>(
+    "SELECT COLUMN_NAME AS nome FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'contatos'"
+  );
+  const tem = new Set(colunas.map((c) => c.nome));
+  const faltam = COLUNAS_NOVAS.filter(([nome]) => !tem.has(nome)).map(([, def]) => `ADD COLUMN ${def}`);
+  if (faltam.length) await db.query(`ALTER TABLE contatos ${faltam.join(", ")}`);
+}
 
 let pool: mysql.Pool | undefined;
 let tabela: Promise<unknown> | undefined;
@@ -49,7 +68,7 @@ function banco() {
     // criado_em no horário de Brasília (sem horário de verão desde 2019), para ler no phpMyAdmin.
     pool.on("connection", (c) => c.query("SET time_zone = '-03:00'"));
   }
-  tabela ??= pool.query(CRIAR_TABELA).catch((e) => {
+  tabela ??= prepararTabela(pool).catch((e) => {
     tabela = undefined; // tenta de novo na próxima chamada
     throw e;
   });
@@ -93,6 +112,11 @@ function validar(corpo: Record<string, unknown>): Linha | string {
   if (pagina && (!pagina.startsWith("/") || pagina.length > 300)) return "Página inválida.";
   if (corpo.consentimento !== true || consentimentoTexto.length < 10 || consentimentoTexto.length > 500)
     return "É preciso autorizar o uso dos dados.";
+  // Ofertas: opcional; só vale marcada de verdade e com o texto que a pessoa viu.
+  const ofertas = corpo.ofertas === true;
+  const ofertasTexto = texto(corpo.ofertas_texto);
+  if (corpo.ofertas !== undefined && typeof corpo.ofertas !== "boolean") return "Autorização de ofertas inválida.";
+  if (ofertas && (ofertasTexto.length < 10 || ofertasTexto.length > 500)) return "Falta o texto da autorização de ofertas.";
 
   const linha: Linha = {
     origem,
@@ -104,6 +128,8 @@ function validar(corpo: Record<string, unknown>): Linha | string {
     pagina: pagina || null,
     consentimento: 1,
     consentimento_texto: consentimentoTexto,
+    ofertas: ofertas ? 1 : 0,
+    ofertas_texto: ofertas ? ofertasTexto : null,
   };
   for (const campo of RASTREIO) linha[campo] = texto(corpo[campo]).slice(0, campo.endsWith("clid") ? 500 : 200) || null;
   return linha;

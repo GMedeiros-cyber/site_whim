@@ -12,6 +12,10 @@ export type Contato = {
   consentimento: true;
   /** O texto exato da caixa que a pessoa marcou. */
   consentimento_texto: string;
+  /** Caixa opcional "Quero receber novidades e ofertas da Whim." (desmarcada por padrão). */
+  ofertas?: boolean;
+  /** O texto exato dessa caixa; obrigatório quando `ofertas` é true. */
+  ofertas_texto?: string;
   /** Valor do campo isca (input escondido name="site"); pessoas deixam vazio. */
   site?: string;
 };
