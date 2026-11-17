@@ -19,7 +19,7 @@ Fonte: respostas da própria Whim. Senhas e logins do PDF **não** ficam no repo
 - **Preço no site:** não, só orçamento.
 - **Seções pedidas:** Início, Sobre a Whim, Técnicas, Portfólio e clientes, Depoimentos, Contato.
 - **Dúvidas mais comuns:** quantidade e tipo de estampa.
-- **WhatsApp dos orçamentos:** 11 94544-8802, atendido pela Caroline.
+- **WhatsApp dos orçamentos:** 11 94544-8802, atendido pela equipe (no site, nunca citar nome pessoal).
 - **Endereço:** Av. Brigadeiro Faria Lima, 110, 2º andar, **Bom Clima**, Guarulhos/SP, CEP 07130-000 (decisão do Gabriel em 16/11; o contrato dizia Cocaia).
 - **CNPJ:** 35.356.367/0001-27. **E-mail:** vendas@whimconfeccao.com.br.
 - **Linha cristã no site:** não.
@@ -30,6 +30,10 @@ Fonte: respostas da própria Whim. Senhas e logins do PDF **não** ficam no repo
 - **Épocas de mais procura:** volta às aulas, fim de ano, eventos e campanhas de empresa.
 
 ## Ainda falta
+
+- Cores de camiseta que a Whim tem disponíveis (para a vitrine do Monte sua peça).
+- Foto original (sem compressão do WhatsApp) da mesa com as camisetas marrons, para a hero em qualidade máxima.
+- Prazo de guarda dos contatos salvos pelo site (proposta: 24 meses).
 
 - Dias de funcionamento (o horário 6h às 18h veio antes; não sabemos os dias).
 - Domínio exato do site (provavelmente whimconfeccao.com.br, pelo e-mail).
