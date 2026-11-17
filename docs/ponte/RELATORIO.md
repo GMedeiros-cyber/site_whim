@@ -309,3 +309,11 @@ Uma entrada por tarefa, sempre acrescentada no fim (nunca reescrever as anterior
 - Conferido: lint e tsc ok; build webpack ok (Poppins trocada só localmente); Playwright 390/1280: 4 páginas sem rolagem lateral e console limpo, home → Monte sua peça → voltar sem erro, barra visível na hora, some ao descer e volta ao subir; capturas das seções novas.
 - Commit: `5e8aac1` (main, um deploy só).
 - Pendente: medir PageSpeed no site publicado.
+
+### 2026-11-17 18:27 · Agente 2 · Ajustes da home de 17/11 à noite (Claude Code)
+- Feito: logo da hero no canto de cima (PC, na grade, abaixo da barra; no celular sai e nem é baixado); telas grandes por `zoom` na página inteira (0,85 a partir de 1800 px, 0,75 a partir de 2400 px; hero e faixa de tinta dividem `vh` por `--zoom`; canvas do "Vista" converte as medidas); técnicas e clientes com `bg-muted/60` e sombra a 20%.
+- Onda: gravei a tela quadro a quadro (1280/1920, CPU 1× e 4×) e medi a nitidez da borda. Causa: o `scaleY` no compositor rasterizava a onda pequena e só esticava a imagem (a 1920, 37 de 96 quadros borrados; só deslizar ficava nítido). Agora cresce pela altura do SVG e corre por transform: 0 borrados nas 4 combinações. O atalho `animation` com 2 animações sai do build com duração 0s; usei as propriedades separadas.
+- Medido: 1920 = 0,85× e 2560 = 0,75× do de antes em barra, textos, títulos, larguras, "Vista" e rodapé; 1440 igual. Playwright no build de produção (390/1280/1440/1920/2560 e movimento reduzido): sticky, IntersectionObserver, canvas do "Vista" alinhado, arara (passar o mouse e clicar), tinta entre páginas cobrindo a tela, abertura, sem rolagem lateral, console limpo.
+- Comandos: `npm run lint`, `npx tsc --noEmit`, `npm run build` (webpack, ok), `next start` + Playwright e screencast do CDP. Prints antes/depois guardados localmente.
+- Commit: `557fa5f`.
+- Pendente: aviso ao agente 1 sobre o arrasto da prévia com zoom (0,85×/0,75× da distância do mouse); texto do Monte sua peça fica com 11–13 px a 1920/2560, se ficar pequeno, decisão do Gabriel.
