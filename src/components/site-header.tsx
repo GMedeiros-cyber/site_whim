@@ -40,7 +40,7 @@ export function SiteHeader({
     <header className="pointer-events-none fixed inset-x-3 top-[calc(env(safe-area-inset-top)+0.75rem)] z-50 flex justify-center transition-[opacity,translate,visibility] duration-500 ease-out in-data-intro:invisible in-data-intro:-translate-y-3 in-data-intro:opacity-0 motion-reduce:transition-none min-[601px]:top-4 min-[1800px]:[zoom:1.2] min-[2400px]:[zoom:1.5]">
       <nav
         aria-label="Navegação principal"
-        className="pointer-events-auto flex w-full items-center justify-between gap-1 rounded-full border border-primary/10 bg-background/60 p-1.5 shadow-[0_10px_40px_-18px] shadow-primary/40 backdrop-blur-xl backdrop-saturate-150 min-[601px]:w-auto min-[601px]:gap-1.5 min-[601px]:p-2"
+        className="pointer-events-auto flex w-full items-center justify-between gap-1 rounded-full border border-primary/10 bg-background/90 p-1.5 shadow-[0_10px_40px_-18px] shadow-primary/40 backdrop-blur-xl backdrop-saturate-150 min-[601px]:w-auto min-[601px]:gap-1.5 min-[601px]:p-2"
       >
         <LinkNav
           href="/"
