@@ -138,6 +138,28 @@
   --sidebar-ring: #31c4ea;
 }
 
+/*
+ * Telas grandes: a página inteira (textos, espaços, imagens, larguras, barra, rodapé e
+ * Monte sua peça) fica ~15% menor a partir de 1800 px (24" Full HD) e ~25% a partir de
+ * 2400 px (27" 2K), por zoom. Até 1799 px nada muda. O zoom também encolhe vh/svh/lvh:
+ * onde a medida tem de ser a da tela, divida por --zoom (ex.: calc(100svh / var(--zoom))).
+ * getBoundingClientRect e clientX já vêm em pixels da tela; px do CSS = esses ÷ zoom.
+ */
+:root {
+  --zoom: 1;
+  zoom: var(--zoom);
+}
+@media (min-width: 1800px) {
+  :root {
+    --zoom: 0.85;
+  }
+}
+@media (min-width: 2400px) {
+  :root {
+    --zoom: 0.75;
+  }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

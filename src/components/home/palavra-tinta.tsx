@@ -207,7 +207,11 @@ async function prepararTinta(texto: HTMLElement, canvas: HTMLCanvasElement) {
 
   const caixa = texto.getBoundingClientRect();
   const cs = getComputedStyle(texto);
-  const pad = Math.ceil(parseFloat(cs.fontSize) * 0.1); // folga para o antisserrilhado
+  // Medidas em pixels da tela; com o zoom das telas grandes (globals.css), o CSS do
+  // canvas e o corpo da fonte ficam em px do CSS = pixels da tela ÷ zoom.
+  const zoom = caixa.width / texto.offsetWidth || 1;
+  const corpo = parseFloat(cs.fontSize) * zoom;
+  const pad = Math.ceil(corpo * 0.1); // folga para o antisserrilhado
   // Canvas em pixel inteiro da tela, para o navegador não arredondar a posição.
   const x0 = Math.floor(caixa.left) - pad;
   const y0 = Math.floor(caixa.top) - pad;
@@ -215,10 +219,10 @@ async function prepararTinta(texto: HTMLElement, canvas: HTMLCanvasElement) {
   const h = Math.ceil(caixa.bottom) + pad - y0;
   const pai = (canvas.offsetParent ?? texto).getBoundingClientRect();
   Object.assign(canvas.style, {
-    left: `${x0 - pai.left}px`,
-    top: `${y0 - pai.top}px`,
-    width: `${w}px`,
-    height: `${h}px`,
+    left: `${(x0 - pai.left) / zoom}px`,
+    top: `${(y0 - pai.top) / zoom}px`,
+    width: `${w / zoom}px`,
+    height: `${h / zoom}px`,
   });
   canvas.width = w;
   canvas.height = h;
@@ -229,7 +233,7 @@ async function prepararTinta(texto: HTMLElement, canvas: HTMLCanvasElement) {
   mascara.height = h;
   const ctx = mascara.getContext("2d");
   if (!ctx) return null;
-  ctx.font = `${cs.fontStyle} ${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+  ctx.font = `${cs.fontStyle} ${cs.fontWeight} ${corpo}px ${cs.fontFamily}`;
   const faixa = document.createRange();
   for (let i = 0; i < no.length; i++) {
     faixa.setStart(no, i);

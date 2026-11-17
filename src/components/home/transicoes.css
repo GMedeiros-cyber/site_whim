@@ -6,16 +6,26 @@
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
     /* Convite: a onda de tinta corre e cresce e os pingos respingam enquanto
-       ela entra na tela; volta ao rolar para cima. */
+       ela entra na tela; volta ao rolar para cima. Crescer muda a altura (o SVG é
+       redesenhado no tamanho de cada quadro), não scaleY: com escala, o navegador
+       rasterizava a onda pequena no começo e só esticava essa imagem, e a borda borrava
+       até o último quadro. Correr fica no transform (compositor, nítido). A linha do tempo
+       é a da caixa, que não muda de tamanho. */
+    .home-onda-caixa {
+      view-timeline: --home-onda;
+    }
     .home-onda {
-      transform-origin: 50% 100%;
-      animation: home-onda linear both;
-      animation-timeline: view();
+      /* Propriedades separadas: o build expande o atalho com 2 animações com duração 0s,
+         e com 0s a animação presa à rolagem pula direto para o fim. */
+      animation-name: home-onda-corre, home-onda-cresce;
+      animation-timing-function: linear;
+      animation-fill-mode: both;
+      animation-timeline: --home-onda;
       animation-range: entry 0% cover 45%;
     }
     .home-pingo {
       animation: home-pingo linear both;
-      animation-timeline: view();
+      animation-timeline: --home-onda;
       animation-range: entry var(--atraso, 0%) cover 45%;
     }
 
@@ -90,16 +100,24 @@
   }
 }
 
-@keyframes home-onda {
+@keyframes home-onda-corre {
   from {
-    transform: translateX(33.333%) scaleY(0.35);
+    transform: translateX(33.333%);
+  }
+}
+
+@keyframes home-onda-cresce {
+  from {
+    height: 35%;
   }
 }
 
 @keyframes home-pingo {
   from {
     opacity: 0;
-    transform: translateY(16px) scale(0.2);
+    transform: translateY(16px);
+    width: calc(var(--d) * 0.2);
+    height: calc(var(--d) * 0.2);
   }
 }
 
@@ -132,9 +150,9 @@
   }
 }
 
-/* Telas grandes (27" Full HD e 2K): a partir de 1800 px a home cresce por igual até
-   os 1180 px do layout de PC virarem 1520 px, a largura do rodapé e do Monte sua peça.
-   Fica fora o "Vista", que a tinta mede na tela e tem tamanho próprio. */
+/* Telas grandes: a partir de 1800 px a home cresce por igual até os 1180 px do layout
+   de PC virarem 1520 px, a largura do rodapé e do Monte sua peça (o zoom da página
+   inteira, em globals.css, aplica-se por cima). Fica fora o "Vista", com tamanho próprio. */
 @media (min-width: 1800px) {
   .home-grande {
     zoom: 1.2881; /* 1520 / 1180 */
