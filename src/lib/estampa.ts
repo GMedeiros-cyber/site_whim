@@ -57,11 +57,18 @@ export function preparar(img: Imagem, manterFundo: boolean, tecnica: Tecnica): A
   const s = Math.min(1, LADO_MAX / Math.max(iw, ih));
   let ctx = tela(iw * s, ih * s);
   ctx.drawImage(img, 0, 0, ctx.canvas.width, ctx.canvas.height);
-  const dados = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
-  const fundo = detectarFundo(dados);
+  let dados = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
+  let fundo = detectarFundo(dados);
   if (fundo && !manterFundo) {
-    tirarFundo(dados, fundo);
-    ctx.putImageData(dados, 0, 0);
+    const sem = new ImageData(new Uint8ClampedArray(dados.data), dados.width, dados.height);
+    tirarFundo(sem, fundo);
+    // Arte toda de uma cor (um quadrado cheio): tirar o "fundo" apagaria a arte inteira. Fica com ele.
+    let opacos = 0;
+    for (let i = 3; i < sem.data.length; i += 4) if (sem.data[i] > 8) opacos++;
+    if (opacos > 0.002 * sem.width * sem.height) {
+      dados = sem;
+      ctx.putImageData(sem, 0, 0);
+    } else fundo = null;
   }
   ctx = cortarMargens(ctx, dados);
   let paleta: number[][] | null = null;
@@ -362,6 +369,8 @@ export function comporEstampa(ctx: OffscreenCanvasRenderingContext2D, peca: Imag
     const L = new Float32Array(rw * rh);
     for (let p = 0; p < rw * rh; p++) L[p] = 0.2126 * B[p * 4] + 0.7152 * B[p * 4 + 1] + 0.0722 * B[p * 4 + 2];
     const Lb = desfocar(L, rw, rh, r);
+    // O deslocamento vem de um mapa mais liso: nas dobras fortes a borda da arte não serrilha.
+    const Ld = desfocar(Lb, rw, rh, r);
 
     const saida = camada.createImageData(rw, rh);
     const o = saida.data;
@@ -375,7 +384,7 @@ export function comporEstampa(ctx: OffscreenCanvasRenderingContext2D, peca: Imag
         const m = (tecido[p] = limitar((B[p * 4 + 3] / 255 - 0.35) / 0.3, 0, 1));
         if (m === 0) continue;
         // 3. Desloca a amostra pelo gradiente (por px do quadro), bilinear pré-multiplicado.
-        const gx = ((Lb[p + 1] - Lb[p - 1]) / 2) * e, gy = ((Lb[p + rw] - Lb[p - rw]) / 2) * e;
+        const gx = ((Ld[p + 1] - Ld[p - 1]) / 2) * e, gy = ((Ld[p + rw] - Ld[p - rw]) / 2) * e;
         const sx = xx + K * limitar(gx / G_REF, -1, 1), sy = yy + K * limitar(gy / G_REF, -1, 1);
         const ix = Math.floor(sx), iy = Math.floor(sy), fx = sx - ix, fy = sy - iy;
         let cr = 0, cg = 0, cb = 0, a = 0;
@@ -393,7 +402,7 @@ export function comporEstampa(ctx: OffscreenCanvasRenderingContext2D, peca: Imag
         cr /= a;
         cg /= a;
         cb /= a;
-        if (t === "Silk") a = a > 127 ? 255 : 0; // alfa duro
+        if (t === "Silk") a = limitar((a - 96) * 4, 0, 255); // alfa quase duro (chapado), com 1 px de transição
         if (a === 0) continue;
         // Sombra das dobras + trama do tecido por dentro da tinta.
         const lb = Lb[p] / lref;

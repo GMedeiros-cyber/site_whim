@@ -8,6 +8,7 @@ import { MEDIDAS, type Cor, type Modelo } from "@/components/arara";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { areaDe, type Area, type InfoArte, type Lado, type Tecnica } from "@/lib/estampa";
+import { carregar } from "@/lib/estampa-cliente";
 import { cn } from "@/lib/utils";
 
 // Posições do nicho (README-estampa-2.md, 3); as chaves são as de manifest.pecas[].areas[lado].
@@ -29,7 +30,7 @@ export const GRUPOS: [string, string[]][] = [
   ["Mangas", ["manga-esquerda", "manga-direita"]],
 ];
 
-export type Arte = { arquivo: File; url: string }; // URL local (blob:), só no navegador
+export type Arte = { arquivo: File; url: string; pixels?: [number, number] }; // URL local (blob:), só no navegador; pixels: imagens não vetoriais
 export type Posicao = { chave: string; arte?: Arte; manterFundo?: boolean };
 
 export const medidaDe = (chave: string) => {
@@ -135,7 +136,8 @@ function MapaLado({ lado, cor, modelo, numeros, onAlternar }: Escolha & { lado: 
             key={k}
             type="button"
             aria-pressed={n !== undefined}
-            aria-label={k.startsWith("manga") ? `${NOME[k]}, vista ${lado === "frente" ? "de frente" : "das costas"}` : NOME[k]}
+            // Com o número que aparece na área (o nome acessível contém o que se vê).
+            aria-label={`${n !== undefined ? `${n}. ` : ""}${k.startsWith("manga") ? `${NOME[k]}, vista ${lado === "frente" ? "de frente" : "das costas"}` : NOME[k]}`}
             onClick={() => onAlternar(k, lado)}
             className={cn(
               "pointer-events-none absolute rounded-[3px] outline-none focus-visible:ring-3 focus-visible:ring-ring",
@@ -203,6 +205,8 @@ export function NomeArquivo({ nome, className }: { nome: string; className?: str
 
 const ARTE_TIPOS = ["image/png", "image/jpeg", "image/webp", "image/svg+xml"];
 const ARTE_MAX = 10 * 1024 * 1024;
+// Abaixo disso (lado maior) a imagem não aguenta impressão nem num peito de 10 cm (~150 dpi).
+const PIXELS_MIN = 600;
 const PEQUENAS = ["peito-esquerdo", "peito-direito", "nuca", "manga-esquerda", "manga-direita"];
 
 /** Uma posição marcada: número, nome, medida, anexo próprio, "usar a mesma arte de" e dicas. */
@@ -238,8 +242,18 @@ export function LinhaPosicao({
     if (!f) return;
     if (!ARTE_TIPOS.includes(f.type)) return setErro("Use PNG, JPG, WebP ou SVG.");
     if (f.size > ARTE_MAX) return setErro("A arte passa de 10 MB. Mande o arquivo direto pelo WhatsApp.");
-    setErro("");
-    onArte({ arquivo: f, url: URL.createObjectURL(f) });
+    // Só entra se abrir como imagem (um .png corrompido não fica "anexado" mostrando o marcador).
+    const url = URL.createObjectURL(f);
+    carregar(url).then(
+      (img) => {
+        setErro("");
+        onArte({ arquivo: f, url, pixels: f.type === "image/svg+xml" ? undefined : [img.naturalWidth, img.naturalHeight] });
+      },
+      () => {
+        URL.revokeObjectURL(url);
+        setErro("Não deu para abrir essa imagem. Confira o arquivo ou mande direto pelo WhatsApp.");
+      }
+    );
   }
   const input = (
     <input
@@ -352,6 +366,12 @@ export function LinhaPosicao({
           </div>
         )}
 
+        {arte?.pixels && Math.max(...arte.pixels) < PIXELS_MIN && (
+          <p role="status" className="mt-2 rounded-[12px] bg-muted px-3 py-2.5 text-[13px]">
+            Imagem pequena ({arte.pixels[0]} × {arte.pixels[1]} px): serve para a prévia. Para imprimir, mande o arquivo original (ou em
+            vetor) pelo WhatsApp.
+          </p>
+        )}
         {manga && <p className="mt-2 text-[13px] text-muted-foreground">Na manga cabe um símbolo ou logo pequeno. Texto longo fica ilegível.</p>}
         {manga && arte && info && info.proporcao > 2.5 && (
           <p role="status" className="mt-1 text-[13px] font-medium">
