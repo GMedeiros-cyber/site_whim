@@ -243,3 +243,9 @@ Uma entrada por tarefa, sempre acrescentada no fim (nunca reescrever as anterior
 - Conferido: lint ok; build webpack ok; Playwright 390/1280 nas 4 páginas igual a antes (estilos, logos, gotas, WhatsApp, console limpo). Binários nativos que ficam: tailwind/lightningcss pedem GLIBC 2.14 e o sharp 2.28, compatíveis.
 - Commit: `1b8cc56`.
 - Pendente: implantar de novo na Hostinger e conferir o log; regra para todos: não voltar para `.ts` nem usar `turbopack` no config.
+
+### 2026-11-17 01:20 · Ajustes rápidos, banco dos contatos e pedidos de 17/11 (Claude, outra conta)
+- Feito: avaliações escondidas, sem nome pessoal, WhatsApp parado, favicon branco, logo Aurora (alimentos), hero e Quem somos sem "oficina própria"; fotos da hero preparadas; banco `u305516480_contatos` + variáveis DB_* na Hostinger; protótipo do resumo horizontal no canvas; pedidos para os agentes 1, 2 e 3.
+- Conferido: lint, tsc e build webpack ok antes do push (`171a1bc`).
+- Commit: `37dd59c`.
+- Pendente: os três pedidos de 17/11; Search Console; cores e foto original com a Whim.
