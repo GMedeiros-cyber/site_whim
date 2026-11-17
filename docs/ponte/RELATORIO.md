@@ -288,3 +288,10 @@ Uma entrada por tarefa, sempre acrescentada no fim (nunca reescrever as anterior
 - Comandos: `git switch -c agente-3/ofertas-horario origin/main`, `npm install`, `npm run lint` (ok), `npm run build` (webpack, ok), `next start` + Puppeteer.
 - Commit: `cfad075`.
 - Pendente: a Whim confirmar os 24 meses; rótulo de conversão do Google Ads; quem for subir públicos de anúncios usa só as linhas com `ofertas = 1`.
+
+### Agente 1 · 2026-11-17 15:55 · Monte sua peça, pedidos da tarde de 17/11 (Claude Code)
+- Feito (`agente-1/ajustes-17-11-b`): resumo de volta ao passo 5 como antes de 17/11 (mensagem, ficha, passos, prazo), com "Seus dados" + validação e o botão "Enviar pelo WhatsApp" no fim; saiu o resumo horizontal. PC: prévia 4/5 até a altura da tela e parada ao rolar a ficha (sem vão embaixo da vitrine); eixo do cano preso à curva do gancho. Estampa: Frente | Costas embaixo de cada camiseta, linha vertical entre elas, Mangas embaixo nas duas colunas, sem linhas horizontais.
+- Juntei `origin/agente-3/ofertas-horario` (conflito só no import do `form-contato.tsx`); a caixa de ofertas já vinha no `Autorizacao`. `focarErro` compartilhado pelos dois formulários; rótulo no campo de arquivo da arte (axe).
+- Comandos: `git switch -c agente-1/ajustes-17-11-b origin/main`, `npm install`, `git merge origin/agente-3/ofertas-horario`, `npm run lint` (ok), `npm run build` (webpack, ok); Playwright no build de produção a 390, 1280, 1920 e 2560 px: 0 falhas (inclui axe, envio interceptado com `ofertas` false/true e os 3 pontos do Lighthouse).
+- Commits: `82e0515` e merge `af26989`. `contato-avaliacoes.tsx` não foi tocado.
+- Pendente: nada meu. O Gabriel decide se a prévia mais alta no PC fica (fácil voltar para a quase quadrada).
