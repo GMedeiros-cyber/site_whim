@@ -1,0 +1,354 @@
+# Passo Peça
+- heading "Escolha na arara e personalize." [level=1]:
+  - text: Escolha na arara
+  - emphasis: e personalize.
+- list "Arara de modelos":
+  - listitem:
+    - button "Camiseta" [pressed]
+  - listitem:
+    - button "Polo"
+  - listitem:
+    - button "Regata"
+  - listitem:
+    - button "Baby look"
+  - listitem:
+    - button "Moletom canguru"
+- group "Prévia da peça. Use as setas para girar":
+  - img "Camiseta na cor Azul-marinho"
+  - text: Prévia
+  - paragraph: Camiseta Azul-marinho
+  - group "Cor do tecido":
+    - button "Branco"
+    - button "Azul-marinho" [pressed]
+    - button "Turquesa"
+    - button "Mescla"
+    - button "Preto"
+- heading "Seu pedido" [level=2]
+- paragraph: Monte em 5 passos e receba o orçamento pelo WhatsApp.
+- list "Passos do pedido":
+  - listitem:
+    - text: "1"
+    - paragraph: Peça
+    - paragraph: Também dá para escolher direto na arara.
+    - group "Peça":
+      - button "Camiseta" [pressed]
+      - button "Polo"
+      - button "Regata"
+      - button "Baby look"
+      - button "Moletom canguru"
+    - text: Tecido
+    - combobox "Tecido":
+      - option "Não sei, me indiquem" [selected]
+      - option "Meia malha penteada 100% algodão premium"
+      - option "Malha fria PV antipilling"
+      - option "Malha mescla PA"
+      - option "Malha piquet PA"
+      - option "Moletom 3 cabos"
+      - option "Dry fit 100% poliéster"
+      - option "Dry fit 100% poliamida"
+    - button "Continuar"
+  - listitem:
+    - text: "2"
+    - paragraph: Cor · Na vitrine da prévia
+  - listitem:
+    - text: "3"
+    - paragraph: Estampa · Posições, artes e técnica
+  - listitem:
+    - text: "4"
+    - paragraph: Quantidade · A partir de 50 peças
+  - listitem:
+    - text: "5"
+    - paragraph: Resumo · Seus dados, ficha e WhatsApp
+
+# Passo Estampa
+- heading "Escolha na arara e personalize." [level=1]:
+  - text: Escolha na arara
+  - emphasis: e personalize.
+- list "Arara de modelos":
+  - listitem:
+    - button "Camiseta" [pressed]
+  - listitem:
+    - button "Polo"
+  - listitem:
+    - button "Regata"
+  - listitem:
+    - button "Baby look"
+  - listitem:
+    - button "Moletom canguru"
+- group "Prévia da peça":
+  - img "Camiseta na cor Azul-marinho, frente, com 1 estampa"
+  - text: Prévia
+  - group "Lado da prévia":
+    - button "Frente" [pressed]
+    - button "Costas"
+  - button "Aproximar"
+  - group:
+    - slider "Zoom": "1.9"
+  - button "Afastar"
+  - paragraph: Silk · Cores chapadas, toque macio. Cada cor é uma tela.
+- heading "Seu pedido" [level=2]
+- paragraph: Monte em 5 passos e receba o orçamento pelo WhatsApp.
+- list "Passos do pedido":
+  - listitem:
+    - img "feito"
+    - paragraph: Peça
+    - paragraph: Camiseta · Não sei, me indiquem
+    - button "Alterar peça": Alterar
+  - listitem:
+    - img "feito"
+    - paragraph: Cor
+    - paragraph: Azul-marinho
+    - button "Alterar cor": Alterar
+  - listitem:
+    - text: "3"
+    - paragraph: Estampa
+    - paragraph: "Clique onde vai a estampa. Dá para marcar mais de uma posição. Tamanho máximo da estampa: A3."
+    - status: Centro do peito não combina com Peito esquerdo, que saiu.
+    - button "Frente inteira"
+    - button "Centro do peito" [pressed]
+    - button "Peito esquerdo"
+    - button "Peito direito"
+    - button "Manga direita, vista de frente"
+    - button "Manga esquerda, vista de frente"
+    - group "Frente":
+      - text: Frente
+      - checkbox "Peito esquerdo"
+      - text: Peito esquerdo
+      - checkbox "Peito direito"
+      - text: Peito direito
+      - checkbox "Centro do peito" [checked]
+      - text: Centro do peito
+      - checkbox "Frente inteira"
+      - text: Frente inteira
+    - button "Costas inteira"
+    - button "Costas em cima"
+    - button "Nuca"
+    - button "Manga direita, vista das costas"
+    - button "Manga esquerda, vista das costas"
+    - group "Costas":
+      - text: Costas
+      - checkbox "Nuca"
+      - text: Nuca
+      - checkbox "Costas em cima"
+      - text: Costas em cima
+      - checkbox "Costas inteira"
+      - text: Costas inteira
+    - group "Mangas":
+      - text: Mangas
+      - checkbox "Manga esquerda"
+      - text: Manga esquerda
+      - checkbox "Manga direita"
+      - text: Manga direita
+    - list "Posições marcadas":
+      - listitem:
+        - paragraph: 1. Centro do peito
+        - paragraph: até ≈ 25 × 12 cm
+        - text: Arraste a arte ou clique para escolher de centro do peito
+        - button "Arte de centro do peito"
+    - paragraph: Medidas de referência. A Whim confirma no orçamento.
+    - paragraph: A arte aqui é só para a prévia. Na hora de enviar o pedido pelo WhatsApp, anexe o arquivo na conversa.
+    - paragraph: Técnica
+    - group "Técnica":
+      - button "Silk" [pressed]
+      - button "DTF"
+      - button "Bordado"
+      - button "Ainda não sei"
+    - paragraph: Cores chapadas, toque macio. Cada cor é uma tela.
+    - button "Voltar"
+    - button "Continuar"
+  - listitem:
+    - text: "4"
+    - paragraph: Quantidade · A partir de 50 peças
+  - listitem:
+    - text: "5"
+    - paragraph: Resumo · Seus dados, ficha e WhatsApp
+
+# Passo Quantidade
+- heading "Escolha na arara e personalize." [level=1]:
+  - text: Escolha na arara
+  - emphasis: e personalize.
+- list "Arara de modelos":
+  - listitem:
+    - button "Camiseta" [pressed]
+  - listitem:
+    - button "Polo"
+  - listitem:
+    - button "Regata"
+  - listitem:
+    - button "Baby look"
+  - listitem:
+    - button "Moletom canguru"
+- group "Prévia da peça. Use as setas para girar":
+  - img "Camiseta na cor Azul-marinho"
+  - text: Prévia
+  - paragraph: Camiseta Azul-marinho
+  - group "Cor do tecido":
+    - button "Branco"
+    - button "Azul-marinho" [pressed]
+    - button "Turquesa"
+    - button "Mescla"
+    - button "Preto"
+- heading "Seu pedido" [level=2]
+- paragraph: Monte em 5 passos e receba o orçamento pelo WhatsApp.
+- list "Passos do pedido":
+  - listitem:
+    - img "feito"
+    - paragraph: Peça
+    - paragraph: Camiseta · Não sei, me indiquem
+    - button "Alterar peça": Alterar
+  - listitem:
+    - img "feito"
+    - paragraph: Cor
+    - paragraph: Azul-marinho
+    - button "Alterar cor": Alterar
+  - listitem:
+    - img "feito"
+    - paragraph: Estampa
+    - paragraph: A definir · Silk
+    - button "Alterar estampa": Alterar
+  - listitem:
+    - text: "4"
+    - paragraph: Quantidade
+    - paragraph: Pedido mínimo de 50 peças. Prazo de produção de 20 a 30 dias, conforme quantidade e modelo.
+    - group "Grupo de tamanhos":
+      - button "Adulto" [pressed]
+      - button "Infantil"
+    - list "Tamanhos adulto":
+      - listitem:
+        - paragraph: PP
+        - button "Menos PP" [disabled]
+        - textbox "Quantidade PP": "0"
+        - button "Mais PP"
+      - listitem:
+        - paragraph: P
+        - button "Menos P" [disabled]
+        - textbox "Quantidade P": "0"
+        - button "Mais P"
+      - listitem:
+        - paragraph: M
+        - button "Menos M" [disabled]
+        - textbox "Quantidade M": "0"
+        - button "Mais M"
+      - listitem:
+        - paragraph: G
+        - button "Menos G" [disabled]
+        - textbox "Quantidade G": "0"
+        - button "Mais G"
+      - listitem:
+        - paragraph: GG
+        - button "Menos GG" [disabled]
+        - textbox "Quantidade GG": "0"
+        - button "Mais GG"
+      - listitem:
+        - paragraph: G1
+        - button "Menos G1" [disabled]
+        - textbox "Quantidade G1": "0"
+        - button "Mais G1"
+      - listitem:
+        - paragraph: G2
+        - button "Menos G2" [disabled]
+        - textbox "Quantidade G2": "0"
+        - button "Mais G2"
+      - listitem:
+        - paragraph: G3
+        - button "Menos G3" [disabled]
+        - textbox "Quantidade G3": "0"
+        - button "Mais G3"
+    - button "Adicionar outro tamanho"
+    - paragraph: Total 0 peças
+    - paragraph: Faltam 50 peças para o mínimo de 50.
+    - button "Voltar"
+    - button "Continuar"
+  - listitem:
+    - text: "5"
+    - paragraph: Resumo · Seus dados, ficha e WhatsApp
+
+# Passo Resumo (depois de tentar enviar vazio)
+- heading "Escolha na arara e personalize." [level=1]:
+  - text: Escolha na arara
+  - emphasis: e personalize.
+- list "Arara de modelos":
+  - listitem:
+    - button "Camiseta" [pressed]
+  - listitem:
+    - button "Polo"
+  - listitem:
+    - button "Regata"
+  - listitem:
+    - button "Baby look"
+  - listitem:
+    - button "Moletom canguru"
+- group "Prévia da peça. Use as setas para girar":
+  - img "Camiseta na cor Azul-marinho"
+  - text: Prévia
+  - paragraph: Camiseta Azul-marinho
+  - group "Cor do tecido":
+    - button "Branco"
+    - button "Azul-marinho" [pressed]
+    - button "Turquesa"
+    - button "Mescla"
+    - button "Preto"
+- heading "Seu pedido" [level=2]
+- paragraph: Monte em 5 passos e receba o orçamento pelo WhatsApp.
+- list "Passos do pedido":
+  - listitem:
+    - img "feito"
+    - paragraph: Peça
+    - paragraph: Camiseta · Não sei, me indiquem
+    - button "Alterar peça": Alterar
+  - listitem:
+    - img "feito"
+    - paragraph: Cor
+    - paragraph: Azul-marinho
+    - button "Alterar cor": Alterar
+  - listitem:
+    - img "feito"
+    - paragraph: Estampa
+    - paragraph: A definir · Silk
+    - button "Alterar estampa": Alterar
+  - listitem:
+    - img "feito"
+    - paragraph: Quantidade
+    - paragraph: 0 peças
+    - button "Alterar quantidade": Alterar
+  - listitem:
+    - text: "5"
+    - paragraph: Resumo
+    - paragraph: "Olá, Whim! Montei minha peça no site: • Peça: Camiseta · Cor: Azul-marinho • Tecido: Não sei, me indiquem • Técnica: Silk • Estampas: a definir • Tamanhos: a definir · Total: 0 peças Vou mandar a ficha e os arquivos aqui na conversa. Podem me passar o orçamento?"
+    - paragraph: Ficha da estampa para a equipe da Whim
+    - 'img "Ficha da estampa: Camiseta, Azul-marinho, Não sei, me indiquem, Silk,0 posições"'
+    - button "Baixar ficha"
+    - list:
+      - listitem: Baixe ou compartilhe a ficha.
+      - listitem: Preencha seus dados e envie a mensagem pelo WhatsApp.
+      - listitem: Na conversa, anexe a ficha.
+    - paragraph: "Prazo de produção: 20 a 30 dias, conforme quantidade e modelo."
+    - paragraph: Quem responde é a equipe da Whim.
+    - paragraph: Seus dados · para a equipe da Whim responder.
+    - group:
+      - text: Nome
+      - textbox "Nome" [invalid]:
+        - /placeholder: Seu nome
+      - alert: Escreva seu nome.
+    - group:
+      - text: Telefone (WhatsApp)
+      - textbox "Telefone (WhatsApp)" [invalid]:
+        - /placeholder: (11) 98765-4321
+      - alert: Telefone com DDD, como (11) 98765-4321.
+    - group:
+      - text: E-mail
+      - textbox "E-mail" [invalid]:
+        - /placeholder: nome@empresa.com.br
+      - alert: Confira o e-mail, como nome@empresa.com.br.
+    - checkbox "Autorizo a Whim a usar estes dados para responder ao meu contato." [invalid]
+    - text: Autorizo a Whim a usar estes dados para responder ao meu contato.
+    - alert: Marque a autorização para enviar.
+    - checkbox "Quero receber novidades e ofertas da Whim."
+    - text: Quero receber novidades e ofertas da Whim.
+    - paragraph:
+      - text: "Quais dados, por quanto tempo e como pedir para apagar:"
+      - link "Política de privacidade":
+        - /url: /privacidade
+      - text: .
+    - button "Enviar pelo WhatsApp"
+    - button "Voltar"

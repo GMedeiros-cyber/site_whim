@@ -1,0 +1,825 @@
+{
+ "gerado": "2026-11-17T22:18:33.051Z",
+ "base": "http://localhost:3417",
+ "resultados": [
+  {
+   "id": "A1",
+   "tela": "390",
+   "ok": true,
+   "detalhe": "25 combinações certas (peça, cor, cartão, vitrine e arara)",
+   "print": "prints/monte/a1-pecas-cores-390.jpg"
+  },
+  {
+   "id": "A1",
+   "tela": "768",
+   "ok": true,
+   "detalhe": "25 combinações certas (peça, cor, cartão, vitrine e arara)",
+   "print": "prints/monte/a1-pecas-cores-768.jpg"
+  },
+  {
+   "id": "A1",
+   "tela": "1280",
+   "ok": true,
+   "detalhe": "25 combinações certas (peça, cor, cartão, vitrine e arara)",
+   "print": "prints/monte/a1-pecas-cores-1280.jpg"
+  },
+  {
+   "id": "A1",
+   "tela": "1920",
+   "ok": true,
+   "detalhe": "25 combinações certas (peça, cor, cartão, vitrine e arara)",
+   "print": "prints/monte/a1-pecas-cores-1920.jpg"
+  },
+  {
+   "id": "A1",
+   "tela": "2560",
+   "ok": true,
+   "detalhe": "25 combinações certas (peça, cor, cartão, vitrine e arara)",
+   "print": "prints/monte/a1-pecas-cores-2560.jpg"
+  },
+  {
+   "id": "A1",
+   "tela": "67%",
+   "ok": true,
+   "detalhe": "25 combinações certas (peça, cor, cartão, vitrine e arara)",
+   "print": "prints/monte/a1-pecas-cores-67.jpg"
+  },
+  {
+   "id": "A2",
+   "tela": "1280",
+   "ok": true,
+   "detalhe": "800 combinações certas no resumo, no topo da ficha e na cor da foto da ficha (1036 s)",
+   "print": "prints/monte/a2-resumo-ficha.jpg"
+  },
+  {
+   "id": "A3",
+   "tela": "1280",
+   "ok": true,
+   "detalhe": "resumo \"Cor: verde-bandeira\", ficha \"verde-bandeira (prévia em Azul-marinho)\", vazia = \"outra, a combinar\", vitrine volta para a cor dela",
+   "print": "prints/monte/a3-outra-cor.jpg"
+  },
+  {
+   "id": "A4",
+   "tela": "1280",
+   "ok": true,
+   "detalhe": "\"Regata não tem manga esquerda e manga direita: essas posições saíram.\" / \"Moletom canguru não tem nuca: essa posição saiu.\"",
+   "print": "prints/monte/a4-troca-peca.jpg"
+  },
+  {
+   "id": "B1",
+   "tela": "1280",
+   "ok": true,
+   "detalhe": "Camiseta: 9 posições com número, linha, rótulo e marcador dentro da área",
+   "print": "prints/monte/b1-camiseta.jpg"
+  },
+  {
+   "id": "B1",
+   "tela": "1280",
+   "ok": true,
+   "detalhe": "Polo: 9 posições com número, linha, rótulo e marcador dentro da área",
+   "print": "prints/monte/b1-polo.jpg"
+  },
+  {
+   "id": "B1",
+   "tela": "1280",
+   "ok": true,
+   "detalhe": "Regata: 7 posições com número, linha, rótulo e marcador dentro da área",
+   "print": "prints/monte/b1-regata.jpg"
+  },
+  {
+   "id": "B1",
+   "tela": "1280",
+   "ok": true,
+   "detalhe": "Baby look: 9 posições com número, linha, rótulo e marcador dentro da área",
+   "print": "prints/monte/b1-babylook.jpg"
+  },
+  {
+   "id": "B1",
+   "tela": "1280",
+   "ok": true,
+   "detalhe": "Moletom canguru: 8 posições com número, linha, rótulo e marcador dentro da área",
+   "print": "prints/monte/b1-moletom.jpg"
+  },
+  {
+   "id": "B5",
+   "tela": "1280",
+   "ok": true,
+   "detalhe": "Manga esquerda e direita aparecem na frente e nas costas em Camiseta, Polo, Baby look e Moletom",
+   "print": "prints/monte/b5-manga-nas-costas.jpg"
+  },
+  {
+   "id": "B2",
+   "tela": "1280",
+   "ok": true,
+   "detalhe": "147 combinações (143 da Camiseta, todas as válidas + a máxima de cada outra peça): lista na ordem marcada, prévia com as posições do lado e sem aviso",
+   "print": "prints/monte/b2-combinacao-maxima.jpg"
+  },
+  {
+   "id": "B3",
+   "tela": "1280",
+   "ok": true,
+   "detalhe": "8 casos: saem as que se sobrepõem, com o aviso certo; Nuca + Costas inteira e as duas mangas convivem",
+   "print": "prints/monte/b3-sobreposicao.jpg"
+  },
+  {
+   "id": "B4",
+   "tela": "1280",
+   "ok": true,
+   "detalhe": "marca e desmarca no meio, marca a ~15 px fora da manga (que tem 9 × 9 px no mapa) e ignora a barra",
+   "print": "prints/monte/b4-mapa-1280.jpg"
+  },
+  {
+   "id": "B4",
+   "tela": "390",
+   "ok": true,
+   "detalhe": "marca e desmarca no meio, marca a ~15 px fora da manga (que tem 7 × 7 px no mapa) e ignora a barra",
+   "print": "prints/monte/b4-mapa-390.jpg"
+  },
+  {
+   "id": "C1",
+   "tela": "1280",
+   "ok": true,
+   "detalhe": "aceito; prévia com a arte dentro da área",
+   "print": "prints/monte/c1-png-transparente.jpg"
+  },
+  {
+   "id": "C2",
+   "tela": "1280",
+   "ok": true,
+   "detalhe": "aceito; prévia com a arte dentro da área; a linha diz \"Fundo removido na prévia\"; \"Manter o fundo\" mostra o fundo na prévia",
+   "print": "prints/monte/c2-png-com-fundo.jpg"
+  },
+  {
+   "id": "C3",
+   "tela": "1280",
+   "ok": true,
+   "detalhe": "aceito; prévia com a arte dentro da área; aviso do silk aparece; \"Ver em DTF\" troca a técnica",
+   "print": "prints/monte/c3-jpg-foto.jpg"
+  },
+  {
+   "id": "C4",
+   "tela": "1280",
+   "ok": false,
+   "detalhe": "com tamanho: aceito; prévia com a arte dentro da área; só viewBox: aceito; prévia SEM a arte (mostra o marcador \"Sua arte\")",
+   "print": "prints/monte/c4-svg.jpg"
+  },
+  {
+   "id": "C5",
+   "tela": "1280",
+   "ok": true,
+   "detalhe": "recusado: \"Use PNG, JPG, WebP ou SVG.\"",
+   "print": "prints/monte/c5-pdf.jpg"
+  },
+  {
+   "id": "C6",
+   "tela": "1280",
+   "ok": true,
+   "detalhe": "centro: aceito; prévia com a arte dentro da área; manga: aceito; prévia com a arte dentro da área, aviso de arte larga aparece",
+   "print": "prints/monte/c6-deitada-manga.jpg"
+  },
+  {
+   "id": "C7",
+   "tela": "1280",
+   "ok": true,
+   "detalhe": "aceito; prévia com a arte dentro da área",
+   "print": "prints/monte/c7-em-pe.jpg"
+  },
+  {
+   "id": "C8",
+   "tela": "1280",
+   "ok": false,
+   "detalhe": "aceito; prévia SEM a arte (área vazia); a linha diz \"Fundo removido na prévia\"",
+   "print": "prints/monte/c8-quadrada.jpg"
+  },
+  {
+   "id": "C9",
+   "tela": "1280",
+   "ok": false,
+   "detalhe": "aceito; prévia com a arte dentro da área; nenhum aviso de que 120 px é pouco para imprimir (a prévia aceita sem dizer nada)",
+   "print": "prints/monte/c9-pequena.jpg"
+  },
+  {
+   "id": "C10",
+   "tela": "1280",
+   "ok": true,
+   "detalhe": "13.8 MB: recusado: \"A arte passa de 10 MB. Mande o arquivo direto pelo WhatsApp.\"",
+   "print": "prints/monte/c10-grande.jpg"
+  },
+  {
+   "id": "C11",
+   "tela": "1280",
+   "ok": true,
+   "detalhe": "GIF: recusado: \"Use PNG, JPG, WebP ou SVG.\"; HEIC: recusado: \"Use PNG, JPG, WebP ou SVG.\"",
+   "print": "prints/monte/c11-formato.jpg"
+  },
+  {
+   "id": "C12",
+   "tela": "1280",
+   "ok": false,
+   "detalhe": "aceito sem aviso: a linha mostra \"logo-corrompido.png\" como anexada e a prévia volta ao marcador \"Sua arte\"",
+   "print": "prints/monte/c12-corrompida.jpg"
+  },
+  {
+   "id": "C13",
+   "tela": "1280",
+   "ok": true,
+   "detalhe": "linha mostra \"logo-verde.png\"; prévia com a arte verde e sem a vermelha",
+   "print": "prints/monte/c13-trocar.jpg"
+  },
+  {
+   "id": "C14",
+   "tela": "1280",
+   "ok": true,
+   "detalhe": "linha volta para \"Arraste a arte…\"; prévia volta ao marcador",
+   "print": "prints/monte/c14-remover.jpg"
+  },
+  {
+   "id": "C15",
+   "tela": "1280",
+   "ok": true,
+   "detalhe": "\"Usar a mesma arte de\" e anexar de novo: linhas com logo-transparente.png e logo-transparente.png; prévia das costas com arte em Costas inteira (sim) e Nuca (sim)",
+   "print": "prints/monte/c15-mesma-arte.jpg"
+  },
+  {
+   "id": "C16",
+   "tela": "1280",
+   "ok": true,
+   "detalhe": "a arte solta na caixa fica anexada",
+   "print": "prints/monte/c16-arrastar.jpg"
+  },
+  {
+   "id": "C17",
+   "tela": "1280",
+   "ok": true,
+   "detalhe": "folha com a prévia de cada anexo aceito: [c-anexos-previa.jpg](prints/monte/c-anexos-previa.jpg)",
+   "print": "prints/monte/c-anexos-previa.jpg"
+  },
+  {
+   "id": "C1",
+   "tela": "390",
+   "ok": true,
+   "detalhe": "PDF recusado com \"Use PNG, JPG, WebP ou SVG.\"; PNG anexado; sem rolagem lateral",
+   "print": "prints/monte/c-anexo-390.jpg"
+  },
+  {
+   "id": "D1",
+   "tela": "1280",
+   "ok": true,
+   "detalhe": "todas as posições das 5 peças com a arte dentro da área (folga de 0,8% para as dobras). Recortes: [Camiseta](prints/monte/d1-camiseta.jpg) · [Polo](prints/monte/d1-polo.jpg) · [Regata](prints/monte/d1-regata.jpg) · [Baby look](prints/monte/d1-babylook.jpg) · [Moletom canguru](prints/monte/d1-moletom.jpg)",
+   "print": "prints/monte/d1-camiseta.jpg"
+  },
+  {
+   "id": "D2",
+   "tela": "1280",
+   "ok": true,
+   "detalhe": "automático: a arte não sobe acima da área em nenhuma posição. Se a própria área pega a gola, só o olho vê: ver a revisão visual e os recortes do D1",
+   "print": "prints/monte/d1-camiseta.jpg"
+  },
+  {
+   "id": "D3",
+   "tela": "1280",
+   "ok": true,
+   "detalhe": "nenhum resto do marcador \"Sua arte\" junto da arte, em nenhuma posição",
+   "print": "prints/monte/d1-camiseta.jpg"
+  },
+  {
+   "id": "D4",
+   "tela": "1280",
+   "ok": true,
+   "detalhe": "todas as artes aparecem juntas, na frente e nas costas, nas 5 peças",
+   "print": "prints/monte/d4-varias-artes.jpg"
+  },
+  {
+   "id": "D5",
+   "tela": "1280",
+   "ok": true,
+   "detalhe": "depois do passo Estampa a prévia segue com as artes, a vitrine e a miniatura do outro lado",
+   "print": "prints/monte/d5-previa-final.jpg"
+  },
+  {
+   "id": "D6",
+   "tela": "1280",
+   "ok": true,
+   "detalhe": "a arte aparece na foto da ficha (frente e costas) e na miniatura de cada linha, nas 3 combinações das 5 peças",
+   "print": "prints/monte/d6-ficha-com-artes.jpg"
+  },
+  {
+   "id": "E1",
+   "tela": "1280",
+   "ok": true,
+   "detalhe": "mostra \"Total 0 peças Faltam 50 peças para o mínimo de 50.\"; deixa continuar e o resumo diz \"Tamanhos: a definir · Total: 0 peças\" (a ficha também)",
+   "print": "prints/monte/e1-zero.jpg"
+  },
+  {
+   "id": "E2",
+   "tela": "1280",
+   "ok": true,
+   "detalhe": "Total 30 peças Faltam 20 peças para o mínimo de 50.",
+   "print": "prints/monte/e2-abaixo.jpg"
+  },
+  {
+   "id": "E3",
+   "tela": "1280",
+   "ok": true,
+   "detalhe": "+3 −1 deu P = 2; Total 50 peças; \"−\" fica desligado no zero: sim",
+   "print": "prints/monte/e3-minimo.jpg"
+  },
+  {
+   "id": "E4",
+   "tela": "1280",
+   "ok": false,
+   "detalhe": "1000000 não cabe no campo (34 px); 25 dígitos viram \"1e+25\" e total \"Total 1e+25 peças\"",
+   "print": "prints/monte/e4-muito-alta.jpg"
+  },
+  {
+   "id": "E5",
+   "tela": "1280",
+   "ok": true,
+   "detalhe": "grupos \"Adulto · 30 | Infantil · 20\"; resumo \"• Tamanhos: P 10, M 20, Infantil 4: 15, Infantil 10: 5 · Total: 50 peças\"; ficha \"Tamanhos: P 10, M 20, Infantil 4: 15, Infantil 10: 5\"",
+   "print": "prints/monte/e5-adulto-infantil.jpg"
+  },
+  {
+   "id": "E6",
+   "tela": "1280",
+   "ok": true,
+   "detalhe": "G4 entra no resumo (\"• Tamanhos: P 10, M 20, Infantil 4: 15, Infantil 10: 5, G4 5 · Total: 55 peças\"); \"g4\" repetido fica desligado; Esc fecha; Remover tira do resumo",
+   "print": "prints/monte/e6-outro-tamanho.jpg"
+  },
+  {
+   "id": "E7",
+   "tela": "1280",
+   "ok": true,
+   "detalhe": "abc → 0; -5 → 5; 1.5 → 15 (o campo só guarda dígitos)",
+   "print": "prints/monte/e7-letras.jpg"
+  },
+  {
+   "id": "E4",
+   "tela": "390",
+   "ok": false,
+   "detalhe": "1000000 não cabe no campo; sem rolagem lateral",
+   "print": "prints/monte/e4-muito-alta-390.jpg"
+  },
+  {
+   "id": "F1",
+   "tela": "1280",
+   "ok": true,
+   "detalhe": "cada passo reabre com o que foi escolhido (peça, tecido, cor, posições com os arquivos, técnica e tamanhos) e o resumo fica igual",
+   "print": "prints/monte/f1-ida-e-volta.jpg"
+  },
+  {
+   "id": "F2",
+   "tela": "1280",
+   "ok": true,
+   "detalhe": "Cancelar volta tudo como estava; Salvar guarda a Regata",
+   "print": "prints/monte/f2-cancelar-salvar.jpg"
+  },
+  {
+   "id": "F3",
+   "tela": "1280",
+   "ok": false,
+   "detalhe": "tudo volta ao começo: passo \"Peça\", prévia \"Camiseta Azul-marinho\" (peça, cor, posições, técnica e tamanhos se perdem)",
+   "print": "prints/monte/f3-recarregar-1280.jpg"
+  },
+  {
+   "id": "F3",
+   "tela": "390",
+   "ok": false,
+   "detalhe": "tudo volta ao começo: passo \"Peça\", prévia \"Camiseta Azul-marinho\" (peça, cor, posições, técnica e tamanhos se perdem)",
+   "print": "prints/monte/f3-recarregar-390.jpg"
+  },
+  {
+   "id": "F5",
+   "tela": "390",
+   "ok": true,
+   "detalhe": "chega pela tinta, a arara e a prévia desenham, sem erro ([meio da transição](prints/monte/f5-transicao-meio-390.jpg))",
+   "print": "prints/monte/f5-chegou-390.jpg"
+  },
+  {
+   "id": "F4",
+   "tela": "390",
+   "ok": true,
+   "detalhe": "Voltar e Avançar mantêm a peça e a cor",
+   "print": "prints/monte/f4-voltar-avancar-390.jpg"
+  },
+  {
+   "id": "F5",
+   "tela": "768",
+   "ok": true,
+   "detalhe": "chega pela tinta, a arara e a prévia desenham, sem erro ([meio da transição](prints/monte/f5-transicao-meio-768.jpg))",
+   "print": "prints/monte/f5-chegou-768.jpg"
+  },
+  {
+   "id": "F4",
+   "tela": "768",
+   "ok": true,
+   "detalhe": "Voltar e Avançar mantêm a peça e a cor",
+   "print": "prints/monte/f4-voltar-avancar-768.jpg"
+  },
+  {
+   "id": "F5",
+   "tela": "1280",
+   "ok": true,
+   "detalhe": "chega pela tinta, a arara e a prévia desenham, sem erro ([meio da transição](prints/monte/f5-transicao-meio-1280.jpg))",
+   "print": "prints/monte/f5-chegou-1280.jpg"
+  },
+  {
+   "id": "F4",
+   "tela": "1280",
+   "ok": true,
+   "detalhe": "Voltar e Avançar mantêm a peça e a cor",
+   "print": "prints/monte/f4-voltar-avancar-1280.jpg"
+  },
+  {
+   "id": "F5",
+   "tela": "1920",
+   "ok": true,
+   "detalhe": "chega pela tinta, a arara e a prévia desenham, sem erro ([meio da transição](prints/monte/f5-transicao-meio-1920.jpg))",
+   "print": "prints/monte/f5-chegou-1920.jpg"
+  },
+  {
+   "id": "F4",
+   "tela": "1920",
+   "ok": true,
+   "detalhe": "Voltar e Avançar mantêm a peça e a cor",
+   "print": "prints/monte/f4-voltar-avancar-1920.jpg"
+  },
+  {
+   "id": "F5",
+   "tela": "2560",
+   "ok": true,
+   "detalhe": "chega pela tinta, a arara e a prévia desenham, sem erro ([meio da transição](prints/monte/f5-transicao-meio-2560.jpg))",
+   "print": "prints/monte/f5-chegou-2560.jpg"
+  },
+  {
+   "id": "F4",
+   "tela": "2560",
+   "ok": true,
+   "detalhe": "Voltar e Avançar mantêm a peça e a cor",
+   "print": "prints/monte/f4-voltar-avancar-2560.jpg"
+  },
+  {
+   "id": "F5",
+   "tela": "67%",
+   "ok": true,
+   "detalhe": "chega pela tinta, a arara e a prévia desenham, sem erro ([meio da transição](prints/monte/f5-transicao-meio-67.jpg))",
+   "print": "prints/monte/f5-chegou-67.jpg"
+  },
+  {
+   "id": "F4",
+   "tela": "67%",
+   "ok": true,
+   "detalhe": "Voltar e Avançar mantêm a peça e a cor",
+   "print": "prints/monte/f4-voltar-avancar-67.jpg"
+  },
+  {
+   "id": "F6",
+   "tela": "1280",
+   "ok": true,
+   "detalhe": "continua no passo \"Quantidade\" e o passo Peça mostra \"Baby look · Não sei, me indiquem\"",
+   "print": "prints/monte/f6-arara-no-meio.jpg"
+  },
+  {
+   "id": "G1",
+   "tela": "1280",
+   "ok": true,
+   "detalhe": "pedido completo e enviado só com o teclado (81 paradas do Tab)",
+   "print": "prints/monte/g1-teclado.jpg"
+  },
+  {
+   "id": "G2",
+   "tela": "1280",
+   "ok": true,
+   "detalhe": "todas as 81 paradas com anel de foco",
+   "print": "prints/monte/g1-teclado.jpg"
+  },
+  {
+   "id": "G3",
+   "tela": "1280",
+   "ok": true,
+   "detalhe": "4 de 4 avanços levam o foco ao título do passo",
+   "print": "prints/monte/g3-foco-no-titulo.jpg"
+  },
+  {
+   "id": "G4",
+   "tela": "1280",
+   "ok": false,
+   "detalhe": "o \"✓ feito\" dos passos é um <svg aria-label> sem role=\"img\" (alguns leitores não leem); texto alternativo da ficha sem espaço: \"Ficha da estampa: Camiseta, Azul-marinho, Não sei, me indiquem, Silk,0 posições\" (4 alertas ao enviar vazio). Árvore completa: [g4-arvore-acessibilidade.txt](prints/monte/g4-arvore-acessibilidade.txt)",
+   "print": "prints/monte/g4-passos-e-erros.jpg"
+  },
+  {
+   "id": "G5",
+   "tela": "390",
+   "ok": false,
+   "detalhe": "label-content-name-mismatch (Elements must have their visible text as part of their accessible name): button[aria-label=\"Peito esquerdo\"]; label-content-name-mismatch (Elements must have their visible text as part of their accessible name): button[aria-label=\"Costas inteira\"]",
+   "print": "prints/monte/g5-g6-estampa-390.jpg"
+  },
+  {
+   "id": "G6",
+   "tela": "390",
+   "ok": false,
+   "detalhe": "Zoom (14 × 14)",
+   "print": "prints/monte/g5-g6-estampa-390.jpg"
+  },
+  {
+   "id": "G6",
+   "tela": "768",
+   "ok": false,
+   "detalhe": "Zoom (14 × 14)",
+   "print": "prints/monte/g5-g6-estampa-768.jpg"
+  },
+  {
+   "id": "G5",
+   "tela": "1280",
+   "ok": false,
+   "detalhe": "label-content-name-mismatch (Elements must have their visible text as part of their accessible name): button[aria-label=\"Peito esquerdo\"]; label-content-name-mismatch (Elements must have their visible text as part of their accessible name): button[aria-label=\"Costas inteira\"]",
+   "print": "prints/monte/g5-g6-estampa-1280.jpg"
+  },
+  {
+   "id": "G6",
+   "tela": "1280",
+   "ok": false,
+   "detalhe": "Zoom (14 × 14)",
+   "print": "prints/monte/g5-g6-estampa-1280.jpg"
+  },
+  {
+   "id": "H1",
+   "tela": "1280",
+   "ok": true,
+   "detalhe": "\"ficha-whim-polo-2026-11-17.png\", PNG 1600 × 1000, 370 KB, igual à da tela",
+   "print": "prints/monte/h1-ficha-baixada-1280.jpg"
+  },
+  {
+   "id": "H2",
+   "tela": "1280",
+   "ok": true,
+   "detalhe": "ficha com peça, cor, técnica, tecido, as 2 posições com medida e arquivo, total e tamanhos",
+   "print": "prints/monte/h1-ficha-baixada-1280.jpg"
+  },
+  {
+   "id": "H4",
+   "tela": "1280",
+   "ok": true,
+   "detalhe": "vazio: 4 erros e foco em #pedido-nome; telefone 123 e e-mail a@b: \"Telefone com DDD, como (11) 98765-4321. / Confira o e-mail, como nome@empresa.com.br. / Marque a autorização para enviar.\"; não abre o WhatsApp",
+   "print": "prints/monte/h4-erros-1280.jpg"
+  },
+  {
+   "id": "H3",
+   "tela": "1280",
+   "ok": true,
+   "detalhe": "mensagem igual ao resumo da tela, com contato, peça, cor, tecido, técnica, posições com medida e arquivo e tamanhos (https://wa.me/5511945448802)",
+   "print": "prints/monte/h3-resumo-1280.jpg"
+  },
+  {
+   "id": "H5",
+   "tela": "1280",
+   "ok": true,
+   "detalhe": "POST /api/contatos: origem \"monte-sua-peca\", pedido igual ao resumo, consentimento true, ofertas true",
+   "print": "prints/monte/h5-enviado-1280.jpg"
+  },
+  {
+   "id": "H1",
+   "tela": "390",
+   "ok": true,
+   "detalhe": "\"ficha-whim-polo-2026-11-17.png\", PNG 1600 × 1000, 370 KB, igual à da tela",
+   "print": "prints/monte/h1-ficha-baixada-390.jpg"
+  },
+  {
+   "id": "H2",
+   "tela": "390",
+   "ok": true,
+   "detalhe": "ficha com peça, cor, técnica, tecido, as 2 posições com medida e arquivo, total e tamanhos",
+   "print": "prints/monte/h1-ficha-baixada-390.jpg"
+  },
+  {
+   "id": "H4",
+   "tela": "390",
+   "ok": true,
+   "detalhe": "vazio: 4 erros e foco em #pedido-nome; telefone 123 e e-mail a@b: \"Telefone com DDD, como (11) 98765-4321. / Confira o e-mail, como nome@empresa.com.br. / Marque a autorização para enviar.\"; não abre o WhatsApp",
+   "print": "prints/monte/h4-erros-390.jpg"
+  },
+  {
+   "id": "H3",
+   "tela": "390",
+   "ok": true,
+   "detalhe": "mensagem igual ao resumo da tela, com contato, peça, cor, tecido, técnica, posições com medida e arquivo e tamanhos (https://wa.me/5511945448802)",
+   "print": "prints/monte/h3-resumo-390.jpg"
+  },
+  {
+   "id": "H5",
+   "tela": "390",
+   "ok": true,
+   "detalhe": "POST /api/contatos: origem \"monte-sua-peca\", pedido igual ao resumo, consentimento true, ofertas true",
+   "print": "prints/monte/h5-enviado-390.jpg"
+  },
+  {
+   "id": "L1",
+   "tela": "390",
+   "ok": true,
+   "detalhe": "pedido completo nos 5 passos; prints: [1](prints/monte/l-390-passo1.jpg) [2](prints/monte/l-390-passo2.jpg) [3](prints/monte/l-390-passo3.jpg) [4](prints/monte/l-390-passo4.jpg) [5](prints/monte/l-390-passo5.jpg)",
+   "print": "prints/monte/l-390-passo3.jpg"
+  },
+  {
+   "id": "L2",
+   "tela": "390",
+   "ok": true,
+   "detalhe": "sem rolagem lateral e nada passa da borda",
+   "print": "prints/monte/l-390-passo3.jpg"
+  },
+  {
+   "id": "L3",
+   "tela": "390",
+   "ok": true,
+   "detalhe": "no celular a prévia fica em cima da ficha (não se aplica)",
+   "print": "prints/monte/l-390-passo3.jpg"
+  },
+  {
+   "id": "L4",
+   "tela": "390",
+   "ok": true,
+   "detalhe": "no celular a ficha fica embaixo da prévia (não se aplica)",
+   "print": "prints/monte/l-390-passo3.jpg"
+  },
+  {
+   "id": "L5",
+   "tela": "390",
+   "ok": true,
+   "detalhe": "nenhum erro no console durante os 5 passos",
+   "print": "prints/monte/l-390-passo5.jpg"
+  },
+  {
+   "id": "L1",
+   "tela": "768",
+   "ok": true,
+   "detalhe": "pedido completo nos 5 passos; prints: [1](prints/monte/l-768-passo1.jpg) [2](prints/monte/l-768-passo2.jpg) [3](prints/monte/l-768-passo3.jpg) [4](prints/monte/l-768-passo4.jpg) [5](prints/monte/l-768-passo5.jpg)",
+   "print": "prints/monte/l-768-passo3.jpg"
+  },
+  {
+   "id": "L2",
+   "tela": "768",
+   "ok": true,
+   "detalhe": "sem rolagem lateral e nada passa da borda",
+   "print": "prints/monte/l-768-passo3.jpg"
+  },
+  {
+   "id": "L3",
+   "tela": "768",
+   "ok": true,
+   "detalhe": "no celular a prévia fica em cima da ficha (não se aplica)",
+   "print": "prints/monte/l-768-passo3.jpg"
+  },
+  {
+   "id": "L4",
+   "tela": "768",
+   "ok": true,
+   "detalhe": "no celular a ficha fica embaixo da prévia (não se aplica)",
+   "print": "prints/monte/l-768-passo3.jpg"
+  },
+  {
+   "id": "L5",
+   "tela": "768",
+   "ok": true,
+   "detalhe": "nenhum erro no console durante os 5 passos",
+   "print": "prints/monte/l-768-passo5.jpg"
+  },
+  {
+   "id": "L1",
+   "tela": "1280",
+   "ok": true,
+   "detalhe": "pedido completo nos 5 passos; prints: [1](prints/monte/l-1280-passo1.jpg) [2](prints/monte/l-1280-passo2.jpg) [3](prints/monte/l-1280-passo3.jpg) [4](prints/monte/l-1280-passo4.jpg) [5](prints/monte/l-1280-passo5.jpg)",
+   "print": "prints/monte/l-1280-passo3.jpg"
+  },
+  {
+   "id": "L2",
+   "tela": "1280",
+   "ok": true,
+   "detalhe": "sem rolagem lateral e nada passa da borda",
+   "print": "prints/monte/l-1280-passo3.jpg"
+  },
+  {
+   "id": "L3",
+   "tela": "1280",
+   "ok": true,
+   "detalhe": "a prévia fica inteira na tela enquanto a ficha rola",
+   "print": "prints/monte/l-1280-passo3.jpg"
+  },
+  {
+   "id": "L4",
+   "tela": "1280",
+   "ok": true,
+   "detalhe": "sem vão grande embaixo da prévia",
+   "print": "prints/monte/l-1280-passo3.jpg"
+  },
+  {
+   "id": "L5",
+   "tela": "1280",
+   "ok": true,
+   "detalhe": "nenhum erro no console durante os 5 passos",
+   "print": "prints/monte/l-1280-passo5.jpg"
+  },
+  {
+   "id": "L1",
+   "tela": "1920",
+   "ok": true,
+   "detalhe": "pedido completo nos 5 passos; prints: [1](prints/monte/l-1920-passo1.jpg) [2](prints/monte/l-1920-passo2.jpg) [3](prints/monte/l-1920-passo3.jpg) [4](prints/monte/l-1920-passo4.jpg) [5](prints/monte/l-1920-passo5.jpg)",
+   "print": "prints/monte/l-1920-passo3.jpg"
+  },
+  {
+   "id": "L2",
+   "tela": "1920",
+   "ok": true,
+   "detalhe": "sem rolagem lateral e nada passa da borda",
+   "print": "prints/monte/l-1920-passo3.jpg"
+  },
+  {
+   "id": "L3",
+   "tela": "1920",
+   "ok": true,
+   "detalhe": "a prévia fica inteira na tela enquanto a ficha rola",
+   "print": "prints/monte/l-1920-passo3.jpg"
+  },
+  {
+   "id": "L4",
+   "tela": "1920",
+   "ok": true,
+   "detalhe": "sem vão grande embaixo da prévia",
+   "print": "prints/monte/l-1920-passo3.jpg"
+  },
+  {
+   "id": "L5",
+   "tela": "1920",
+   "ok": true,
+   "detalhe": "nenhum erro no console durante os 5 passos",
+   "print": "prints/monte/l-1920-passo5.jpg"
+  },
+  {
+   "id": "L1",
+   "tela": "2560",
+   "ok": true,
+   "detalhe": "pedido completo nos 5 passos; prints: [1](prints/monte/l-2560-passo1.jpg) [2](prints/monte/l-2560-passo2.jpg) [3](prints/monte/l-2560-passo3.jpg) [4](prints/monte/l-2560-passo4.jpg) [5](prints/monte/l-2560-passo5.jpg)",
+   "print": "prints/monte/l-2560-passo3.jpg"
+  },
+  {
+   "id": "L2",
+   "tela": "2560",
+   "ok": true,
+   "detalhe": "sem rolagem lateral e nada passa da borda",
+   "print": "prints/monte/l-2560-passo3.jpg"
+  },
+  {
+   "id": "L3",
+   "tela": "2560",
+   "ok": true,
+   "detalhe": "a prévia fica inteira na tela enquanto a ficha rola",
+   "print": "prints/monte/l-2560-passo3.jpg"
+  },
+  {
+   "id": "L4",
+   "tela": "2560",
+   "ok": false,
+   "detalhe": "passo 3: 455 px (32% da altura da tela) [print](prints/monte/l-2560-vao-passo3.jpg); passo 5: 459 px (32% da altura da tela) [print](prints/monte/l-2560-vao-passo5.jpg)",
+   "print": "prints/monte/l-2560-passo3.jpg"
+  },
+  {
+   "id": "L5",
+   "tela": "2560",
+   "ok": true,
+   "detalhe": "nenhum erro no console durante os 5 passos",
+   "print": "prints/monte/l-2560-passo5.jpg"
+  },
+  {
+   "id": "L1",
+   "tela": "67%",
+   "ok": true,
+   "detalhe": "pedido completo nos 5 passos; prints: [1](prints/monte/l-67-passo1.jpg) [2](prints/monte/l-67-passo2.jpg) [3](prints/monte/l-67-passo3.jpg) [4](prints/monte/l-67-passo4.jpg) [5](prints/monte/l-67-passo5.jpg)",
+   "print": "prints/monte/l-67-passo3.jpg"
+  },
+  {
+   "id": "L2",
+   "tela": "67%",
+   "ok": true,
+   "detalhe": "sem rolagem lateral e nada passa da borda",
+   "print": "prints/monte/l-67-passo3.jpg"
+  },
+  {
+   "id": "L3",
+   "tela": "67%",
+   "ok": true,
+   "detalhe": "a prévia fica inteira na tela enquanto a ficha rola",
+   "print": "prints/monte/l-67-passo3.jpg"
+  },
+  {
+   "id": "L4",
+   "tela": "67%",
+   "ok": false,
+   "detalhe": "passo 3: 627 px (39% da altura da tela) [print](prints/monte/l-67-vao-passo3.jpg); passo 5: 627 px (39% da altura da tela) [print](prints/monte/l-67-vao-passo5.jpg)",
+   "print": "prints/monte/l-67-passo3.jpg"
+  },
+  {
+   "id": "L5",
+   "tela": "67%",
+   "ok": true,
+   "detalhe": "nenhum erro no console durante os 5 passos",
+   "print": "prints/monte/l-67-passo5.jpg"
+  }
+ ]
+}
