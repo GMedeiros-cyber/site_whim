@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 };
 
 // Atualizar a data quando entrar o primeiro ID de medição (a seção Cookies muda sozinha).
-const ATUALIZACAO = "16 de novembro de 2026";
+const ATUALIZACAO = "17 de novembro de 2026";
 
 const GOOGLE = "https://policies.google.com/privacy?hl=pt-BR";
 
@@ -79,9 +79,12 @@ export default function Privacidade() {
               <h2>Quais dados recebemos e como</h2>
               <ul>
                 <li>
-                  <strong>O formulário de contato e o “Monte sua peça” não guardam dados no site.</strong>{" "}
-                  Eles só montam uma mensagem e abrem o WhatsApp. O que você envia por lá segue
-                  também as regras do WhatsApp (Meta).
+                  <strong>No formulário de contato e no “Monte sua peça”</strong>, você informa nome,
+                  e-mail e telefone e marca a autorização. Guardamos esses dados, a sua mensagem ou o
+                  resumo do pedido, a página de onde enviou, a data e, se você chegou por um anúncio ou
+                  link de campanha, a origem dessa visita (códigos como utm_source, gclid ou fbclid).
+                  Não guardamos o seu IP. Em seguida, o site abre o WhatsApp com a mensagem pronta; o
+                  que você envia por lá segue também as regras do WhatsApp (Meta).
                 </li>
                 <li>
                   <strong>As artes anexadas no “Monte sua peça” ficam só no seu navegador.</strong>{" "}
@@ -95,16 +98,27 @@ export default function Privacidade() {
 
               <h2>Por que podemos usar esses dados</h2>
               <p>
+                Os dados do formulário e do “Monte sua peça” são guardados com o seu consentimento,
+                dado na caixa de autorização (art. 7º, inciso I, da LGPD), para responder ao seu
+                contato. Você pode retirar esse consentimento quando quiser.
+              </p>
+              <p>
                 Usamos os dados para os procedimentos antes do contrato, feitos a seu pedido (como
                 o orçamento), e para cumprir o contrato, quando o pedido é fechado (art. 7º, inciso V,
                 da LGPD). Quando for o caso, também usamos com base no legítimo interesse, para
                 atender você e melhorar o nosso serviço.
               </p>
 
+              <h2>Onde ficam guardados</h2>
+              <p>
+                Num banco de dados no servidor da <strong>Hostinger</strong>, a empresa que hospeda
+                o site. Só a equipe da Whim tem acesso.
+              </p>
+
               <h2>Com quem compartilhamos</h2>
               <p>
                 Só com quem é necessário para atender você (por exemplo, o WhatsApp, que é o canal
-                da conversa) e quando a lei exigir.
+                da conversa, e a Hostinger, que guarda os dados) e quando a lei exigir.
                 {TEM_MEDICAO && " Com o seu consentimento, também com as ferramentas listadas em Cookies."}{" "}
                 <strong>Não vendemos dados.</strong>
               </p>
@@ -160,9 +174,16 @@ export default function Privacidade() {
               </p>
 
               <h2>Por quanto tempo guardamos</h2>
+              {/* 24 meses: prazo proposto, a Whim precisa confirmar. */}
               <p>
-                Pelo tempo necessário para o atendimento e para cumprir as obrigações legais e
-                fiscais.
+                Os dados do formulário e do “Monte sua peça” ficam guardados por até 24 meses depois
+                do envio, ou até você pedir para apagar, o que vier antes. Os demais, pelo tempo
+                necessário para o atendimento e para cumprir as obrigações legais e fiscais.
+              </p>
+              <p>
+                <strong>Para apagar</strong> os dados que você enviou pelo site, escreva para{" "}
+                {email} com o nome e o e-mail ou telefone que informou. Apagamos e confirmamos por
+                e-mail.
               </p>
 
               <h2>Os seus direitos</h2>
