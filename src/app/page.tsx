@@ -33,9 +33,11 @@ const botaoContorno = cn(
   "w-full border-primary-foreground/40 bg-transparent hover:border-accent hover:bg-primary-foreground/10 sm:w-auto"
 );
 
-/** Seção que sobe por cima da anterior (cantos de cima, sombra e margem negativa). */
+/** Seção que sobe por cima da anterior (cantos de cima, sombra leve e margem negativa). */
 const sobrepoe =
-  "relative isolate -mt-7 rounded-t-[28px] shadow-[0_-24px_40px_-34px] shadow-primary/35 md:-mt-10 md:rounded-t-[40px]";
+  "relative isolate -mt-7 rounded-t-[28px] shadow-[0_-24px_40px_-34px] shadow-primary/20 md:-mt-10 md:rounded-t-[40px]";
+/** Fundo das seções cinza (técnicas e clientes): o fundo claro mais perto do branco. */
+const cinza = "bg-muted/60";
 /** Título e linha de apoio que sobem ao entrar na tela. */
 const sobe = "home-sobe";
 const apoio = "mt-[18px] max-w-[56ch] text-base leading-relaxed text-pretty text-muted-foreground sm:text-[17px]";
@@ -139,7 +141,7 @@ function Topo() {
     <section id="topo" className="p-2 md:p-3">
       <div
         className={cn(
-          "relative isolate flex min-h-[calc(100svh-1rem)] flex-col items-center justify-center overflow-hidden rounded-[24px] bg-primary px-5 pt-28 pb-24 text-center text-primary-foreground md:min-h-[min(880px,calc(100svh-1.5rem))] md:rounded-[32px] min-[1800px]:min-h-[calc(100svh-1.5rem)]! md:px-10 md:pt-32 md:pb-28",
+          "relative isolate flex min-h-[calc(100svh-1rem)] flex-col items-center justify-center overflow-hidden rounded-[24px] bg-primary px-5 pt-28 pb-24 text-center text-primary-foreground md:min-h-[min(880px,calc(100svh-1.5rem))] md:rounded-[32px] min-[1800px]:min-h-[calc(100svh/var(--zoom)-1.5rem)]! md:px-10 md:pt-32 md:pb-28",
           "home-recua"
         )}
       >
@@ -157,15 +159,19 @@ function Topo() {
           className="absolute inset-0 -z-10 bg-radial-[90%_62%_at_50%_44%] from-primary/88 via-primary/74 via-55% to-primary/38"
         />
 
-        <Image
-          src="/brand/whim-logo-branco.svg"
-          alt="Whim Confecção e Estamparia"
-          width={444}
-          height={138}
-          loading="eager"
-          className="home-grande h-[42px] w-auto opacity-95 md:h-[58px]"
-        />
-        <h1 className="mt-1.5">
+        {/* Logo no canto de cima, abaixo da barra e na linha do conteúdo das seções (o
+            recuo negativo desfaz a margem do cartão). No celular não aparece nem é baixado
+            (fundo só a partir de 601 px): a barra já mostra o logo. */}
+        <div className="home-grande absolute -inset-x-2 top-24 hidden min-[601px]:block md:-inset-x-3 min-[2400px]:top-[106px]">
+          <Container>
+            <span
+              role="img"
+              aria-label="Whim Confecção e Estamparia"
+              className="block aspect-[444/138] h-9 bg-[url(/brand/whim-logo-branco.svg)] bg-contain bg-no-repeat opacity-95"
+            />
+          </Container>
+        </div>
+        <h1>
           <PalavraTinta>Vista</PalavraTinta>{" "}
           <span className="home-grande mt-1.5 block text-[28px] leading-[1.1] font-semibold tracking-[-0.025em] text-balance md:text-[40px]">
             a sua marca, peça por peça.
@@ -257,7 +263,7 @@ function QuemSomos() {
 
 function OQueFazemos() {
   return (
-    <section id="servicos" className={cn(secao, sobrepoe, "bg-muted")}>
+    <section id="servicos" className={cn(secao, sobrepoe, cinza)}>
       <Container>
         <Titulo className={sobe}>
           Três jeitos de <Destaque>estampar sua marca.</Destaque>
@@ -370,7 +376,7 @@ function ListaMarcas({ copia = false }: { copia?: boolean }) {
 
 function Clientes() {
   return (
-    <section id="clientes" className={cn(secao, sobrepoe, "bg-muted")}>
+    <section id="clientes" className={cn(secao, sobrepoe, cinza)}>
       <Container>
         <Titulo className={sobe}>
           Marcas que <Destaque>confiam na Whim.</Destaque>
@@ -435,23 +441,23 @@ function Convite() {
       {/* Borda de tinta: o azul-marinho escorre por cima da seção anterior. Ao entrar na
           tela, a onda corre e cresce e os pingos respingam (transicoes.css). A onda tem 150%
           da largura para correr sem mostrar a ponta. */}
-      <div aria-hidden className="absolute inset-x-0 -top-[38px] h-10 overflow-clip md:-top-[58px] md:h-[60px]">
+      <div aria-hidden className="home-onda-caixa absolute inset-x-0 -top-[38px] h-10 overflow-clip md:-top-[58px] md:h-[60px]">
         <svg
           viewBox="0 0 1440 60"
           preserveAspectRatio="none"
-          className="home-onda absolute top-0 -left-1/2 h-full w-[150%] fill-primary"
+          className="home-onda absolute bottom-0 -left-1/2 h-full w-[150%] fill-primary"
         >
           <path d="M0 60 L0 38 C 80 30 140 44 220 36 C 300 26 340 12 430 20 C 520 28 560 46 660 40 C 760 34 800 14 900 18 C 990 22 1040 40 1130 36 C 1220 32 1260 10 1340 16 C 1390 20 1420 30 1440 28 L1440 60 Z" />
         </svg>
         {[
-          { x: "21%", y: "18%", d: "size-2.5", a: "0%" },
-          { x: "62%", y: "34%", d: "size-1.5", a: "10%" },
-          { x: "86%", y: "6%", d: "size-2", a: "20%" },
+          { x: "21%", y: "18%", d: "10px", a: "0%" },
+          { x: "62%", y: "34%", d: "6px", a: "10%" },
+          { x: "86%", y: "6%", d: "8px", a: "20%" },
         ].map((p) => (
           <span
             key={p.x}
-            style={{ left: p.x, top: p.y, "--atraso": p.a } as React.CSSProperties}
-            className={cn("home-pingo absolute rounded-full bg-primary", p.d)}
+            style={{ left: p.x, top: p.y, "--d": p.d, "--atraso": p.a } as React.CSSProperties}
+            className="home-pingo absolute size-(--d) rounded-full bg-primary"
           />
         ))}
       </div>
