@@ -265,3 +265,12 @@ Uma entrada por tarefa, sempre acrescentada no fim (nunca reescrever as anterior
 - Comandos: `git switch -c agente-1/ajustes-17-11 origin/main`, `git merge origin/main` (protótipo) e `origin/agente-3/contatos`, `npm install`, `npm run lint` (ok), `npm run build` (webpack, ok), trace do Chrome.
 - Commits: `6a65b04` e `2c68a8f` no `agente-1/ajustes-17-11`.
 - Pendente: texto da autorização se os dados forem para anúncios/prospecção (Gabriel); agente 2: contraste do menu sobre blocos escuros e largura do rodapé em telas grandes.
+
+### 2026-11-17 02:17 · Agente 2 · Ajustes da home de 17/11 (Claude Code)
+- Feito: entrada em toda carga (abertura → tinta do "Vista" → barra com fade e descida), fase em `<html data-intro>`; logo recomeça a entrada; abertura parada até hidratar e decodificar; tinta a ~60 q/s; hero sem selos e com ícone de rolagem, fotos novas por `<picture>` e véu mais leve; onda do convite com `view()`; tinta entre páginas só de/para o Monte sua peça; telas grandes com `zoom` 1,2/1,5 (home, rodapé da home e barra).
+- Decisões: transição pela View Transitions API direto (o `<ViewTransition>` do React esconde a raiz); a página anterior fica no DOM escondida pelo Next (`cacheComponents`), por isso o canvas da tinta é criado a cada pintura e a saída no meio da entrada é vista por `checkVisibility()`.
+- Medido (CPU 4×, 412 px, sessão nova): abertura em movimento sem tarefa longa (84–104 q/s), tinta 115–132 q/s sem quadro perdido; ~200 ms de pausa parada na passagem.
+- Conferido no Chrome: 56 checagens em 390/768/1280/1920/2560 e movimento reduzido (fases, barra, logo, transição, ícone, onda, alturas da hero, sem rolagem lateral, console limpo).
+- Comandos: `npm run lint`, `npm run build` (webpack, ok), `next start` + Playwright.
+- Commit: `5c958c1`. `package-lock.json` mudou só no `npm install` (`"peer": true`) e ficou fora.
+- Pendente: com CPU 4× a abertura espera ~2,5 s parada pela hidratação; o botão do WhatsApp não cresce nas telas grandes (fica no layout de todas as páginas).

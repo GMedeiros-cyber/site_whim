@@ -2,9 +2,11 @@
 
 import { useRef, useState } from "react";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import { MenuIcon, XIcon } from "lucide-react";
 
 import { LinkNav, useAtivo } from "@/components/link-nav";
+import { faseIntro, pedirIntro } from "@/lib/abertura";
 import { ACAO, NAVEGACAO, type ItemNav } from "@/lib/navegacao";
 import { cn } from "@/lib/utils";
 
@@ -17,11 +19,14 @@ const MENU_ID = "menu-principal";
  * Desktop: símbolo + links + botão de ação.
  * Celular (até 600px): símbolo + escrita WHIM e botão "Menu", que abre um
  * popover nativo (fecha ao tocar fora e com Esc; ao escolher, fechamos aqui).
+ * Na entrada da home (abertura e tinta do "Vista", <html data-intro>) fica escondido e
+ * entra com fade e leve descida quando a palavra fica pronta. O logo recomeça a entrada.
  */
 export function SiteHeader({
   links = NAVEGACAO,
   cta = ACAO,
 }: { links?: ItemNav[]; cta?: ItemNav } = {}) {
+  const pathname = usePathname();
   const menuRef = useRef<HTMLDivElement>(null);
   const [aberto, setAberto] = useState(false);
   const ctaAtivo = useAtivo(cta.href);
@@ -32,13 +37,23 @@ export function SiteHeader({
     : [...links, cta];
 
   return (
-    <header className="pointer-events-none fixed inset-x-3 top-[calc(env(safe-area-inset-top)+0.75rem)] z-50 flex justify-center min-[601px]:top-4">
+    <header className="pointer-events-none fixed inset-x-3 top-[calc(env(safe-area-inset-top)+0.75rem)] z-50 flex justify-center transition-[opacity,translate,visibility] duration-500 ease-out in-data-intro:invisible in-data-intro:-translate-y-3 in-data-intro:opacity-0 motion-reduce:transition-none min-[601px]:top-4 min-[1800px]:[zoom:1.2] min-[2400px]:[zoom:1.5]">
       <nav
         aria-label="Navegação principal"
         className="pointer-events-auto flex w-full items-center justify-between gap-1 rounded-full border border-primary/10 bg-background/60 p-1.5 shadow-[0_10px_40px_-18px] shadow-primary/40 backdrop-blur-xl backdrop-saturate-150 min-[601px]:w-auto min-[601px]:gap-1.5 min-[601px]:p-2"
       >
         <LinkNav
           href="/"
+          onClick={(e) => {
+            const naHome = pathname === "/";
+            pedirIntro(naHome);
+            if (naHome && faseIntro()) {
+              // A abertura cobre a tela: rola ao topo na hora, sem a rolagem suave.
+              e.preventDefault();
+              window.history.replaceState(window.history.state, "", "/");
+              window.scrollTo({ top: 0, behavior: "instant" });
+            }
+          }}
           aria-label="Whim Confecção e Estamparia, página inicial"
           className="flex min-h-11 shrink-0 items-center gap-2 rounded-full"
         >

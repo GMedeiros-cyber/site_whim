@@ -1,13 +1,11 @@
 "use client";
 
-import { useLayoutEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
-import { depoisDaAbertura } from "@/lib/abertura";
+import { EVENTO_REINICIO, avisarVistaPronta, depoisDaAbertura, faseIntro } from "@/lib/abertura";
 
-const CHAVE = "whim-vista-pintada";
 const ATRASO = 250; // ms antes de a tinta entrar
 const DURACAO = 2500; // ms da pintura inteira
-const QUADRO = 30; // ms mínimos entre desenhos: ~30 quadros/s bastam para a tinta
 
 const VERT = `
 attribute vec2 a_pos;
@@ -69,35 +67,43 @@ const rgb = (cor: string) =>
   (cor.match(/[\d.]+/g) ?? []).slice(0, 3).map((n) => Number(n) / 255);
 
 /**
- * Palavra gigante do topo. Na 1ª visita da sessão um shader de tinta turquesa
- * pinta a palavra da esquerda para a direita; um toque ou uma tecla pula.
- * No fim o texto em CSS (mesmo degradê) assume e o canvas some.
- * Movimento reduzido, sem WebGL ou já vista na sessão: aparece pronta.
+ * Palavra gigante do topo. Depois da abertura, um shader de tinta turquesa pinta a
+ * palavra da esquerda para a direita (~60 quadros/s); um toque ou uma tecla pula.
+ * No fim o texto em CSS (mesmo degradê) assume, o canvas some e a barra de navegação entra.
+ * Sem a entrada (chegou por outro link), movimento reduzido ou sem WebGL: aparece pronta.
  */
 export function PalavraTinta({ children }: { children: string }) {
   const textoRef = useRef<HTMLSpanElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [vez, setVez] = useState(0);
+
+  // Logo clicado na home: a entrada recomeça e a palavra é pintada de novo.
+  useEffect(() => {
+    const recomecar = () => setVez((v) => v + 1);
+    window.addEventListener(EVENTO_REINICIO, recomecar);
+    return () => window.removeEventListener(EVENTO_REINICIO, recomecar);
+  }, []);
 
   useLayoutEffect(() => {
     const texto = textoRef.current;
-    const canvas = canvasRef.current;
-    if (!texto || !canvas) return;
+    if (!texto?.parentElement) return;
     const pronta = () => {
       texto.dataset.estado = "pronta";
+      avisarVistaPronta();
     };
 
-    let vista = false;
-    try {
-      vista = sessionStorage.getItem(CHAVE) === "1";
-    } catch {}
-    if (vista || matchMedia("(prefers-reduced-motion: reduce)").matches) return pronta();
+    if (!faseIntro() || matchMedia("(prefers-reduced-motion: reduce)").matches) return pronta();
+    delete texto.dataset.estado;
 
     let cancelado = false;
     let raf = 0;
     let timer = 0;
     let inicio = 0;
-    let ultimo = 0;
     let gl: WebGLRenderingContext | null = null;
+    // Canvas novo a cada pintura (o da anterior teve o WebGL liberado); sai no fim.
+    const canvas = document.createElement("canvas");
+    canvas.setAttribute("aria-hidden", "true");
+    canvas.className =
+      "pointer-events-none absolute text-accent opacity-0 transition-opacity duration-300 data-ativo:opacity-100";
     // Pular = o próximo quadro já é o último. Toque, tecla, resize, aba oculta
     // ou o topo saindo da tela.
     const pular = () => {
@@ -112,13 +118,17 @@ export function PalavraTinta({ children }: { children: string }) {
       if (liga) fora.observe(texto);
       else fora.disconnect();
     };
-    const soltarGl = () => gl?.getExtension("WEBGL_lose_context")?.loseContext();
+    const soltarGl = () => {
+      gl?.getExtension("WEBGL_lose_context")?.loseContext();
+      canvas.remove();
+    };
 
     const comecar = () => {
       if (cancelado) return;
       const r = texto.getBoundingClientRect();
       if (r.bottom < 0 || r.top > innerHeight) return pronta(); // já rolou para longe
       const cs = getComputedStyle(texto);
+      texto.after(canvas);
       document.fonts
         .load(`${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`, children)
         .catch(() => {})
@@ -126,23 +136,20 @@ export function PalavraTinta({ children }: { children: string }) {
         .then((tinta) => {
           gl = tinta?.gl ?? null;
           if (cancelado) return soltarGl();
-          if (!tinta) return pronta();
-          try {
-            sessionStorage.setItem(CHAVE, "1");
-          } catch {}
+          if (!tinta) {
+            soltarGl();
+            return pronta();
+          }
           canvas.dataset.ativo = "";
           ouvir(true);
           inicio = performance.now() + ATRASO;
           const quadro = (agora: number) => {
             const t = Math.min(1, Math.max(0, (agora - inicio) / DURACAO));
+            tinta.pintar(suave(t));
             if (t < 1) {
               raf = requestAnimationFrame(quadro);
-              if (agora - ultimo < QUADRO) return;
-              ultimo = agora;
-              tinta.pintar(suave(t));
               return;
             }
-            tinta.pintar(1);
             ouvir(false);
             pronta();
             delete canvas.dataset.ativo; // some em 300 ms por cima do texto igual
@@ -150,15 +157,14 @@ export function PalavraTinta({ children }: { children: string }) {
           };
           raf = requestAnimationFrame(quadro);
         })
-        .catch(pronta); // se o WebGL falhar no meio, a palavra não pode ficar invisível
+        .catch(() => {
+          // se o WebGL falhar no meio, a palavra não pode ficar invisível
+          soltarGl();
+          pronta();
+        });
     };
-    // Espera a abertura (logo pintado) acabar e, sem ela, a página ficar ociosa
-    // depois da hidratação: o preparo não disputa a thread com o carregamento.
-    const cancelarEspera = depoisDaAbertura(() =>
-      "requestIdleCallback" in window
-        ? requestIdleCallback(comecar, { timeout: 2000 })
-        : setTimeout(comecar, 500)
-    );
+    // A abertura só anda depois da hidratação, então a tinta já começa com a página ociosa.
+    const cancelarEspera = depoisDaAbertura(comecar);
 
     return () => {
       cancelarEspera();
@@ -167,8 +173,11 @@ export function PalavraTinta({ children }: { children: string }) {
       clearTimeout(timer);
       ouvir(false);
       soltarGl();
+      // Saiu da home no meio da entrada (a página fica escondida pelo Next, ainda no DOM):
+      // a barra das outras páginas não pode ficar escondida.
+      queueMicrotask(() => texto.checkVisibility() || avisarVistaPronta());
     };
-  }, [children]);
+  }, [children, vez]);
 
   return (
     <span className="relative mx-auto block w-fit text-primary-foreground">
@@ -176,15 +185,10 @@ export function PalavraTinta({ children }: { children: string }) {
         ref={textoRef}
         // O padding (desfeito pela margem) deixa o pingo do "i" e o fim do "a"
         // dentro da caixa: o bg-clip-text não pinta o que passa dela.
-        className="-mx-[0.08em] -my-[0.1em] block bg-linear-to-r/srgb from-accent from-8% to-primary-foreground to-42% bg-clip-text px-[0.08em] py-[0.1em] text-[clamp(7.5rem,26vw,20.625rem)] leading-[0.82] font-extrabold tracking-[-0.065em] whitespace-nowrap text-transparent motion-safe:opacity-0 data-[estado=pronta]:opacity-100"
+        className="-mx-[0.08em] -my-[0.1em] block bg-linear-to-r/srgb from-accent from-8% to-primary-foreground to-42% bg-clip-text px-[0.08em] py-[0.1em] text-[clamp(7.5rem,26vw,20.625rem)] leading-[0.82] min-[1800px]:text-[26rem] min-[2400px]:text-[32rem] font-extrabold tracking-[-0.065em] whitespace-nowrap text-transparent motion-safe:opacity-0 data-[estado=pronta]:opacity-100"
       >
         {children}
       </span>
-      <canvas
-        ref={canvasRef}
-        aria-hidden
-        className="pointer-events-none absolute text-accent opacity-0 transition-opacity duration-300 data-ativo:opacity-100"
-      />
     </span>
   );
 }

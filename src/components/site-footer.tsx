@@ -20,11 +20,17 @@ const novaAba = { target: "_blank", rel: "noopener noreferrer" } as const;
 const MAPA_EMBED =
   "https://www.google.com/maps?q=Av.+Brigadeiro+Faria+Lima,+110,+Bom+Clima,+Guarulhos+-+SP,+07130-000&output=embed";
 
-export function SiteFooter() {
+/** `className`: a home passa o crescimento das telas grandes (home-grande). */
+export function SiteFooter({ className }: { className?: string } = {}) {
   return (
     // pb maior: no fim da página, o botão flutuante do WhatsApp (até 80 px do
     // chão) não pode tapar os links da última linha.
-    <footer className="bg-primary pt-14 pb-[calc(env(safe-area-inset-bottom)+6.5rem)] text-sm text-primary-foreground/75 sm:pt-16">
+    <footer
+      className={cn(
+        "bg-primary pt-14 pb-[calc(env(safe-area-inset-bottom)+6.5rem)] text-sm text-primary-foreground/75 sm:pt-16",
+        className
+      )}
+    >
       <Container>
         <div className="grid gap-x-10 gap-y-10 sm:grid-cols-2 lg:grid-cols-[1.15fr_0.8fr_1.15fr_1.7fr]">
           {/* Marca */}

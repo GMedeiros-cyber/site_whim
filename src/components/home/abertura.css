@@ -1,10 +1,15 @@
 /*
  * Abertura da home: a tinta empurrada pinta o símbolo da Whim e a escrita entra.
  * Mesma animação do protótipo aprovado pela Whim em 12/11 (referencia/prototipo/index.html).
- * Uma vez por sessão; um toque pula; com movimento reduzido não aparece.
+ * Em toda carga da home e ao clicar no logo; um toque pula; com movimento reduzido não aparece.
  * O logo não é redesenhado: só os arquivos oficiais de public/brand/ revelados por máscara.
+ * Só anima transform, opacity e mask-position (will-change em cada camada) e fica parada
+ * enquanto <html data-intro="espera"> (hidratação e decodificação das imagens).
  */
-.abertura{position:fixed;inset:0;z-index:100;background:var(--background);display:grid;place-items:center;cursor:pointer;animation:abertura-sai .8s cubic-bezier(.77,0,.175,1) 3.15s forwards}
+.abertura{position:fixed;inset:0;z-index:100;background:var(--background);display:grid;place-items:center;cursor:pointer;will-change:transform;animation:abertura-sai .8s cubic-bezier(.77,0,.175,1) 3.15s forwards}
+html[data-intro=espera] .abertura,html[data-intro=espera] .abertura *{animation-play-state:paused}
+.abertura-tinta1,.abertura-tinta2{will-change:mask-position}
+.abertura-palavra,.abertura-pular{will-change:transform,opacity}
 .abertura[data-pulou]{animation:abertura-sai .5s cubic-bezier(.77,0,.175,1) forwards}
 .abertura-palco{position:relative;width:min(46vw,240px);aspect-ratio:1;margin-bottom:120px}
 .abertura-palco img{position:absolute;inset:0;width:100%;height:100%;display:block;user-select:none;pointer-events:none}
@@ -18,5 +23,4 @@
 @keyframes abertura-empurra2{from{-webkit-mask-position:0 0;mask-position:0 0}to{-webkit-mask-position:0 62%;mask-position:0 62%}}
 @keyframes abertura-aparece{to{opacity:1}}
 @keyframes abertura-sai{to{transform:translateY(-100%);visibility:hidden}}
-@media (prefers-reduced-motion:reduce){.abertura{animation:abertura-some .4s ease .8s forwards}.abertura-tinta1,.abertura-tinta2{-webkit-mask:none;mask:none;animation:none}.abertura-palavra{opacity:1;animation:none}}
-@keyframes abertura-some{to{opacity:0;visibility:hidden}}
+@media (prefers-reduced-motion:reduce){.abertura{display:none}}

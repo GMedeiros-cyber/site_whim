@@ -4,6 +4,7 @@ import "./globals.css";
 
 import { BotaoWhatsApp } from "@/components/botao-whatsapp";
 import { Medicao } from "@/components/medicao";
+import { TransicaoPinta } from "@/components/transicao-pinta";
 import { JsonLd, NEGOCIO } from "@/lib/schema";
 import { SITE_URL } from "@/lib/site";
 
@@ -27,14 +28,18 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
+    // suppressHydrationWarning: o script da abertura marca <html data-intro> e trava a rolagem
+    // antes da hidratação (src/lib/abertura.ts).
     <html
       lang="pt-BR"
+      suppressHydrationWarning
       data-scroll-behavior="smooth"
       className={`${poppins.variable} h-full antialiased motion-safe:scroll-smooth`}
     >
       <body className="min-h-full flex flex-col">
         {children}
         <BotaoWhatsApp />
+        <TransicaoPinta />
         <JsonLd dados={NEGOCIO} />
         <Medicao />
       </body>
