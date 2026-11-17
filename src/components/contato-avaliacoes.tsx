@@ -10,8 +10,9 @@ import { CONTATO, WHATSAPP } from "@/lib/whim";
 const linkInfo =
   "inline-flex min-h-11 w-fit items-center rounded-sm underline-offset-4 outline-none hover:underline focus-visible:ring-3 focus-visible:ring-ring/50 lg:min-h-0 lg:py-1";
 
-// As avaliações ficam escondidas até a Whim mandar as reais (pedido do Gabriel em 17/11).
-const MOSTRAR_AVALIACOES = false;
+// Seção visível com aviso de "em breve" até chegarem os depoimentos reais (17/11).
+// Nunca colocar depoimento inventado aqui: só os reais, com autorização de quem escreveu.
+const MOSTRAR_AVALIACOES = true;
 
 /** Seção única "Contato + Avaliações" (direção B: claro em camadas). */
 export function ContatoAvaliacoes() {
@@ -61,12 +62,25 @@ function Avaliacoes() {
       <h3 className="text-xl font-semibold tracking-[-0.01em]">O que dizem de nós</h3>
       <p className="mt-4 inline-flex items-center gap-2 rounded-full border border-accent bg-background px-3.5 py-1.5 text-xs font-medium">
         <StarIcon aria-hidden className="size-3.5 fill-accent text-accent" />
-        Nota no Google · entra aqui
+        Depoimentos em breve
+      </p>
+      <p className="mt-3 max-w-[46ch] text-sm leading-relaxed text-muted-foreground">
+        Os depoimentos dos nossos clientes chegam em breve. Enquanto isso, você encontra a Whim no{" "}
+        <a
+          href={CONTATO.mapa}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-medium text-foreground underline underline-offset-4 outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+        >
+          Google Maps
+        </a>
+        .
       </p>
 
       <ul
-        tabIndex={0}
-        aria-label="Avaliações do Google (lugar reservado)"
+        aria-hidden
+        tabIndex={-1}
+        aria-label="Depoimentos em breve"
         className="-mx-4 mt-5 flex snap-x snap-mandatory scroll-px-4 gap-3 overflow-x-auto px-4 pb-1 outline-none focus-visible:ring-3 focus-visible:ring-ring/50 sm:-mx-7 sm:scroll-px-7 sm:px-7 lg:mx-0 lg:grid lg:snap-none lg:gap-4 lg:overflow-visible lg:px-0 lg:pb-0"
       >
         {cartoes.map((linhas, i) => (
@@ -88,7 +102,7 @@ function Avaliacoes() {
               <span aria-hidden className="size-9 shrink-0 rounded-full bg-muted" />
               <div className="grid min-w-0 gap-1.5">
                 <Skeleton aria-hidden className="h-[7px] w-16 motion-reduce:animate-none" />
-                <p className="text-xs text-muted-foreground">Avaliação real do Google entra aqui</p>
+                <Skeleton aria-hidden className="h-[7px] w-24 motion-reduce:animate-none" />
               </div>
             </div>
           </li>
