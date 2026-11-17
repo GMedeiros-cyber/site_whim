@@ -35,6 +35,6 @@ Fonte: respostas da própria Whim. Senhas e logins do PDF **não** ficam no repo
 - Foto original (sem compressão do WhatsApp) da mesa com as camisetas marrons, para a hero em qualidade máxima.
 - Prazo de guarda dos contatos salvos pelo site (proposta: 24 meses).
 
-- Dias de funcionamento (o horário 6h às 18h veio antes; não sabemos os dias).
+- Dias de funcionamento: respondido em 17/11, segunda a sexta, das 9h às 18h (o "6h às 18h" de antes saiu).
 - Domínio exato do site (provavelmente whimconfeccao.com.br, pelo e-mail).
 - Depoimentos reais, fotos de trabalhos para portfólio.
