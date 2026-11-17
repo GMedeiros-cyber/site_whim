@@ -280,3 +280,11 @@ Uma entrada por tarefa, sempre acrescentada no fim (nunca reescrever as anterior
 - Conferido: lint e tsc ok; build webpack ok (Poppins trocada só localmente, também no `global-error.tsx`); Playwright 390/1280: home → Monte sua peça → voltar, durante e depois da abertura, sem a tela de erro e com console limpo; 4 páginas sem rolagem lateral; capturas em 390/1280/2560.
 - Commit: `7e245a2` (main, um deploy só).
 - Pendente: texto da autorização para anúncios/prospecção; espera de ~2,5 s da abertura em celular lento (decisão do Gabriel); rodapé em 1180 px nas telas grandes.
+
+### 2026-11-17 15:45 · Agente 3 · Ofertas e horário (Claude Code)
+- Feito (`agente-3/ofertas-horario`): 2ª caixa, opcional e desmarcada, "Quero receber novidades e ofertas da Whim." no Contato e no passo 5 do Monte sua peça (`campos-contato.tsx`); `/api/contatos` grava `ofertas` e `ofertas_texto` (texto só quando marcada) e acrescenta as colunas por ALTER TABLE na tabela que já existe; /privacidade com as duas finalidades, públicos de anúncios do Google e da Meta só para quem marcou (dados codificados) e como sair pelo WhatsApp ou por e-mail.
+- Horário: "Segunda a sexta, das 9h às 18h" no `CONTATO.horario` (rodapé, Contato, llms.txt) e `openingHoursSpecification` Mo–Fr 09:00–18:00 no schema; referências atualizadas, protótipos HTML não.
+- Conferido: MySQL 9.7 de verdade com a tabela no formato antigo (colunas entram no lugar certo, contato antigo com `ofertas = 0`) e do zero; 9 checagens novas e as 20 de antes ok. Navegador 1280 e 390: caixa desmarcada, 201 com `ofertas` 0 e 1 conforme marcado, WhatsApp abre, horário novo e nada de "6h às 18h".
+- Comandos: `git switch -c agente-3/ofertas-horario origin/main`, `npm install`, `npm run lint` (ok), `npm run build` (webpack, ok), `next start` + Puppeteer.
+- Commit: `cfad075`.
+- Pendente: a Whim confirmar os 24 meses; rótulo de conversão do Google Ads; quem for subir públicos de anúncios usa só as linhas com `ofertas = 1`.
