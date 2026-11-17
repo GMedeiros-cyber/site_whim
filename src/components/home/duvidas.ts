@@ -34,6 +34,6 @@ export const DUVIDAS = [
   },
   {
     pergunta: "O site mostra preço?",
-    resposta: "Não. O orçamento é feito pelo WhatsApp, e quem responde é a Caroline.",
+    resposta: "Não. O orçamento é feito pelo WhatsApp, e quem responde é a equipe da Whim.",
   },
 ];

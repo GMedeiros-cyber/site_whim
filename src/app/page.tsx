@@ -95,7 +95,7 @@ const MARCAS = [
   { nome: "Santander", arquivo: "santander", largura: 688, altura: 32 },
   { nome: "SBT", arquivo: "sbt", largura: 120, altura: 52 },
   { nome: "Bauducco", arquivo: "bauducco", largura: 345, altura: 45 },
-  { nome: "Aurora", arquivo: "aurora", largura: 518, altura: 37 },
+  { nome: "Aurora", arquivo: "aurora", largura: 182, altura: 50 },
   { nome: "Electrochemical", arquivo: "electrochemical", largura: 982, altura: 27 },
   { nome: "Lopes Kalil Engenharia", arquivo: "lopes-kalil", largura: 120, altura: 52 },
   { nome: "Indovinya", arquivo: "indovinya", largura: 388, altura: 42 },
@@ -160,8 +160,7 @@ function Topo() {
           </span>
         </h1>
         <p className="mt-4 max-w-[52ch] text-[15px] leading-relaxed text-pretty text-primary-foreground/80 md:text-base">
-          Uniformes, camisetas e peças com a sua marca. Silk, DTF e bordado numa oficina própria em
-          Guarulhos.
+          Uniformes, camisetas e peças com a sua marca. Silk, DTF e bordado.
         </p>
         <div className="mt-7 flex w-full flex-col gap-2.5 sm:w-auto sm:flex-row">
           <a href={WHATSAPP_ORCAMENTO} className={botaoClaro}>
@@ -229,9 +228,6 @@ function QuemSomos() {
               </figure>
             ))}
           </Carrossel>
-          <span className="absolute top-4 left-4 hidden rounded-2xl bg-primary px-4 py-3 text-[13px] font-medium text-primary-foreground shadow-[0_16px_30px_-18px] shadow-primary/60 md:block lg:top-7 lg:-left-[22px]">
-            Oficina própria · Guarulhos/SP
-          </span>
         </div>
 
         <ul className="grid grid-cols-2 gap-x-[18px] gap-y-4 sm:gap-x-7 sm:gap-y-[22px] lg:col-start-1 lg:self-start">
@@ -447,7 +443,7 @@ function Convite() {
           </h2>
           <p className="mt-[22px] mb-8 max-w-[46ch] text-base leading-relaxed text-pretty text-primary-foreground/80 md:text-[17px]">
             Peça, cor, estampa e quantidade em 5 passos. O orçamento chega pronto no WhatsApp da Whim,
-            e quem responde é a Caroline.
+            e a nossa equipe responde.
           </p>
           <div className="flex w-full flex-col justify-center gap-2.5 sm:w-auto sm:flex-row">
             <Link href={ACAO.href} className={botaoClaro}>

@@ -9,7 +9,7 @@ Logos oficiais, convertidos para uma cor só (`#5D6178`, cinza-azulado da Whim) 
 | Santander | `santander.webp` | Wikimedia Commons, "Banco Santander Logotipo.svg" |
 | SBT | `sbt.webp` | Wikimedia Commons, versão monocromática do logo do SBT |
 | Bauducco | `bauducco.webp` | logo do cabeçalho de bauducco.com.br |
-| Aurora | `aurora.webp` | Wikimedia Commons, "Logotipo da Aurora Coop.svg" (Aurora Coop, a de alimentos; confirmado pelo Gabriel em 16/11) |
+| Aurora | `aurora.webp` | logo "Aurora" da marca de alimentos, de auroracoop.com.br (trocado em 17/11 a pedido do Gabriel; em tons de cinza para manter o sol e os arcos) |
 | Electrochemical | `electrochemical.webp` | logo do cabeçalho de electrochemical.com.br (Guarulhos) |
 | Lopes Kalil Engenharia | `lopes-kalil.webp` | logo de lopeskalil.com.br (original pequeno, 130 px) |
 | Indovinya | `indovinya.webp` | logo de indovinya.indoramaventures.com |

@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { XIcon } from "lucide-react";
 
-import "./botao-whatsapp.css";
 import { linkWhatsApp } from "@/lib/whim";
 
 const CHAVE = "whim-dica-whatsapp";
@@ -11,7 +10,7 @@ const LINK = linkWhatsApp("Olá, Whim! Quero um orçamento.");
 
 /**
  * Botão flutuante do WhatsApp, em todas as páginas (layout.tsx).
- * Só o ícone do WhatsApp, 56 px (PC e celular), sem texto.
+ * Só o ícone do WhatsApp, 56 px (PC e celular), sem texto e parado (sem balanço).
  * Balão uma vez por sessão, 3 s depois de carregar; some em 8 s, no × ou no clique.
  */
 export function BotaoWhatsApp() {
@@ -40,7 +39,7 @@ export function BotaoWhatsApp() {
       {dica && (
         // Por cima do botão (absolute): se entrasse no fluxo, o bloco fixo cresceria e contaria como CLS.
         <div className="pointer-events-auto absolute right-0 bottom-[calc(100%+0.625rem)] flex w-max max-w-[210px] items-start rounded-[16px_16px_4px_16px] border border-primary/8 bg-background py-0.5 pr-0.5 pl-3.5 text-[13px] leading-snug text-foreground shadow-[0_14px_30px_-18px] shadow-primary/55 duration-500 ease-[cubic-bezier(.2,.9,.3,1.3)] animate-in fade-in zoom-in-90 slide-in-from-bottom-2 motion-reduce:animate-none md:max-w-[250px]">
-          <p className="py-2">Oi! Quer um orçamento? A Caroline responde no WhatsApp.</p>
+          <p className="py-2">Oi! Quer um orçamento? A nossa equipe responde no WhatsApp.</p>
           <button
             type="button"
             aria-label="Fechar aviso"
@@ -57,7 +56,7 @@ export function BotaoWhatsApp() {
         rel="noopener noreferrer"
         aria-label="Pedir orçamento no WhatsApp"
         onClick={() => setDica(false)}
-        className="botao-whatsapp pointer-events-auto flex size-14 items-center justify-center gap-2.5 rounded-full bg-accent text-[15px] font-semibold text-primary shadow-[0_18px_36px_-16px] shadow-primary/60 transition-colors outline-none hover:bg-[color-mix(in_oklab,var(--accent),var(--background)_18%)] focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-primary"
+        className="pointer-events-auto flex size-14 items-center justify-center gap-2.5 rounded-full bg-accent text-[15px] font-semibold text-primary shadow-[0_18px_36px_-16px] shadow-primary/60 transition-colors outline-none hover:bg-[color-mix(in_oklab,var(--accent),var(--background)_18%)] focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-primary"
       >
         {/* Ícone oficial do WhatsApp, numa cor só. */}
         <svg aria-hidden viewBox="0 0 24 24" className="size-7 shrink-0 fill-current">

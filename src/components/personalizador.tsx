@@ -457,7 +457,7 @@ export function Personalizador() {
               <p>
                 <span className="font-semibold">Prazo de produção:</span> 20 a 30 dias, conforme quantidade e modelo.
               </p>
-              <p>Quem responde é a Caroline.</p>
+              <p>Quem responde é a equipe da Whim.</p>
             </div>
             <a
               href={linkWhatsApp(resumo)}

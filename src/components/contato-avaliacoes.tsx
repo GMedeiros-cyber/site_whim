@@ -10,6 +10,9 @@ import { CONTATO, WHATSAPP } from "@/lib/whim";
 const linkInfo =
   "inline-flex min-h-11 w-fit items-center rounded-sm underline-offset-4 outline-none hover:underline focus-visible:ring-3 focus-visible:ring-ring/50 lg:min-h-0 lg:py-1";
 
+// As avaliações ficam escondidas até a Whim mandar as reais (pedido do Gabriel em 17/11).
+const MOSTRAR_AVALIACOES = false;
+
 /** Seção única "Contato + Avaliações" (direção B: claro em camadas). */
 export function ContatoAvaliacoes() {
   return (
@@ -19,7 +22,10 @@ export function ContatoAvaliacoes() {
           Fale com <Destaque>a Whim.</Destaque>
         </Titulo>
 
-        <div className="mt-8 grid rounded-[28px] bg-background p-2 shadow-[0_24px_56px_-24px] shadow-primary/20 sm:mt-10 lg:grid-cols-[minmax(0,600px)_minmax(0,1fr)] lg:rounded-[36px] lg:p-3">
+        <div className={cn(
+            "mt-8 grid rounded-[28px] bg-background p-2 shadow-[0_24px_56px_-24px] shadow-primary/20 sm:mt-10 lg:rounded-[36px] lg:p-3",
+            MOSTRAR_AVALIACOES ? "lg:grid-cols-[minmax(0,600px)_minmax(0,1fr)]" : "max-w-[720px]"
+          )}>
           <div className="px-4 pt-6 pb-8 sm:px-7 sm:pt-8 lg:px-9 lg:py-10">
             <h3 className="text-xl font-semibold tracking-[-0.01em]">Mande sua mensagem</h3>
             <p className="mt-2 text-sm text-muted-foreground">
@@ -28,7 +34,7 @@ export function ContatoAvaliacoes() {
             <FormContato className="mt-6" />
           </div>
 
-          <Avaliacoes />
+          {MOSTRAR_AVALIACOES && <Avaliacoes />}
         </div>
 
         <InfoContato />
