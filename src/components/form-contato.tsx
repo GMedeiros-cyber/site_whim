@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import { Seta } from "@/components/blocos";
 import { CampoIsca } from "@/components/campo-isca";
-import { Autorizacao, CamposContato, CONTATO_VAZIO, contatoValido, focarErro, TEXTO_AUTORIZACAO } from "@/components/campos-contato";
+import { Autorizacao, CamposContato, CONTATO_VAZIO, contatoValido, focarErro, TEXTO_AUTORIZACAO, TEXTO_OFERTAS } from "@/components/campos-contato";
 import { medir } from "@/components/medicao";
 import { Button } from "@/components/ui/button";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
@@ -42,6 +42,8 @@ export function FormContato({ className }: { className?: string }) {
       mensagem: [empresa && `Empresa ou escola: ${empresa}`, mensagem].filter(Boolean).join("\n") || undefined,
       consentimento: true,
       consentimento_texto: TEXTO_AUTORIZACAO,
+      ofertas: contato.ofertas,
+      ofertas_texto: TEXTO_OFERTAS,
       site: campo("site"),
     });
     const texto = `Olá, Whim! Sou ${nome}${empresa ? ` da ${empresa}` : ""}. ${mensagem || "Quero um orçamento."}`;

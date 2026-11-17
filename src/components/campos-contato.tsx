@@ -9,9 +9,11 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
 /** Nome, telefone e e-mail de quem pede o orçamento (Monte sua peça e formulário de Contato). */
-export type DadosContato = { nome: string; telefone: string; email: string; autoriza: boolean };
-export const CONTATO_VAZIO: DadosContato = { nome: "", telefone: "", email: "", autoriza: false };
+export type DadosContato = { nome: string; telefone: string; email: string; autoriza: boolean; ofertas: boolean };
+export const CONTATO_VAZIO: DadosContato = { nome: "", telefone: "", email: "", autoriza: false, ofertas: false };
 export const TEXTO_AUTORIZACAO = "Autorizo a Whim a usar estes dados para responder ao meu contato.";
+/** Segunda autorização: opcional e sempre começa desmarcada. */
+export const TEXTO_OFERTAS = "Quero receber novidades e ofertas da Whim.";
 
 /** "(11) 98765-4321" ou "(11) 3456-7890" enquanto digita; tira o +55 de número colado. */
 export function mascararTelefone(v: string) {
@@ -96,7 +98,7 @@ export function CamposContato({
   );
 }
 
-/** Caixa de autorização (obrigatória) e o link para a Política de privacidade. */
+/** Caixas de autorização (a 1ª obrigatória; a de ofertas, opcional) e o link para a Política de privacidade. */
 export function Autorizacao({
   id,
   valor,
@@ -127,6 +129,10 @@ export function Autorizacao({
           {erro}
         </p>
       )}
+      <label className="flex min-h-11 cursor-pointer items-center gap-3 text-[13px] leading-snug">
+        <Checkbox checked={valor.ofertas} onCheckedChange={(v) => onValor({ ...valor, ofertas: !!v })} className="size-5" />
+        {TEXTO_OFERTAS}
+      </label>
       <p className="text-xs leading-relaxed text-muted-foreground">
         Quais dados, por quanto tempo e como pedir para apagar:{" "}
         <Link href="/privacidade" className="font-medium text-foreground underline underline-offset-4">

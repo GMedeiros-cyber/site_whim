@@ -18,7 +18,7 @@ export const CONTATO = {
   mapa: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
     `Av. Brigadeiro Faria Lima, 110, ${bairro}, Guarulhos - SP, ${cep}`
   )}`,
-  horario: "Das 6h às 18h",
+  horario: "Segunda a sexta, das 9h às 18h", // confirmado pela Whim em 17/11
   whatsapp: "+55 11 94544-8802",
   email: "vendas@whimconfeccao.com.br",
   instagram: "@whimconfeccao",

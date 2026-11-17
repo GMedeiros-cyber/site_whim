@@ -1,5 +1,5 @@
 // Dados estruturados (JSON-LD). Só dados confirmados pela Whim (referencia/briefing-whim.md):
-// sem horário (faltam os dias) e sem AggregateRating até existirem avaliações reais.
+// sem AggregateRating até existirem avaliações reais.
 import { SITE_URL } from "@/lib/site";
 import { CONTATO, EMPRESA } from "@/lib/whim";
 
@@ -35,6 +35,13 @@ export const NEGOCIO = {
   foundingDate: "2021",
   telephone: CONTATO.whatsapp,
   email: CONTATO.email,
+  // Igual ao CONTATO.horario (segunda a sexta, das 9h às 18h).
+  openingHoursSpecification: {
+    "@type": "OpeningHoursSpecification",
+    dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+    opens: "09:00",
+    closes: "18:00",
+  },
   address: {
     "@type": "PostalAddress",
     streetAddress: `${CONTATO.logradouro.replace(" · ", ", ")}, ${CONTATO.bairro}`,

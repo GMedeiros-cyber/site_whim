@@ -14,6 +14,7 @@ import {
   contatoValido,
   focarErro,
   TEXTO_AUTORIZACAO,
+  TEXTO_OFERTAS,
   type DadosContato,
 } from "@/components/campos-contato";
 import { medir } from "@/components/medicao";
@@ -521,6 +522,8 @@ export function Personalizador() {
       pedido: resumo,
       consentimento: true,
       consentimento_texto: TEXTO_AUTORIZACAO,
+      ofertas: contato.ofertas,
+      ofertas_texto: TEXTO_OFERTAS,
       site: isca instanceof HTMLInputElement ? isca.value : "",
     });
     medir("contato_whatsapp", { origem: "personalizador" });
