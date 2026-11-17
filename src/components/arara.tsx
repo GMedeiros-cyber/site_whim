@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 
 import manifest from "../../public/arara/manifest.json";
+import { depoisDaTransicao } from "@/components/transicao-pinta";
 import { cn } from "@/lib/utils";
 
 /** Modelos da arara, na ordem do manifesto (public/arara/manifest.json). */
@@ -186,20 +187,28 @@ export function Arara({ selecionada, cor, onEscolher }: { selecionada: string; c
   const [foco, setFoco] = useState<number | null>(null);
   const semGiro = usePoucoMovimento();
 
+  // Só começa a decodificar os quadros depois da transição de tinta entre páginas,
+  // para ela não engasgar (pedido do agente 2, 17/11).
   useEffect(() => {
     const el = araraRef.current;
     if (!el) return;
-    const io = new IntersectionObserver(
-      ([e]) => {
-        if (e.isIntersecting) {
-          setCarregar(true);
-          io.disconnect();
-        }
-      },
-      { rootMargin: "200px" }
-    );
-    io.observe(el);
-    return () => io.disconnect();
+    let io: IntersectionObserver | undefined;
+    const cancelar = depoisDaTransicao(() => {
+      io = new IntersectionObserver(
+        ([e]) => {
+          if (e.isIntersecting) {
+            setCarregar(true);
+            io?.disconnect();
+          }
+        },
+        { rootMargin: "200px" }
+      );
+      io.observe(el);
+    });
+    return () => {
+      cancelar();
+      io?.disconnect();
+    };
   }, []);
 
   const corDe = (m: Modelo) => (m.nome === selecionada ? cor : corPropria(m));

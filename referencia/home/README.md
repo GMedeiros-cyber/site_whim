@@ -33,7 +33,7 @@ A versão que vale é a do Claude Design (atualizada em 15/11 com os ajustes do 
    - Celular: texto em cima, as 3 fotos num carrossel (scroll-snap, ~80% de largura cada, bolinhas de posição), e as etapas em 2 colunas.
    - O manifesto antigo com fotos em pílula sai.
 3. **O que fazemos** (16/11: a Whim **não faz sublimação**): título "Três jeitos de *estampar sua marca.*" e a linha "Cada técnica deixa a arte de um jeito. Veja como fica cada uma e para o que ela é melhor."
-   - 3 cartões com imagem 3:4 gerada por IA e o selo "Imagem ilustrativa" (obrigatório): `public/images/estilos/silk.webp`, `dtf.webp`, `bordado.webp`. Textos:
+   - 3 cartões com imagem 3:4 gerada por IA e o selo "Imagem ilustrativa" (obrigatório): `public/images/estilos/silk-close.webp` (IA, 17/11), `dtf.webp`, `bordado.webp`. Textos:
      - Silk: "Tinta grossa em cores chapadas, com o toque e a durabilidade da tinta na tela." Bom para: logos de poucas cores e tiragens maiores.
      - DTF: "Todas as cores, degradês e fotos, com acabamento fotográfico." Bom para: artes coloridas e pedidos menores.
      - Bordado: "A arte é costurada em linha, em relevo, e dura junto com a peça." Bom para: logo no peito de polos e uniformes.
@@ -97,9 +97,9 @@ Regras de sempre: só as classes do tema (sem hex solto), Poppins, logo nunca re
 | bdb470a9… | `public/images/f17.webp` |
 | cf78a384… | `public/images/f35.webp` |
 | 0c1349c5… | `public/images/f41.webp` |
-| e23cd7b4… | `public/images/hero.webp` |
+| e23cd7b4… | `public/images/rodo-tela.webp` (IA, 17/11) |
 | 6c13b2e1… | `public/brand/whim-logo-branco.svg` |
-| a782de32… | `public/images/estilos/silk.webp` |
+| a782de32… | `public/images/estilos/silk-close.webp` (IA, 17/11) |
 | a17489e8… | `public/images/estilos/dtf.webp` |
 | dcc5b0d9… | `public/images/estilos/bordado.webp` |
 | fc911543… | `public/brand/whim-simbolo.webp` |

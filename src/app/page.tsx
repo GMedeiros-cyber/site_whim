@@ -61,7 +61,7 @@ const OFICINA = [
 
 const FOTOS = [
   { src: "/images/f41.webp", alt: "Estampador trabalhando na mesa longa com peças azuis", legenda: "Estampa em série na mesa longa" },
-  { src: "/images/hero.webp", alt: "Mãos passando o rodo na tela de silk", legenda: "Rodo na tela de silk · ilustrativa" },
+  { src: "/images/rodo-tela.webp", alt: "Mãos passando o rodo na tela de silk", legenda: "Rodo na tela de silk · ilustrativa" },
   { src: "/images/f35.webp", alt: "Camisetas pretas estampadas na mesa", legenda: "Peças na mesa de estampa" },
 ];
 
@@ -69,7 +69,7 @@ const FOTOS = [
 const TECNICAS = [
   {
     nome: "Silk",
-    imagem: "silk",
+    imagem: "silk-close",
     alt: "Estampa em silk com cores chapadas numa camiseta azul-marinho",
     texto: "Tinta grossa em cores chapadas, com o toque e a durabilidade da tinta na tela.",
     bomPara: "logos de poucas cores e tiragens maiores.",
