@@ -303,3 +303,9 @@ Uma entrada por tarefa, sempre acrescentada no fim (nunca reescrever as anterior
 - Comandos: `npm run lint`, `npm run build` (webpack, ok), `next start` + Playwright e traces.
 - Commit: `0269a39`. `package-lock.json` com só `"peer": true` do `npm install` antigo ficou guardado num stash, não descartado.
 - Pendente: o agente 1 ligar `depoisDaTransicao` na arara; o agente 3 ver o aviso de CSS pré-carregado do `global-error.tsx` (os dois em PEDIDOS).
+
+### 2026-11-17 16:55 · Revisão e merge da tarde de 17/11 (Claude, outra conta)
+- Feito: juntei `agente-1/ajustes-17-11-b` (com o agente 3 dentro), `agente-2/ajustes-17-11-b` e `claude/conteudo-17-11` (silk e rodo novos, "confiam na Whim", depoimentos "em breve"); fiz os dois pedidos do agente 2 que estavam abertos: arara só decodifica depois da transição (`depoisDaTransicao`) e Poppins do `global-error` com os pesos do layout; imagens novas renomeadas (`silk-close.webp`, `rodo-tela.webp`) para não pegar cache antigo do otimizador.
+- Conferido: lint e tsc ok; build webpack ok (Poppins trocada só localmente); Playwright 390/1280: 4 páginas sem rolagem lateral e console limpo, home → Monte sua peça → voltar sem erro, barra visível na hora, some ao descer e volta ao subir; capturas das seções novas.
+- Commit: `5e8aac1` (main, um deploy só).
+- Pendente: medir PageSpeed no site publicado.
