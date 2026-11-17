@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Image from "next/image";
+import Image, { getImageProps } from "next/image";
 import Link from "next/link";
 
 import { Container, Destaque, Seta, Titulo, secao } from "@/components/blocos";
@@ -39,8 +39,17 @@ const sobrepoe =
 const sobe = "home-sobe";
 const apoio = "mt-[18px] max-w-[56ch] text-base leading-relaxed text-pretty text-muted-foreground sm:text-[17px]";
 
-// A Whim faz silk, DTF e bordado (não faz sublimação: briefing de 16/11).
-const TECNICAS_TOPO = ["Silk", "DTF", "Bordado"];
+// Foto do topo com art direction: paisagem quando a tela é mais larga que alta, retrato
+// no resto (celular e tablet em pé). Mesma prioridade alta da foto anterior.
+const HERO = {
+  alt: "Camisetas marrons estampadas em silk, em série na mesa longa da oficina da Whim",
+  sizes: "100vw",
+  loading: "eager",
+  fetchPriority: "high",
+} as const;
+const HERO_PAISAGEM = "(min-aspect-ratio: 1/1)";
+const { srcSet: heroPaisagem } = getImageProps({ ...HERO, src: "/images/hero-mesa-pc.webp", width: 1200, height: 744 }).props;
+const heroRetrato = getImageProps({ ...HERO, src: "/images/hero-mesa-celular.webp", width: 1200, height: 1600 }).props;
 
 const OFICINA = [
   { nome: "Gravação de telas", texto: "A arte vira tela para o silk." },
@@ -109,14 +118,16 @@ export default function Home() {
       <SiteHeader />
       <main className="flex-1">
         <Topo />
-        <QuemSomos />
-        <OQueFazemos />
-        <ComoFunciona />
-        <Clientes />
-        <Duvidas />
-        <Convite />
+        <div className="home-grande">
+          <QuemSomos />
+          <OQueFazemos />
+          <ComoFunciona />
+          <Clientes />
+          <Duvidas />
+          <Convite />
+        </div>
       </main>
-      <SiteFooter />
+      <SiteFooter className="home-grande" />
       <JsonLd dados={perguntas(DUVIDAS)} />
     </>
   );
@@ -127,22 +138,22 @@ function Topo() {
     <section id="topo" className="p-2 md:p-3">
       <div
         className={cn(
-          "relative isolate flex min-h-[calc(100svh-1rem)] flex-col items-center justify-center overflow-hidden rounded-[24px] bg-primary px-5 pt-28 pb-24 text-center text-primary-foreground md:min-h-[min(880px,calc(100svh-1.5rem))] md:rounded-[32px] md:px-10 md:pt-32 md:pb-28",
+          "relative isolate flex min-h-[calc(100svh-1rem)] flex-col items-center justify-center overflow-hidden rounded-[24px] bg-primary px-5 pt-28 pb-24 text-center text-primary-foreground md:min-h-[min(880px,calc(100svh-1.5rem))] md:rounded-[32px] min-[1800px]:min-h-[calc(100svh-1.5rem)]! md:px-10 md:pt-32 md:pb-28",
           "home-recua"
         )}
       >
-        <Image
-          src="/images/hero-mesa.webp"
-          alt="Mesa longa de silk com peças estampadas em série na oficina da Whim"
-          fill
-          loading="eager"
-          fetchPriority="high"
-          sizes="100vw"
-          className="-z-20 object-cover object-[center_40%] grayscale-35"
-        />
+        <picture>
+          <source media={HERO_PAISAGEM} srcSet={heroPaisagem} sizes={HERO.sizes} />
+          <img
+            {...heroRetrato}
+            alt={HERO.alt}
+            className="absolute inset-0 -z-20 size-full object-cover object-[38%_50%] [@media(min-aspect-ratio:1/1)]:object-[50%_74%]"
+          />
+        </picture>
+        {/* Véu azul: forte atrás do texto, mais leve nas bordas e embaixo, onde a estampa aparece. */}
         <div
           aria-hidden
-          className="absolute inset-0 -z-10 bg-radial-[120%_90%_at_50%_45%] from-primary/60 via-primary/86 via-60% to-primary/97"
+          className="absolute inset-0 -z-10 bg-radial-[90%_62%_at_50%_44%] from-primary/88 via-primary/74 via-55% to-primary/38"
         />
 
         <Image
@@ -151,18 +162,18 @@ function Topo() {
           width={444}
           height={138}
           loading="eager"
-          className="h-[42px] w-auto opacity-95 md:h-[58px]"
+          className="home-grande h-[42px] w-auto opacity-95 md:h-[58px]"
         />
         <h1 className="mt-1.5">
           <PalavraTinta>Vista</PalavraTinta>{" "}
-          <span className="mt-1.5 block text-[28px] leading-[1.1] font-semibold tracking-[-0.025em] text-balance md:text-[40px]">
+          <span className="home-grande mt-1.5 block text-[28px] leading-[1.1] font-semibold tracking-[-0.025em] text-balance md:text-[40px]">
             a sua marca, peça por peça.
           </span>
         </h1>
-        <p className="mt-4 max-w-[52ch] text-[15px] leading-relaxed text-pretty text-primary-foreground/80 md:text-base">
+        <p className="home-grande mt-4 max-w-[52ch] text-[15px] leading-relaxed text-pretty text-primary-foreground/80 md:text-base">
           Uniformes, camisetas e peças com a sua marca. Silk, DTF e bordado.
         </p>
-        <div className="mt-7 flex w-full flex-col gap-2.5 sm:w-auto sm:flex-row">
+        <div className="home-grande mt-7 flex w-full flex-col gap-2.5 sm:w-auto sm:flex-row">
           <a href={WHATSAPP_ORCAMENTO} className={botaoClaro}>
             Pedir orçamento no WhatsApp <Seta />
           </a>
@@ -171,16 +182,16 @@ function Topo() {
           </a>
         </div>
 
-        <div className="absolute inset-x-5 bottom-5 flex items-center justify-center text-xs md:inset-x-10 md:bottom-[30px] md:justify-between">
-          <ul aria-label="Técnicas" className="flex flex-wrap justify-center gap-2">
-            {TECNICAS_TOPO.map((t) => (
-              <li key={t} className="rounded-full border border-primary-foreground/22 px-3 py-[7px] text-primary-foreground/85">
-                {t}
-              </li>
-            ))}
-          </ul>
-          <span className="hidden text-primary-foreground/65 md:block">role para conhecer</span>
-        </div>
+        {/* Ícone de rolagem: balança de leve e some ao rolar (transicoes.css). */}
+        <a
+          href="#sobre"
+          aria-label="Ir para Quem somos"
+          className="home-rolar home-grande absolute bottom-3 left-1/2 flex size-11 -translate-x-1/2 items-center justify-center rounded-full text-primary-foreground/75 transition-colors hover:text-primary-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-foreground md:bottom-5"
+        >
+          <span aria-hidden className="home-rolar-mouse relative h-[34px] w-[22px] rounded-full border-2 border-current">
+            <span className="absolute top-1.5 left-1/2 h-[7px] w-[3px] -translate-x-1/2 rounded-full bg-current" />
+          </span>
+        </a>
       </div>
     </section>
   );
@@ -424,18 +435,29 @@ function Duvidas() {
 function Convite() {
   return (
     <section id="fim" className="relative isolate bg-primary text-primary-foreground">
-      {/* Borda de tinta: o azul-marinho escorre por cima da seção anterior. */}
-      <svg
-        aria-hidden
-        viewBox="0 0 1440 60"
-        preserveAspectRatio="none"
-        className="absolute inset-x-0 -top-[38px] h-10 w-full fill-primary md:-top-[58px] md:h-[60px]"
-      >
-        <path d="M0 60 L0 38 C 80 30 140 44 220 36 C 300 26 340 12 430 20 C 520 28 560 46 660 40 C 760 34 800 14 900 18 C 990 22 1040 40 1130 36 C 1220 32 1260 10 1340 16 C 1390 20 1420 30 1440 28 L1440 60 Z" />
-        <circle cx="318" cy="22" r="5" />
-        <circle cx="1012" cy="30" r="3.5" />
-        <circle cx="1268" cy="8" r="4" />
-      </svg>
+      {/* Borda de tinta: o azul-marinho escorre por cima da seção anterior. Ao entrar na
+          tela, a onda corre e cresce e os pingos respingam (transicoes.css). A onda tem 150%
+          da largura para correr sem mostrar a ponta. */}
+      <div aria-hidden className="absolute inset-x-0 -top-[38px] h-10 overflow-clip md:-top-[58px] md:h-[60px]">
+        <svg
+          viewBox="0 0 1440 60"
+          preserveAspectRatio="none"
+          className="home-onda absolute top-0 -left-1/2 h-full w-[150%] fill-primary"
+        >
+          <path d="M0 60 L0 38 C 80 30 140 44 220 36 C 300 26 340 12 430 20 C 520 28 560 46 660 40 C 760 34 800 14 900 18 C 990 22 1040 40 1130 36 C 1220 32 1260 10 1340 16 C 1390 20 1420 30 1440 28 L1440 60 Z" />
+        </svg>
+        {[
+          { x: "21%", y: "18%", d: "size-2.5", a: "0%" },
+          { x: "62%", y: "34%", d: "size-1.5", a: "10%" },
+          { x: "86%", y: "6%", d: "size-2", a: "20%" },
+        ].map((p) => (
+          <span
+            key={p.x}
+            style={{ left: p.x, top: p.y, "--atraso": p.a } as React.CSSProperties}
+            className={cn("home-pingo absolute rounded-full bg-primary", p.d)}
+          />
+        ))}
+      </div>
       <Container>
         <div className="flex flex-col items-center border-b border-primary-foreground/15 pt-20 pb-14 text-center md:pt-30 md:pb-24">
           <h2 className={cn("text-5xl leading-none font-bold tracking-[-0.045em] md:text-[80px]", sobe)}>

@@ -1,12 +1,24 @@
 /*
  * Transições da home (referencia/home/README.md, "Transições entre as seções").
  * Presas à rolagem (animation-timeline: view()). Sem suporte ou com movimento
- * reduzido, tudo fica parado e visível.
- * CSS global com prefixo home-: a regra "*.css" do next.config transforma
- * .module.css em global, então um CSS Module não teria classes com hash.
+ * reduzido, tudo fica parado e visível. CSS global com prefixo home-.
  */
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
+    /* Convite: a onda de tinta corre e cresce e os pingos respingam enquanto
+       ela entra na tela; volta ao rolar para cima. */
+    .home-onda {
+      transform-origin: 50% 100%;
+      animation: home-onda linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 45%;
+    }
+    .home-pingo {
+      animation: home-pingo linear both;
+      animation-timeline: view();
+      animation-range: entry var(--atraso, 0%) cover 45%;
+    }
+
     /* Título e linha de apoio sobem ao entrar na tela. */
     .home-sobe {
       animation: home-sobe linear both;
@@ -75,5 +87,61 @@
     transform: scale(0.94);
     border-radius: 48px;
     filter: brightness(0.8);
+  }
+}
+
+@keyframes home-onda {
+  from {
+    transform: translateX(33.333%) scaleY(0.35);
+  }
+}
+
+@keyframes home-pingo {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.2);
+  }
+}
+
+/* Ícone de rolagem do topo: some nos primeiros 140 px de rolagem... */
+@supports (animation-timeline: scroll()) {
+  .home-rolar {
+    animation: home-rolar-some linear both;
+    animation-timeline: scroll(root block);
+    animation-range: 0 140px;
+  }
+}
+
+/* ...e balança de leve, no tempo (parado com movimento reduzido). */
+@media (prefers-reduced-motion: no-preference) {
+  .home-rolar-mouse {
+    animation: home-rolar-balanca 1.6s ease-in-out infinite alternate;
+  }
+}
+
+@keyframes home-rolar-some {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+@keyframes home-rolar-balanca {
+  to {
+    transform: translateY(5px);
+  }
+}
+
+/* Telas grandes (27" Full HD e 2K): a home cresce por igual a partir do layout de PC
+   (larguras, espaços e textos juntos). Fica fora o "Vista", que a tinta mede na tela
+   e tem tamanho próprio. */
+@media (min-width: 1800px) {
+  .home-grande {
+    zoom: 1.2;
+  }
+}
+@media (min-width: 2400px) {
+  .home-grande {
+    zoom: 1.5;
   }
 }

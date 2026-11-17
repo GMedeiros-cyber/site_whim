@@ -1,61 +1,88 @@
 "use client";
 
-import { useLayoutEffect, useRef } from "react";
+import { useLayoutEffect, useRef, useSyncExternalStore } from "react";
 
 import "./abertura.css";
-import { CHAVE_ABERTURA, aberturaVaiTocar, avisarFimDaAbertura } from "@/lib/abertura";
+import {
+  EVENTO_FIM,
+  EVENTO_REINICIO,
+  SCRIPT_CARGA,
+  aberturaNaTela,
+  avisarFimDaAbertura,
+  faseIntro,
+  travarRolagem,
+} from "@/lib/abertura";
+
+const assinar = (avisar: () => void) => {
+  window.addEventListener(EVENTO_FIM, avisar);
+  window.addEventListener(EVENTO_REINICIO, avisar);
+  return () => {
+    window.removeEventListener(EVENTO_FIM, avisar);
+    window.removeEventListener(EVENTO_REINICIO, avisar);
+  };
+};
 
 /**
  * Abertura da home: o símbolo da Whim é pintado pela tinta e a escrita entra (~3,5 s).
- * Vem no HTML do servidor para aparecer antes de qualquer coisa; o script em linha
- * esconde na hora quem já viu nesta sessão ou prefere menos movimento.
- * Um toque (ou tecla) pula. No fim, avisa a tinta da palavra "Vista" para começar.
+ * Toca em toda carga da home e quando o logo da barra é clicado (src/lib/abertura.ts).
+ * Vem no HTML do servidor para aparecer antes de tudo, parada ("espera") até a página
+ * hidratar e as imagens decodificarem: assim a hidratação não engasga a animação.
+ * Um toque (ou tecla) pula. No fim, a tinta da palavra "Vista" começa.
  */
 export function Abertura() {
   const ref = useRef<HTMLDivElement>(null);
+  // No HTML do servidor ela sempre vem; no cliente, só enquanto a fase da entrada pede
+  // (chegando à home por outro link, ou com movimento reduzido, não há abertura).
+  const tocando = useSyncExternalStore(assinar, aberturaNaTela, () => true);
 
   useLayoutEffect(() => {
     const el = ref.current;
-    if (!el) return;
-    if (!aberturaVaiTocar()) {
-      el.remove();
-      avisarFimDaAbertura();
-      return;
-    }
-    try {
-      sessionStorage.setItem(CHAVE_ABERTURA, "1");
-    } catch {}
-    document.documentElement.style.overflow = "hidden";
+    if (!tocando || !el) return;
+    travarRolagem(true);
 
+    let vivo = true;
+    let comecou = false;
     let fim = 0;
     const terminar = () => {
       clearTimeout(fim);
-      document.documentElement.style.overflow = "";
-      el.remove();
-      avisarFimDaAbertura();
+      travarRolagem(false);
+      avisarFimDaAbertura(); // a fase vira "tinta" e a abertura sai da árvore
     };
+    const comecar = () => {
+      if (!vivo || comecou) return;
+      comecou = true;
+      if (faseIntro() === "espera") document.documentElement.dataset.intro = "abertura";
+      clearTimeout(fim);
+      fim = window.setTimeout(terminar, 4800); // garantia, se o animationend não vier
+    };
+    const imagens = [...el.querySelectorAll("img")].map((i) => i.decode().catch(() => {}));
+    Promise.all(imagens).then(() => requestAnimationFrame(comecar));
+    fim = window.setTimeout(comecar, 1500); // imagem lenta não segura a abertura
+
     const pular = () => {
+      comecar();
       el.dataset.pulou = "";
       clearTimeout(fim);
       fim = window.setTimeout(terminar, 600);
     };
     const aoAcabar = (e: AnimationEvent) => {
-      if (e.target === el && /abertura-sai|abertura-some/.test(e.animationName)) terminar();
+      if (e.target === el && e.animationName === "abertura-sai") terminar();
     };
     el.addEventListener("animationend", aoAcabar);
     el.addEventListener("pointerdown", pular, { once: true });
     window.addEventListener("keydown", pular, { once: true });
-    fim = window.setTimeout(terminar, 4800); // garantia, se o animationend não vier
 
     return () => {
+      vivo = false;
       clearTimeout(fim);
       el.removeEventListener("animationend", aoAcabar);
       el.removeEventListener("pointerdown", pular);
       window.removeEventListener("keydown", pular);
-      document.documentElement.style.overflow = "";
+      travarRolagem(false);
     };
-  }, []);
+  }, [tocando]);
 
+  if (!tocando) return null;
   return (
     <>
       <div ref={ref} id="abertura" className="abertura" aria-hidden="true" title="Toque para pular">
@@ -71,12 +98,7 @@ export function Abertura() {
         </div>
         <span className="abertura-pular">Toque para pular</span>
       </div>
-      <script
-        // Esconde antes do primeiro desenho quem já viu nesta sessão ou prefere menos movimento.
-        dangerouslySetInnerHTML={{
-          __html: `try{if(sessionStorage.getItem("${CHAVE_ABERTURA}")==="1"||matchMedia("(prefers-reduced-motion: reduce)").matches){var a=document.getElementById("abertura");a&&(a.style.display="none")}}catch(e){}`,
-        }}
-      />
+      <script dangerouslySetInnerHTML={{ __html: SCRIPT_CARGA }} />
     </>
   );
 }
