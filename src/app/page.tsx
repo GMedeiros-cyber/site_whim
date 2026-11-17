@@ -60,7 +60,7 @@ const OFICINA = [
 
 const FOTOS = [
   { src: "/images/f41.webp", alt: "Estampador trabalhando na mesa longa com peças azuis", legenda: "Estampa em série na mesa longa" },
-  { src: "/images/hero.webp", alt: "Mãos passando o rodo na tela de silk", legenda: "Rodo na tela de silk" },
+  { src: "/images/hero.webp", alt: "Mãos passando o rodo na tela de silk", legenda: "Rodo na tela de silk · ilustrativa" },
   { src: "/images/f35.webp", alt: "Camisetas pretas estampadas na mesa", legenda: "Peças na mesa de estampa" },
 ];
 
@@ -372,7 +372,7 @@ function Clientes() {
     <section id="clientes" className={cn(secao, sobrepoe, "bg-muted")}>
       <Container>
         <Titulo className={sobe}>
-          Marcas que <Destaque>confiam na oficina.</Destaque>
+          Marcas que <Destaque>confiam na Whim.</Destaque>
         </Titulo>
       </Container>
 
