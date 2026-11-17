@@ -274,3 +274,9 @@ Uma entrada por tarefa, sempre acrescentada no fim (nunca reescrever as anterior
 - Comandos: `npm run lint`, `npm run build` (webpack, ok), `next start` + Playwright.
 - Commit: `5c958c1`. `package-lock.json` mudou só no `npm install` (`"peer": true`) e ficou fora.
 - Pendente: com CPU 4× a abertura espera ~2,5 s parada pela hidratação; o botão do WhatsApp não cresce nas telas grandes (fica no layout de todas as páginas).
+
+### 2026-11-17 13:00 · Revisão e merge de 17/11 dos agentes 1, 2 e 3 (Claude, outra conta)
+- Feito: juntei `agente-1/ajustes-17-11`, `agente-3/contatos` e `agente-2/ajustes-17-11` (só conflitos de PEDIDOS/RELATORIO, mantidos todos os status e blocos); menu do cabeçalho mais opaco (`bg-background/90`) para o contraste pedido pelo agente 1. O `el.remove()` da abertura já não existe na versão do agente 2 (ela sai da árvore pelo React).
+- Conferido: lint e tsc ok; build webpack ok (Poppins trocada só localmente, também no `global-error.tsx`); Playwright 390/1280: home → Monte sua peça → voltar, durante e depois da abertura, sem a tela de erro e com console limpo; 4 páginas sem rolagem lateral; capturas em 390/1280/2560.
+- Commit: `7e245a2` (main, um deploy só).
+- Pendente: texto da autorização para anúncios/prospecção; espera de ~2,5 s da abertura em celular lento (decisão do Gabriel); rodapé em 1180 px nas telas grandes.
