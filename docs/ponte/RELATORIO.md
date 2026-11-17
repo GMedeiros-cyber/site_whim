@@ -309,3 +309,10 @@ Uma entrada por tarefa, sempre acrescentada no fim (nunca reescrever as anterior
 - Conferido: lint e tsc ok; build webpack ok (Poppins trocada só localmente); Playwright 390/1280: 4 páginas sem rolagem lateral e console limpo, home → Monte sua peça → voltar sem erro, barra visível na hora, some ao descer e volta ao subir; capturas das seções novas.
 - Commit: `5e8aac1` (main, um deploy só).
 - Pendente: medir PageSpeed no site publicado.
+
+### 2026-11-17 19:35 · Agente 3 · Testes do Monte sua peça e espaços vazios (Claude Code)
+- Feito (`agente-3/testes-monte`, a partir do main `7884efc`): checklist de UX/UI do Monte sua peça (`docs/qualidade/monte-sua-peca-checklist.md`: 61 itens, 51 ok e 10 com falha, mais a gola e a carcela vistas no olho, com print e passos para repetir) e espaços vazios (`docs/qualidade/espacos-vazios.md`). Falhas passadas ao agente 1, e a margem da home com zoom ao agente 2, em PEDIDOS.
+- Scripts para rodar de novo, sem mudar código de produção: `scripts/testes-monte.mjs` (Playwright nas 6 telas, 800 combinações, artes geradas na hora, WhatsApp e contato interceptados, axe) e `scripts/espacos-vazios.mjs`. `playwright-core` e `axe-core` entram com `npm i --no-save`, porque o `package.json` é "ninguém sem pedir".
+- Comandos: `npm i --no-save playwright-core axe-core`, `npm run build` + `npx next start -p 3417`, os dois scripts, `npm run lint` (ok), `npm run build` (webpack, ok).
+- Commit: `e1c8b3f`.
+- Pendente: as falhas com os agentes 1 e 2; a 404 a 1920 com a metade direita vazia (minha, baixa).
