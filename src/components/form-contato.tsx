@@ -1,38 +1,65 @@
 "use client";
 
+import { useState } from "react";
+
 import { Seta } from "@/components/blocos";
+import { CampoIsca } from "@/components/campo-isca";
+import { Autorizacao, CamposContato, CONTATO_VAZIO, contatoValido, errosContato, TEXTO_AUTORIZACAO } from "@/components/campos-contato";
 import { medir } from "@/components/medicao";
 import { Button } from "@/components/ui/button";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { enviarContato } from "@/lib/contatos";
 import { cn } from "@/lib/utils";
 import { linkWhatsApp } from "@/lib/whim";
 
 const estiloCampo = "rounded-xl bg-background px-3.5";
 
-/** Monta a mensagem e abre a conversa com a Whim no WhatsApp. */
+/** Guarda o contato no banco (sem esperar) e abre a conversa com a Whim no WhatsApp. */
 export function FormContato({ className }: { className?: string }) {
+  const [contato, setContato] = useState(CONTATO_VAZIO);
+  const [tentou, setTentou] = useState(false);
+
   function enviar(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const dados = new FormData(e.currentTarget);
+    const form = e.currentTarget;
+    if (!contatoValido(contato)) {
+      setTentou(true);
+      // Foco no primeiro campo com problema (a caixa de autorização é a última).
+      const erros = errosContato(contato);
+      const primeiro = (["nome", "telefone", "email"] as const).find((k) => erros[k]);
+      (primeiro ? form.querySelector<HTMLElement>(`#c-${primeiro}`) : form.querySelector<HTMLElement>("[role=checkbox]"))?.focus();
+      return;
+    }
+    const dados = new FormData(form);
     const campo = (nome: string) => String(dados.get(nome) ?? "").trim();
     const empresa = campo("empresa");
-    const texto = `Olá, Whim! Sou ${campo("nome")}${empresa ? ` da ${empresa}` : ""}. ${campo("mensagem") || "Quero um orçamento."}`;
+    const mensagem = campo("mensagem");
+    const nome = contato.nome.trim();
+    enviarContato({
+      origem: "formulario",
+      nome,
+      email: contato.email.trim(),
+      telefone: contato.telefone,
+      mensagem: [empresa && `Empresa ou escola: ${empresa}`, mensagem].filter(Boolean).join("\n") || undefined,
+      consentimento: true,
+      consentimento_texto: TEXTO_AUTORIZACAO,
+      site: campo("site"),
+    });
+    const texto = `Olá, Whim! Sou ${nome}${empresa ? ` da ${empresa}` : ""}. ${mensagem || "Quero um orçamento."}`;
     medir("contato_whatsapp", { origem: "formulario" });
     window.open(linkWhatsApp(texto), "_blank", "noopener,noreferrer");
   }
 
   return (
-    <form onSubmit={enviar} className={className}>
+    <form onSubmit={enviar} noValidate className={cn("relative", className)}>
+      <CampoIsca />
       <FieldGroup className="gap-5">
-        <Field>
-          <FieldLabel htmlFor="c-nome">Nome</FieldLabel>
-          <Input id="c-nome" name="nome" autoComplete="name" placeholder="Seu nome" required className={cn(estiloCampo, "h-12")} />
-        </Field>
+        <CamposContato id="c" valor={contato} onValor={setContato} mostrarErros={tentou} campoClassName={cn(estiloCampo, "h-12")} />
         <Field>
           <FieldLabel htmlFor="c-empresa">Empresa ou escola</FieldLabel>
-          <Input id="c-empresa" name="empresa" autoComplete="organization" placeholder="Opcional" className={cn(estiloCampo, "h-12")} />
+          <Input id="c-empresa" name="empresa" autoComplete="organization" placeholder="Opcional" maxLength={120} className={cn(estiloCampo, "h-12")} />
         </Field>
         <Field>
           <FieldLabel htmlFor="c-mensagem">O que você precisa?</FieldLabel>
@@ -40,10 +67,12 @@ export function FormContato({ className }: { className?: string }) {
             id="c-mensagem"
             name="mensagem"
             rows={3}
+            maxLength={1800}
             placeholder="Ex.: 80 camisetas para um evento em março"
             className={cn(estiloCampo, "min-h-24 py-3")}
           />
         </Field>
+        <Autorizacao id="c" valor={contato} onValor={setContato} mostrarErros={tentou} />
         <Button type="submit" size="xl" className="mt-1 w-full">
           Enviar pelo WhatsApp <Seta />
         </Button>

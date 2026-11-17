@@ -31,19 +31,22 @@ const limitar = (v: number) => Math.max(-1, Math.min(1, v));
 const numero = (i: number) => String(i + 1).padStart(3, "0");
 
 /**
- * O giro e o pêndulo, fora do React: bancos de quadros por pasta de cor (carregados aos poucos),
- * espelho com histerese, crossfade na troca de cor e o laço de animação (pausa fora da tela).
+ * O giro e o pêndulo, fora do React: bancos de quadros por pasta de cor (carregados aos poucos,
+ * já decodificados como ImageBitmap no tamanho do canvas), espelho com histerese, crossfade na
+ * troca de cor e o laço de animação (pausa fora da tela). O canvas só é redesenhado quando o
+ * quadro muda; o balanço do pêndulo é só transform numa camada própria.
  */
 function criarMotor(painel: HTMLElement, canvas: HTMLCanvasElement, pendulo: HTMLElement, sombra: HTMLElement) {
   const ctx = canvas.getContext("2d")!;
   const s = { theta: 0, destino: 0, espelho: false, ang: 0, vel: 0, arrasto: null as { x: number; theta: number } | null };
   type Quadros = { pasta: string; n: number };
-  const bancos = new Map<string, (HTMLImageElement | undefined)[]>();
+  const bancos = new Map<string, (ImageBitmap | undefined)[]>();
   const pedidos = new Map<string, Set<number>>();
   let atual: Quadros | null = null;
   let anterior: (Quadros & { desde: number }) | null = null;
   let alvo: Quadros = { pasta: "", n: 0 };
-  let semGiro = false, parado = false, naTela = true, raf = 0, antes = 0;
+  let semGiro = false, parado = false, naTela = true, raf = 0, antes = 0, avulso = 0;
+  let desenhado = "", angulo = "", largura = "";
 
   const indice = (n: number) => (n - 1) * (1 - Math.abs(s.theta));
   const perto = (n: number) => {
@@ -51,6 +54,30 @@ function criarMotor(painel: HTMLElement, canvas: HTMLCanvasElement, pendulo: HTM
     return [i, i + 1, i - 1, i + 2];
   };
   const todos = (n: number) => Array.from({ length: n }, (_, i) => i);
+  function descartar(pasta: string) {
+    bancos.get(pasta)?.forEach((q) => q?.close());
+    bancos.delete(pasta);
+    pedidos.delete(pasta);
+  }
+  // Quadro novo com o laço parado: desenha no próximo frame (uma vez, mesmo chegando vários).
+  function agendar() {
+    desenhado = "";
+    if (!raf && !avulso)
+      avulso = requestAnimationFrame((t) => {
+        avulso = 0;
+        desenhar(t);
+      });
+  }
+
+  // Canvas no tamanho da tela × DPR (até 2), medido fora do laço.
+  const ro = new ResizeObserver(([e]) => {
+    const w = Math.round(e.contentRect.width * Math.min(2, devicePixelRatio || 1));
+    if (!w || w === canvas.width) return;
+    canvas.width = w;
+    canvas.height = Math.round((w * 4) / 3);
+    agendar();
+  });
+  ro.observe(canvas);
 
   function pedir(pasta: string, n: number, indices: number[], alta: boolean) {
     let banco = bancos.get(pasta);
@@ -61,14 +88,15 @@ function criarMotor(painel: HTMLElement, canvas: HTMLCanvasElement, pendulo: HTM
     for (const i of indices) {
       if (i < 0 || i >= n || feitos.has(i)) continue;
       feitos.add(i);
-      const img = new window.Image(); // "Image" aqui é o do next/image
-      img.fetchPriority = alta ? "high" : "low";
-      img.src = `${pasta}${numero(i)}.webp`;
-      img.decode().then(() => {
-        b[i] = img;
-        trocar();
-        if (!raf) desenhar();
-      }, () => {});
+      fetch(`${pasta}${numero(i)}.webp`, { priority: alta ? "high" : "low" })
+        .then((r) => r.blob())
+        .then((blob) => createImageBitmap(blob, { resizeWidth: canvas.width, resizeHeight: canvas.height, resizeQuality: "high" }))
+        .then((q) => {
+          if (bancos.get(pasta) !== b) return q.close(); // a cor saiu enquanto decodificava
+          b[i] = q;
+          trocar();
+          agendar();
+        }, () => {});
     }
   }
 
@@ -84,14 +112,13 @@ function criarMotor(painel: HTMLElement, canvas: HTMLCanvasElement, pendulo: HTM
       const lado = Math.sign(s.ang) || 1;
       s.vel = (lado * Math.max(1, PICO - Math.abs(s.ang))) / RESPOSTA;
     } else if (atual) {
-      bancos.delete(atual.pasta);
-      pedidos.delete(atual.pasta);
+      descartar(atual.pasta);
     }
     atual = { ...alvo };
     if (!semGiro) pedir(alvo.pasta, alvo.n, todos(alvo.n), false); // o resto em segundo plano
   }
 
-  function maisPerto(b: (HTMLImageElement | undefined)[], i: number, n: number) {
+  function maisPerto(b: (ImageBitmap | undefined)[], i: number, n: number) {
     for (let d = 0; d < n; d++) {
       const img = b[i - d] ?? b[i + d];
       if (img) return img;
@@ -118,34 +145,43 @@ function criarMotor(painel: HTMLElement, canvas: HTMLCanvasElement, pendulo: HTM
 
   function desenhar(agora = performance.now()) {
     if (!atual) return;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.save();
-    if (s.espelho) {
-      ctx.translate(canvas.width, 0);
-      ctx.scale(-1, 1);
-    }
     let alfa = 1;
     if (anterior) {
       alfa = Math.min(1, (agora - anterior.desde) / FADE_MS);
-      if (alfa < 1) pintar(anterior, 1);
-      else {
-        bancos.delete(anterior.pasta);
-        pedidos.delete(anterior.pasta);
+      if (alfa >= 1) {
+        descartar(anterior.pasta);
         anterior = null;
       }
     }
-    pintar(atual, alfa);
-    ctx.restore();
-    const d = canvas.dataset;
-    d.theta = s.theta.toFixed(3);
-    d.quadro = String(Math.round(indice(atual.n)) + 1);
-    d.espelho = s.espelho ? "1" : "0";
-    d.cor = atual.pasta;
-    d.fade = anterior ? "1" : "0";
-    pendulo.style.transform = s.ang ? `rotate(${s.ang.toFixed(3)}deg)` : "";
-    pendulo.dataset.angulo = s.ang.toFixed(2);
-    // A sombra estreita quando a peça fica de lado.
-    sombra.style.transform = `scaleX(${1 - 0.4 * Math.abs(s.theta)})`;
+    // Redesenha só quando muda o quadro, o espelho ou o fade (no balanço parado, nada).
+    const chave = `${atual.pasta}|${indice(atual.n).toFixed(2)}|${s.espelho}|${anterior ? alfa.toFixed(2) : ""}`;
+    if (chave !== desenhado) {
+      desenhado = chave;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.save();
+      if (s.espelho) {
+        ctx.translate(canvas.width, 0);
+        ctx.scale(-1, 1);
+      }
+      if (anterior) pintar(anterior, 1);
+      pintar(atual, alfa);
+      ctx.restore();
+      const d = canvas.dataset;
+      d.theta = s.theta.toFixed(3);
+      d.quadro = String(Math.round(indice(atual.n)) + 1);
+      d.espelho = s.espelho ? "1" : "0";
+      d.cor = atual.pasta;
+      d.fade = anterior ? "1" : "0";
+      // A sombra estreita quando a peça fica de lado.
+      const l = `scaleX(${(1 - 0.4 * Math.abs(s.theta)).toFixed(3)})`;
+      if (l !== largura) sombra.style.transform = largura = l;
+    }
+    const a = s.ang.toFixed(2);
+    if (a !== angulo) {
+      angulo = a;
+      pendulo.style.transform = s.ang ? `rotate(${a}deg)` : "";
+      pendulo.dataset.angulo = a;
+    }
   }
 
   function passo(agora: number) {
@@ -188,7 +224,7 @@ function criarMotor(painel: HTMLElement, canvas: HTMLCanvasElement, pendulo: HTM
       if (sem || paradaDeFrente) {
         desligar();
         Object.assign(s, { theta: 0, destino: 0, espelho: false, ang: 0, vel: 0, arrasto: null });
-        desenhar();
+        agendar();
       } else {
         if (atual) pedir(atual.pasta, atual.n, todos(atual.n), false);
         ligar();
@@ -198,7 +234,7 @@ function criarMotor(painel: HTMLElement, canvas: HTMLCanvasElement, pendulo: HTM
       alvo = { pasta, n };
       pedir(pasta, n, semGiro ? [n - 1] : perto(n), true);
       trocar();
-      desenhar();
+      agendar();
     },
     /** Mouse em cima, foco ou toque num botão da vitrine: o quadro atual e os vizinhos daquela cor. */
     preCarregar(pasta: string, n: number) {
@@ -220,14 +256,21 @@ function criarMotor(painel: HTMLElement, canvas: HTMLCanvasElement, pendulo: HTM
     },
     parar() {
       desligar();
+      cancelAnimationFrame(avulso);
       io.disconnect();
+      ro.disconnect();
       document.removeEventListener("visibilitychange", aba);
+      [...bancos.keys()].forEach(descartar);
     },
   };
 }
 type Motor = ReturnType<typeof criarMotor>;
 
-/** O que o passo Estampa mostra: posições marcadas (na ordem dos números), técnica e foco do zoom. */
+/**
+ * O que o passo Estampa mostra: posições marcadas (na ordem dos números), técnica e foco do zoom.
+ * `final`: depois do passo Estampa a prévia continua com as artes, sem zoom, com a vitrine
+ * embaixo e a miniatura do outro lado.
+ */
 export type PosicaoPrevia = { chave: string; url?: string; manterFundo?: boolean };
 export type EstampaPrevia = {
   lado: Lado;
@@ -235,7 +278,67 @@ export type EstampaPrevia = {
   posicoes: PosicaoPrevia[];
   tecnica: Tecnica;
   foco: { chave: string; n: number }; // a cada posição marcada, n muda e o zoom aproxima nela
+  final?: boolean;
 };
+
+const outroLado = (l: Lado): Lado => (l === "frente" ? "costas" : "frente");
+const nomeLado = (l: Lado) => (l === "frente" ? "Frente" : "Costas");
+
+/**
+ * Compõe no Worker o lado pedido com as artes e desenha no canvas (a imagem anterior fica até a
+ * nova sair). `assinatura` é o JSON de { lado, tecnica, p } ou "" para limpar.
+ */
+function useComposicao(
+  ref: React.RefObject<HTMLCanvasElement | null>,
+  assinatura: string,
+  modelo: Modelo,
+  cor: Cor,
+  aoDesenhar?: (desenhou: boolean) => void
+) {
+  const aviso = useRef(aoDesenhar);
+  useEffect(() => {
+    aviso.current = aoDesenhar;
+  });
+  useEffect(() => {
+    const ctx = ref.current?.getContext("2d");
+    if (!ctx) return;
+    if (!assinatura) {
+      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+      delete ctx.canvas.dataset.pronto;
+      aviso.current?.(false);
+      return;
+    }
+    const { lado: l, tecnica: t, p } = JSON.parse(assinatura) as { lado: Lado; tecnica: Tecnica; p: [string, string, boolean][] };
+    let vivo = true;
+    comporEstampa({
+      largura: ctx.canvas.width,
+      altura: ctx.canvas.height,
+      peca: `${modelo.coresPasta}${cor.pasta}/${l}.webp`,
+      branco: `${modelo.coresPasta}branco/${l}.webp`,
+      tecnica: t,
+      camadas: p.map(([chave, url, manter]) => ({ area: areaDe(modelo, l, chave)!, url: url || undefined, manter })),
+      tinta: tintaPara(cor.hex),
+      fonte: getComputedStyle(document.body).fontFamily,
+    }).then(({ bitmap, ms }) => {
+      if (!vivo) return bitmap.close();
+      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+      ctx.drawImage(bitmap, 0, 0);
+      bitmap.close();
+      aviso.current?.(true);
+      ctx.canvas.dataset.ms = String(ms);
+      ctx.canvas.dataset.pronto = `${cor.pasta}|${assinatura}`;
+    }, () => {});
+    return () => {
+      vivo = false;
+    };
+  }, [ref, assinatura, modelo, cor]);
+}
+
+/** Assinatura estável da composição de um lado (o objeto `estampa` muda a cada render). */
+function assinar(modelo: Modelo, lado: Lado, tecnica: Tecnica, posicoes: PosicaoPrevia[]) {
+  const p = posicoes.filter((x) => areaDe(modelo, lado, x.chave)).map((x) => [x.chave, x.url ?? "", !!x.manterFundo]);
+  return JSON.stringify({ lado, tecnica, p });
+}
 
 /** Cor da marca para o marcador: azul-marinho em tecido claro, branco em tecido escuro. */
 export function tintaPara(hex: string) {
@@ -268,6 +371,7 @@ export function PreviaPeca({
   const penduloRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const estampaRef = useRef<HTMLCanvasElement>(null);
+  const miniRef = useRef<HTMLCanvasElement>(null);
   const sombraRef = useRef<HTMLDivElement>(null);
   const motor = useRef<Motor | null>(null);
   const pan = useRef({ x: 0, y: 0, limite: { x: 0, y: 0 }, arrasto: null as { x: number; y: number } | null });
@@ -275,14 +379,15 @@ export function PreviaPeca({
   const semGiro = usePoucoMovimento();
 
   const comEstampa = estampa !== undefined;
+  const editar = comEstampa && !estampa.final; // passo Estampa: zoom, arrasto e legenda da técnica
   const lado = estampa?.lado ?? "frente";
   const [zoom, setZoom] = useState(1);
   // Ao entrar ou sair do passo Estampa o zoom volta para 1×; a cada posição marcada, aproxima nela.
-  const [estavaComEstampa, setEstavaComEstampa] = useState(comEstampa);
+  const [estavaEditando, setEstavaEditando] = useState(editar);
   const focoN = estampa?.foco.n ?? 0;
   const [ultimoFoco, setUltimoFoco] = useState(focoN);
-  if (estavaComEstampa !== comEstampa) {
-    setEstavaComEstampa(comEstampa);
+  if (estavaEditando !== editar) {
+    setEstavaEditando(editar);
     setZoom(1);
   }
   if (ultimoFoco !== focoN) {
@@ -290,7 +395,7 @@ export function PreviaPeca({
     const a = estampa && areaDe(modelo, lado, estampa.foco.chave);
     if (a) setZoom(zoomPara(a));
   }
-  const z = comEstampa ? zoom : 1;
+  const z = editar ? zoom : 1;
 
   // Posições que aparecem no lado da tela e a área onde o zoom aproxima.
   const naTela = estampa?.posicoes.filter((p) => areaDe(modelo, lado, p.chave)) ?? [];
@@ -299,8 +404,8 @@ export function PreviaPeca({
       ? estampa.foco.chave
       : (naTela.at(-1)?.chave ?? (lado === "frente" ? "frente-inteira" : "costas-inteira"));
   const tecnica = estampa?.tecnica ?? "DTF";
-  // Tudo o que muda a composição, numa chave estável (o objeto `estampa` muda a cada render).
-  const assinatura = comEstampa ? JSON.stringify({ lado, tecnica, p: naTela.map((p) => [p.chave, p.url ?? "", !!p.manterFundo]) }) : "";
+  const assinatura = estampa ? assinar(modelo, lado, tecnica, estampa.posicoes) : "";
+  const assinaturaMini = estampa?.final ? assinar(modelo, outroLado(lado), tecnica, estampa.posicoes) : "";
 
   const pasta = `${modelo.coresPasta}${cor.pasta}/`;
   const n = modelo.coresQuadros;
@@ -313,55 +418,24 @@ export function PreviaPeca({
   useEffect(() => motor.current?.configurar(semGiro, comEstampa), [semGiro, comEstampa]);
   useEffect(() => motor.current?.escolher(pasta, n), [pasta, n]);
 
-  // Passo Estampa: foto parada do lado escolhido com as artes (ou marcadores) nas dobras, em 2×,
-  // composta no Worker. Só recalcula quando muda a assinatura, a peça ou a cor; a foto anterior
-  // fica até a nova sair.
-  useEffect(() => {
-    const ctx = estampaRef.current?.getContext("2d");
-    const giro = canvasRef.current;
-    if (!ctx || !giro) return;
-    if (!assinatura) {
-      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-      delete ctx.canvas.dataset.pronto;
-      giro.style.visibility = "";
-      return;
-    }
-    const { lado: l, tecnica: t, p } = JSON.parse(assinatura) as { lado: Lado; tecnica: Tecnica; p: [string, string, boolean][] };
-    let vivo = true;
-    comporEstampa({
-      largura: ctx.canvas.width,
-      altura: ctx.canvas.height,
-      peca: `${modelo.coresPasta}${cor.pasta}/${l}.webp`,
-      branco: `${modelo.coresPasta}branco/${l}.webp`,
-      tecnica: t,
-      camadas: p.map(([chave, url, manter]) => ({ area: areaDe(modelo, l, chave)!, url: url || undefined, manter })),
-      tinta: tintaPara(cor.hex),
-      fonte: getComputedStyle(document.body).fontFamily,
-    }).then(({ bitmap, ms }) => {
-      if (!vivo) return bitmap.close();
-      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-      ctx.drawImage(bitmap, 0, 0);
-      bitmap.close();
-      giro.style.visibility = "hidden";
-      ctx.canvas.dataset.ms = String(ms);
-      ctx.canvas.dataset.pronto = `${cor.pasta}|${assinatura}`;
-    }, () => {});
-    return () => {
-      vivo = false;
-    };
-  }, [assinatura, modelo, cor]);
+  // Com estampa: foto parada do lado escolhido com as artes (ou marcadores) nas dobras, em 2×,
+  // composta no Worker; o giro some quando ela sai. Na prévia final, a miniatura do outro lado.
+  useComposicao(estampaRef, assinatura, modelo, cor, (desenhou) => {
+    if (canvasRef.current) canvasRef.current.style.visibility = desenhou ? "hidden" : "";
+  });
+  useComposicao(miniRef, assinaturaMini, modelo, cor);
 
   // Enquadramento do palco. No passo Estampa a peça cresce para ocupar o lugar do cartão, à
   // esquerda da barra de zoom; o zoom leva o centro da área em foco para o meio, e o arrasto move.
   useEffect(() => {
     pan.current.x = pan.current.y = 0;
-  }, [foco, lado, comEstampa]);
+  }, [foco, lado, editar]);
   useEffect(() => {
     const painel = painelRef.current, palco = palcoRef.current, tela = canvasRef.current;
     if (!painel || !palco || !tela) return;
     if (z === 1) pan.current.x = pan.current.y = 0;
     aplicar.current = () => {
-      if (!comEstampa) {
+      if (!editar) {
         palco.style.transform = "";
         return;
       }
@@ -386,14 +460,14 @@ export function PreviaPeca({
     const ro = new ResizeObserver(() => aplicar.current());
     ro.observe(painel);
     return () => ro.disconnect();
-  }, [comEstampa, z, foco, lado, modelo]);
+  }, [editar, z, foco, lado, modelo]);
 
   // Arrastar (botão apertado ou dedo) gira; com zoom no passo Estampa, move a imagem.
   // Os controles do painel (cartão, Frente/Costas, zoom) ficam fora disso.
   function apertar(e: React.PointerEvent<HTMLDivElement>) {
     if (e.button !== 0 || (e.target as Element).closest("[data-controle]")) return;
     if (comEstampa) {
-      if (z === 1) return;
+      if (!editar || z === 1) return;
       pan.current.arrasto = { x: e.clientX - pan.current.x, y: e.clientY - pan.current.y };
     } else {
       if (semGiro) return;
@@ -445,7 +519,7 @@ export function PreviaPeca({
       onPointerCancel={soltar}
       className={cn(
         "group/painel relative mx-auto aspect-[358/530] w-full overflow-hidden rounded-[22px] border border-primary/10 bg-muted outline-none select-none focus-visible:ring-3 focus-visible:ring-ring/50 min-[601px]:aspect-[662/640] min-[601px]:max-w-[662px] min-[601px]:rounded-[26px] lg:max-w-none",
-        comEstampa && limpo ? "cursor-grab touch-none data-arrastando:cursor-grabbing" : "touch-pan-y",
+        editar && limpo ? "cursor-grab touch-none data-arrastando:cursor-grabbing" : "touch-pan-y",
         gira && "cursor-grab data-arrastando:cursor-grabbing"
       )}
     >
@@ -466,7 +540,7 @@ export function PreviaPeca({
           )}
         />
         {/* Pêndulo: peça e sombra giram em torno do gancho (no eixo do cano). */}
-        <div ref={penduloRef} className="absolute inset-0 origin-[50%_11.31%] min-[601px]:origin-[50%_12.08%]">
+        <div ref={penduloRef} className="absolute inset-0 origin-[50%_11.31%] will-change-transform min-[601px]:origin-[50%_12.08%]">
           <div
             ref={sombraRef}
             aria-hidden
@@ -509,7 +583,8 @@ export function PreviaPeca({
             onValueChange={(v: string[]) => v[0] && estampa.onLado(v[0] as Lado)}
             spacing={0}
             variant="outline"
-            className="absolute top-4 left-4 rounded-full bg-background/85 backdrop-blur-sm"
+            // Na prévia final do celular, quem troca o lado é a miniatura (o botão cobriria o cano).
+            className={cn("absolute top-4 left-4 rounded-full bg-background/85 backdrop-blur-sm", !editar && "max-[600px]:hidden")}
           >
             {(["frente", "costas"] as const).map((l) => (
               <ToggleGroupItem
@@ -517,11 +592,15 @@ export function PreviaPeca({
                 value={l}
                 className="h-11 px-4 text-[13.5px] first:rounded-l-full! last:rounded-r-full! aria-pressed:bg-primary aria-pressed:text-primary-foreground"
               >
-                {l === "frente" ? "Frente" : "Costas"}
+                {nomeLado(l)}
               </ToggleGroupItem>
             ))}
           </ToggleGroup>
+        </>
+      )}
 
+      {editar && (
+        <>
           {/* Zoom: barra vertical à direita, centralizada na altura (+ em cima, − embaixo). */}
           <div
             data-controle
@@ -552,47 +631,62 @@ export function PreviaPeca({
         </>
       )}
 
-      {!estampa && (
-        <div data-controle className="absolute inset-x-3 bottom-3 cursor-auto rounded-2xl bg-background p-3 min-[601px]:inset-x-6 min-[601px]:bottom-6 min-[601px]:rounded-[18px] min-[601px]:p-4">
-          <p className="flex items-baseline gap-2">
-            <span className="text-base font-semibold min-[601px]:text-lg">{modelo.nome}</span>
-            <span className="text-[13px] text-muted-foreground min-[601px]:text-sm">{cor.nome}</span>
-          </p>
-          <div role="group" aria-label="Cor do tecido" className="mt-2.5 grid grid-cols-5 gap-1 min-[601px]:mt-3 min-[601px]:gap-2">
-            {CORES.map((c) => {
-              const ativa = c.pasta === cor.pasta;
-              return (
-                <button
-                  key={c.pasta}
-                  type="button"
-                  aria-pressed={ativa}
-                  aria-label={c.nome}
-                  onClick={() => onCor(c)}
-                  onPointerEnter={() => preCarregar(c)}
-                  onPointerDown={() => preCarregar(c)}
-                  onFocus={() => preCarregar(c)}
-                  className="flex min-h-11 flex-col items-center justify-end gap-1 rounded-xl pb-1 outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
-                >
-                  <Image
-                    src={`${modelo.coresPasta}${c.pasta}/${ultimo}.webp`}
-                    alt=""
-                    width={modelo.largura}
-                    height={modelo.altura}
-                    sizes="(min-width: 1024px) 80px, 64px"
-                    className={cn(
-                      "w-auto motion-safe:transition-[height,width] motion-safe:duration-300",
-                      // PC: miniaturas com 64 px de largura ou mais.
-                      ativa ? "h-12 min-[601px]:h-16 lg:h-auto lg:w-20" : "h-10 min-[601px]:h-12 lg:h-auto lg:w-16"
-                    )}
-                  />
-                  <span className={cn("text-[11px] leading-none whitespace-nowrap lg:text-xs", ativa ? "font-semibold" : "text-muted-foreground")}>
-                    <span className="min-[601px]:hidden">{c.curto ?? c.nome}</span>
-                    <span className="hidden min-[601px]:inline">{c.nome}</span>
-                  </span>
-                  <span aria-hidden className={cn("h-[3px] w-[22px] rounded-full", ativa ? "bg-accent" : "bg-transparent")} />
-                </button>
-              );
-            })}
+      {!editar && (
+        <div className="pointer-events-none absolute inset-x-3 bottom-3 grid justify-items-end gap-2 min-[601px]:inset-x-6 min-[601px]:bottom-6 min-[601px]:gap-3">
+          {/* Prévia final: o outro lado em miniatura; um clique troca. */}
+          {estampa && (
+            <button
+              type="button"
+              data-controle
+              onClick={() => estampa.onLado(outroLado(lado))}
+              aria-label={`Ver ${nomeLado(outroLado(lado)).toLowerCase()}`}
+              className="pointer-events-auto grid w-[68px] justify-items-center gap-0.5 rounded-[14px] border border-primary/12 bg-background p-1.5 text-[11px] text-muted-foreground outline-none focus-visible:ring-3 focus-visible:ring-ring/50 min-[601px]:w-[92px] min-[601px]:text-xs"
+            >
+              <canvas ref={miniRef} width={300} height={400} aria-hidden className="aspect-[3/4] w-full" />
+              {nomeLado(outroLado(lado))}
+            </button>
+          )}
+          <div data-controle className="pointer-events-auto w-full cursor-auto rounded-2xl bg-background p-3 min-[601px]:rounded-[18px] min-[601px]:p-4">
+            <p className="flex items-baseline gap-2">
+              <span className="text-base font-semibold min-[601px]:text-lg">{modelo.nome}</span>
+              <span className="text-[13px] text-muted-foreground min-[601px]:text-sm">{cor.nome}</span>
+            </p>
+            <div role="group" aria-label="Cor do tecido" className="mt-2.5 grid grid-cols-5 gap-1 min-[601px]:mt-3 min-[601px]:gap-2">
+              {CORES.map((c) => {
+                const ativa = c.pasta === cor.pasta;
+                return (
+                  <button
+                    key={c.pasta}
+                    type="button"
+                    aria-pressed={ativa}
+                    aria-label={c.nome}
+                    onClick={() => onCor(c)}
+                    onPointerEnter={() => preCarregar(c)}
+                    onPointerDown={() => preCarregar(c)}
+                    onFocus={() => preCarregar(c)}
+                    className="flex min-h-11 flex-col items-center justify-end gap-1 rounded-xl pb-1 outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+                  >
+                    <Image
+                      src={`${modelo.coresPasta}${c.pasta}/${ultimo}.webp`}
+                      alt=""
+                      width={modelo.largura}
+                      height={modelo.altura}
+                      sizes="(min-width: 1024px) 80px, 64px"
+                      className={cn(
+                        "w-auto motion-safe:transition-[height,width] motion-safe:duration-300",
+                        // PC: miniaturas com 64 px de largura ou mais.
+                        ativa ? "h-12 min-[601px]:h-16 lg:h-auto lg:w-20" : "h-10 min-[601px]:h-12 lg:h-auto lg:w-16"
+                      )}
+                    />
+                    <span className={cn("text-[11px] leading-none whitespace-nowrap lg:text-xs", ativa ? "font-semibold" : "text-muted-foreground")}>
+                      <span className="min-[601px]:hidden">{c.curto ?? c.nome}</span>
+                      <span className="hidden min-[601px]:inline">{c.nome}</span>
+                    </span>
+                    <span aria-hidden className={cn("h-[3px] w-[22px] rounded-full", ativa ? "bg-accent" : "bg-transparent")} />
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
       )}

@@ -158,7 +158,7 @@ export function MapaPosicoes({
   );
 }
 
-/** A mesma escolha em caixas de marcar, agrupada em Frente / Costas / Mangas. */
+/** A mesma escolha em caixas de marcar: Frente, Costas e Mangas, cada grupo com título e uma linha entre eles. */
 export function ListaPosicoes({
   modelo,
   numeros,
@@ -169,14 +169,15 @@ export function ListaPosicoes({
   onAlternar: (chave: string, lado: Lado) => void;
 }) {
   return (
-    <div className="mt-4 grid grid-cols-2 gap-x-3 gap-y-2">
+    <div className="mt-4">
       {GRUPOS.map(([grupo, chaves]) => {
         const existem = chaves.filter((k) => temPosicao(modelo, k));
         if (!existem.length) return null;
         return (
-          <fieldset key={grupo} className={cn("min-w-0", grupo === "Mangas" && "col-span-2")}>
-            <legend className="text-[13px] font-medium">{grupo}</legend>
-            <div className={cn(grupo === "Mangas" && "flex flex-wrap gap-x-5")}>
+          <fieldset key={grupo} className="min-w-0 border-t border-primary/10 pt-3 pb-1 first:border-t-0 first:pt-0">
+            {/* float + w-full: o título fica dentro do grupo, não em cima da linha. */}
+            <legend className="float-left w-full text-[13px] font-semibold">{grupo}</legend>
+            <div className="clear-left grid grid-cols-2 gap-x-3">
               {existem.map((k) => (
                 <label key={k} className="flex min-h-11 cursor-pointer items-center gap-2.5 text-[13px] leading-tight">
                   <Checkbox checked={numeros.has(k)} onCheckedChange={() => onAlternar(k, ladoDe(k))} className="size-5 shrink-0" />

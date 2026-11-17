@@ -15,13 +15,39 @@ const CHAVE = "whim-cookies";
 const ABRIR = "whim:preferencias-cookies";
 const COOKIES_DE_MEDICAO = /^(_ga|_gid|_gat|_gcl|_fbp|_fbc|_clck|_clsk|_uet)/;
 
+// Eventos que a Meta conhece com outro nome (os padrão otimizam os anúncios).
+const META: Record<string, string> = { generate_lead: "Lead" };
+
 /** Envia um evento às ferramentas carregadas. Sem consentimento (ou sem ID), não faz nada. */
 export function medir(evento: string, dados: Record<string, string> = {}) {
   const w = window as unknown as Globais;
   if (MEDICAO.gtm) w.dataLayer?.push({ event: evento, ...dados });
   w.gtag?.("event", evento, dados);
-  w.fbq?.("trackCustom", evento, dados);
+  if (META[evento]) w.fbq?.("track", META[evento], dados);
+  else w.fbq?.("trackCustom", evento, dados);
   w.clarity?.("event", evento);
+}
+
+const ORIGEM = "whim-origem";
+const RASTREIO = ["utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content", "gclid", "fbclid"];
+
+/** Guarda as UTMs e os ids de clique (gclid, fbclid) da 1ª página da sessão. Só vão com um contato enviado. */
+export function guardarOrigem() {
+  try {
+    if (sessionStorage.getItem(ORIGEM)) return;
+    const url = new URLSearchParams(location.search);
+    const achados = RASTREIO.flatMap((c) => (url.get(c) ? [[c, url.get(c)!.slice(0, 500)]] : []));
+    sessionStorage.setItem(ORIGEM, JSON.stringify(Object.fromEntries(achados)));
+  } catch {}
+}
+
+export function lerOrigem(): Record<string, string> {
+  guardarOrigem();
+  try {
+    return JSON.parse(sessionStorage.getItem(ORIGEM) ?? "{}");
+  } catch {
+    return {};
+  }
 }
 
 /** De onde veio o clique no WhatsApp, pela seção da página. */
@@ -66,6 +92,7 @@ export function Medicao() {
   const focar = useRef(false);
 
   useEffect(() => {
+    guardarOrigem(); // a UTM só está na URL da página em que a pessoa chegou
     if (!TEM_MEDICAO) return;
     const salva = ler();
     // eslint-disable-next-line react-hooks/set-state-in-effect -- localStorage só existe no navegador

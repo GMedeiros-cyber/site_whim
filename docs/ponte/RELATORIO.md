@@ -249,3 +249,19 @@ Uma entrada por tarefa, sempre acrescentada no fim (nunca reescrever as anterior
 - Conferido: lint, tsc e build webpack ok antes do push (`171a1bc`).
 - Commit: `37dd59c`.
 - Pendente: os três pedidos de 17/11; Search Console; cores e foto original com a Whim.
+
+### 2026-11-17 01:40 · Agente 3 · Contatos no banco e tela de erro (Claude Code)
+- Feito (`agente-3/contatos`): `POST /api/contatos` com `mysql2` (tabela `contatos` criada na 1ª chamada, sem IP, campo isca, limite por minuto, só envios do próprio site; sem `DB_*` responde 200 sem gravar); `src/lib/contatos.ts` (`enviarContato`, UTMs/gclid/fbclid da página de chegada, `generate_lead` e "Lead" na Meta ao gravar); `CampoIsca`; /privacidade com o que fica guardado, onde, 24 meses e como apagar; `.env.example` com as `DB_*`.
+- Tela "This page couldn't load": não era deploy. O `el.remove()` da `abertura.tsx` quebra toda ida da home para outra página por link (100% das vezes, PC e celular). Entraram `error.tsx` e `global-error.tsx` com o visual da Whim, recarregando sozinhos uma vez por minuto no máximo (esse erro e o de JS de deploy antigo). A correção de raiz foi pedida ao agente 2.
+- Conferido: rota contra um MySQL 9.7 de verdade (`mysql-memory-server`, sem Docker): 20 checagens ok (gravação com acento/emoji/UTMs, 9 inválidos recusados, isca, outro site 403, GET 405, limite 429, horário de Brasília). Navegador a 1280 e 390: home → Monte sua peça e JS sumido abrem depois do recarregamento; tela de erro sem laço; UTMs da chegada guardadas.
+- Comandos: `git switch -c agente-3/contatos origin/main`, `npm install`, `npm install mysql2`, `npm run lint` (ok), `npm run build` (webpack, ok), `next start` + Puppeteer.
+- Commit: `1f4daa8`.
+- Pendente: agente 2 corrigir a abertura; agente 1 ligar os formulários (`enviarContato` + `CampoIsca`); a Whim confirmar os 24 meses; rótulo de conversão do Google Ads; texto da autorização se os dados forem usados em anúncios ou prospecção.
+
+### Agente 1 · 2026-11-17 12:40 · Monte sua peça, ajustes de 17/11 (Claude Code)
+- Feito: (1) giro da arara e da prévia com quadros em `ImageBitmap` no tamanho do canvas (tela × DPR), desenho só no rAF, peça em camada própria e o balanço sem redesenhar; CPU 4× a 1280 px: quadros longos 69–117 → 5–34, p95 34–45 → 22–28 ms; (2) Frente/Costas/Mangas com título e linha; (3) anexar a arte leva a prévia ao lado da posição (a Nuca ficava escondida atrás da frente); (4) prévia final com as artes, Frente/Costas e miniatura do outro lado; (5) resumo horizontal do protótipo, passo 5 "Seus dados"; (7) 1520 px a partir de 1800 px, colunas meio a meio e prévia + resumo parados ao rolar quando cabem.
+- (6) `agente-3/contatos` juntado; nome, telefone (máscara) e e-mail obrigatórios + autorização e link da privacidade no passo 5 e no Contato; `enviarContato` + WhatsApp no mesmo clique; `CampoIsca` nos dois `<form>`.
+- Conferido (Playwright, 390/1280/1920/2560, rota interceptada): 1 falha no axe a 1280 px, no cabeçalho (fora do meu escopo, pedido ao agente 2); o resto sem falha (fluxo, envio, WhatsApp, alvos de 44 px, sem rolagem lateral, console limpo). Teste do Lighthouse de 16/11 sem falha.
+- Comandos: `git switch -c agente-1/ajustes-17-11 origin/main`, `git merge origin/main` (protótipo) e `origin/agente-3/contatos`, `npm install`, `npm run lint` (ok), `npm run build` (webpack, ok), trace do Chrome.
+- Commits: `6a65b04` e `2c68a8f` no `agente-1/ajustes-17-11`.
+- Pendente: texto da autorização se os dados forem para anúncios/prospecção (Gabriel); agente 2: contraste do menu sobre blocos escuros e largura do rodapé em telas grandes.

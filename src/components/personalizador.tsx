@@ -6,9 +6,20 @@ import { CheckIcon, DownloadIcon, InfoIcon, MinusIcon, PlusIcon, Share2Icon } fr
 
 import { Arara, CORES, MODELOS, usePoucoMovimento, type Cor } from "@/components/arara";
 import { Container, Destaque, Seta, Titulo } from "@/components/blocos";
+import { CampoIsca } from "@/components/campo-isca";
+import {
+  Autorizacao,
+  CamposContato,
+  CONTATO_VAZIO,
+  contatoValido,
+  errosContato,
+  TEXTO_AUTORIZACAO,
+  type DadosContato,
+} from "@/components/campos-contato";
 import {
   conflitos,
   juntar,
+  ladoDe,
   LinhaPosicao,
   ListaPosicoes,
   MapaPosicoes,
@@ -20,11 +31,12 @@ import {
   type Posicao,
 } from "@/components/posicoes";
 import { PreviaPeca, tintaPara, type EstampaPrevia } from "@/components/previa-peca";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { areaDe, FRASE_TECNICA, TECNICAS, type InfoArte, type Lado, type Tecnica } from "@/lib/estampa";
+import { enviarContato } from "@/lib/contatos";
 import { analisarArte } from "@/lib/estampa-cliente";
 import { gerarFicha, nomeFicha } from "@/lib/ficha";
 import { cn } from "@/lib/utils";
@@ -92,6 +104,7 @@ export function Personalizador() {
   const [aviso, setAviso] = useState("");
   const [infos, setInfos] = useState<Record<string, InfoArte>>({}); // análise de cada arte, por URL
   const [ficha, setFicha] = useState<Ficha | null>(null);
+  const [contato, setContato] = useState<DadosContato>(CONTATO_VAZIO);
   const tituloRef = useRef<HTMLParagraphElement>(null);
   const previaRef = useRef<HTMLDivElement>(null);
   const focar = useRef(false);
@@ -120,6 +133,7 @@ export function Personalizador() {
 
   const resumo = [
     "Olá, Whim! Montei minha peça no site:",
+    ...(contatoValido(contato) ? [`• Contato: ${contato.nome.trim()} · ${contato.telefone} · ${contato.email.trim()}`] : []),
     `• Peça: ${peca} · Cor: ${nomeCor}`,
     `• Tecido: ${tecido}`,
     `• Técnica: ${tecnica}`,
@@ -157,7 +171,12 @@ export function Personalizador() {
   }
   function anexar(chave: string, arte?: Arte, manterFundo?: boolean) {
     mudarPosicao(chave, { arte, manterFundo });
-    if (arte && !infos[arte.url]) analisarArte(arte.url).then((info) => setInfos((x) => ({ ...x, [arte.url]: info })), () => {});
+    if (!arte) return;
+    // A prévia vai para o lado da posição e aproxima nela: a arte da Nuca (costas) não fica
+    // escondida atrás da frente.
+    setLado(ladoDe(chave));
+    setFoco((f) => ({ chave, n: f.n + 1 }));
+    if (!infos[arte.url]) analisarArte(arte.url).then((info) => setInfos((x) => ({ ...x, [arte.url]: info })), () => {});
   }
 
   // ToggleGroup deixa desmarcar tudo; ignoramos o valor vazio para sempre ter uma escolha.
@@ -274,13 +293,40 @@ export function Personalizador() {
     { nome: "Cor", valor: usaOutra ? `Outra: ${nomeCor}` : cor.nome, depois: "Na vitrine da prévia" },
     { nome: "Estampa", valor: `${posicoes.length ? posicoes.map((p) => NOME[p.chave]).join(", ") : "A definir"} · ${tecnica}`, depois: "Posições, artes e técnica" },
     { nome: "Quantidade", valor: `${pecas(total)}${listaTamanhos ? ` · ${listaTamanhos}` : ""}`, depois: `A partir de ${MINIMO} peças` },
-    { nome: "Resumo", valor: "", depois: "Ficha e WhatsApp" },
+    { nome: "Seus dados", valor: contato.nome.trim(), depois: "Nome, telefone e e-mail para a equipe responder" },
   ];
   const ultimo = passos.length - 1;
 
+  // Resumo embaixo da vitrine: cada item preenche quando o passo fica feito; o botão só acende
+  // no fim (passo 5 alcançado e dados completos).
+  const itensResumo = [
+    { rotulo: "Peça", valor: alcancado > 0 ? (tecido === TECIDOS[0] ? peca : `${peca} · ${tecido}`) : "" },
+    { rotulo: "Cor", valor: alcancado > 1 ? nomeCor : "" },
+    {
+      rotulo: "Estampa",
+      valor:
+        alcancado > 2
+          ? `${posicoes.length ? `${posicoes.length} ${posicoes.length === 1 ? "posição" : "posições"}` : "Posição a definir"} · ${tecnica === "Ainda não sei" ? "técnica a definir" : tecnica}`
+          : "",
+    },
+    { rotulo: "Quantidade", valor: alcancado > 3 ? pecas(total) : "" },
+  ];
+  const erros = errosContato(contato);
+  const faltam = [erros.nome && "nome", erros.telefone && "telefone", erros.email && "e-mail", erros.autoriza && "a autorização"].filter(Boolean) as string[];
+  const aceso = alcancado >= ultimo && !faltam.length;
+
+  // Prévia com as artes: no passo Estampa (com zoom) e, depois dele, a prévia final.
+  const final = alcancado > 2 && passo !== 2 && posicoes.length > 0;
   const estampa: EstampaPrevia | undefined =
-    passo === 2
-      ? { lado, onLado: setLado, posicoes: posicoes.map((p) => ({ chave: p.chave, url: p.arte?.url, manterFundo: p.manterFundo })), tecnica, foco }
+    passo === 2 || final
+      ? {
+          lado,
+          onLado: setLado,
+          posicoes: posicoes.map((p) => ({ chave: p.chave, url: p.arte?.url, manterFundo: p.manterFundo })),
+          tecnica,
+          foco,
+          final,
+        }
       : undefined;
 
   function conteudo(i: number) {
@@ -417,8 +463,15 @@ export function Personalizador() {
       default:
         return (
           <>
-            <p className="rounded-2xl bg-muted p-[18px] text-sm wrap-anywhere whitespace-pre-wrap">{resumo}</p>
-            <div className="mt-3.5 rounded-2xl border border-primary/12 p-3">
+            <p className="text-sm text-muted-foreground">Nome, telefone e e-mail para a equipe da Whim responder.</p>
+            {/* Quem envia é o botão do resumo; o Enter num campo não manda nada. */}
+            <form id={FORM_DADOS} noValidate onSubmit={(e) => e.preventDefault()} className="relative mt-3.5 grid gap-4">
+              <CampoIsca />
+              <CamposContato id="pedido" valor={contato} onValor={setContato} mostrarErros={false} />
+              {/* O que falta aparece no resumo, ao lado do botão. */}
+              <Autorizacao id="pedido" valor={contato} onValor={setContato} mostrarErros={false} />
+            </form>
+            <div className="mt-5 rounded-2xl border border-primary/12 p-3">
               <p className="text-[13px] font-medium">Ficha da estampa para a equipe da Whim</p>
               {fichaPronta ? (
                 <Image
@@ -450,63 +503,84 @@ export function Personalizador() {
             </div>
             <ol className="mt-3.5 grid list-inside list-decimal gap-1 text-sm marker:font-semibold marker:text-accent">
               <li>Baixe ou compartilhe a ficha.</li>
-              <li>Envie a mensagem pelo WhatsApp.</li>
+              <li>
+                Toque em <span className="font-semibold">Pedir orçamento no WhatsApp</span>, no resumo
+                <span className="lg:hidden"> abaixo</span>
+                <span className="hidden lg:inline"> ao lado</span>.
+              </li>
               <li>Na conversa, anexe a ficha{temArte ? " e os arquivos das artes" : ""}.</li>
             </ol>
-            <div className="mt-3.5 grid gap-1 rounded-[14px] bg-muted p-3.5 text-[13px]">
-              <p>
-                <span className="font-semibold">Prazo de produção:</span> 20 a 30 dias, conforme quantidade e modelo.
-              </p>
-              <p>Quem responde é a equipe da Whim.</p>
-            </div>
-            <a
-              href={linkWhatsApp(resumo)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={cn(buttonVariants({ size: "xl" }), "mt-3.5")}
-            >
-              Enviar pelo WhatsApp <Seta />
-            </a>
+            <p className="mt-3.5 rounded-[14px] bg-muted p-3.5 text-[13px]">Quem responde é a equipe da Whim.</p>
           </>
         );
     }
   }
 
+  // Grava o contato (sem esperar) e o link abre o WhatsApp no mesmo clique.
+  function pedir() {
+    const form = document.getElementById(FORM_DADOS) as HTMLFormElement | null;
+    const isca = form?.elements.namedItem("site");
+    enviarContato({
+      origem: "monte-sua-peca",
+      nome: contato.nome.trim(),
+      email: contato.email.trim(),
+      telefone: contato.telefone,
+      pedido: resumo,
+      consentimento: true,
+      consentimento_texto: TEXTO_AUTORIZACAO,
+      site: isca instanceof HTMLInputElement ? isca.value : "",
+    });
+  }
+  const resumoProps = {
+    itens: itensResumo,
+    aceso,
+    falta: alcancado >= ultimo && faltam.length ? faltam : [],
+    href: linkWhatsApp(resumo),
+    onPedir: pedir,
+  };
+
   return (
-    <>
-      <section id="personalizar" className="scroll-mt-24 pt-[132px] pb-3 sm:pt-[168px] sm:pb-8">
-        <Container>
-          <Titulo as="h1">
-            Escolha na arara <Destaque>e personalize.</Destaque>
-          </Titulo>
+    <section id="personalizar" className="scroll-mt-24 pt-[132px] sm:pt-[168px]">
+      <Container className={cn("pb-3 sm:pb-8", LARGO)}>
+        <Titulo as="h1">
+          Escolha na arara <Destaque>e personalize.</Destaque>
+        </Titulo>
 
-          {/* Arara: um clique ou toque já escolhe a peça (no começo, leva ao passo da cor). */}
-          <div className="mt-10">
-            <Arara
-              selecionada={peca}
-              cor={cor.hex}
-              onEscolher={(p) => {
-                trocarPeca(p);
-                if (alcancado <= 1) {
-                  setPasso(1);
-                  setAlcancado(1);
-                  setAntes(null);
-                }
-                // No celular, rola suave até a prévia se ela não estiver inteira na tela.
-                const el = previaRef.current;
-                if (el && !semGiro && celular()) {
-                  const r = el.getBoundingClientRect();
-                  if (r.top < 0 || r.bottom > innerHeight) el.scrollIntoView({ behavior: "smooth", block: "center" });
-                }
-              }}
-            />
+        {/* Arara: um clique ou toque já escolhe a peça (no começo, leva ao passo da cor). */}
+        <div className="mt-10">
+          <Arara
+            selecionada={peca}
+            cor={cor.hex}
+            onEscolher={(p) => {
+              trocarPeca(p);
+              if (alcancado <= 1) {
+                setPasso(1);
+                setAlcancado(1);
+                setAntes(null);
+              }
+              // No celular, rola suave até a prévia se ela não estiver inteira na tela.
+              const el = previaRef.current;
+              if (el && !semGiro && celular()) {
+                const r = el.getBoundingClientRect();
+                if (r.top < 0 || r.bottom > innerHeight) el.scrollIntoView({ behavior: "smooth", block: "center" });
+              }
+            }}
+          />
+        </div>
+      </Container>
+
+      <Container
+        className={cn(
+          "grid items-start gap-8 pt-3 pb-7 sm:pt-8 sm:pb-10 lg:grid-cols-[1.2fr_0.8fr] lg:gap-[clamp(20px,4vw,48px)] min-[112.5rem]:grid-cols-2 min-[112.5rem]:gap-16",
+          LARGO
+        )}
+      >
+        {/* Prévia e, embaixo dela, o resumo (no PC; fica parado na tela quando cabe inteiro). */}
+        <div className={cn("min-w-0", FIXA)}>
+          <div ref={previaRef}>
+            <PreviaPeca modelo={modelo} cor={cor} onCor={(c) => mudar({ cor: c, usaOutra: false })} estampa={estampa} />
           </div>
-        </Container>
-      </section>
-
-      <Container className="grid items-start gap-8 pt-3 pb-7 sm:pt-8 sm:pb-10 lg:grid-cols-[1.2fr_0.8fr] lg:gap-[clamp(20px,4vw,48px)]">
-        <div ref={previaRef} className="min-w-0">
-          <PreviaPeca modelo={modelo} cor={cor} onCor={(c) => mudar({ cor: c, usaOutra: false })} estampa={estampa} />
+          <ResumoPedido {...resumoProps} className="mt-4 hidden lg:block" />
         </div>
 
         {/* Ficha do pedido: 5 passos numa linha vertical (feito, atual, depois). */}
@@ -598,9 +672,66 @@ export function Personalizador() {
               );
             })}
           </ol>
+          {/* No celular o resumo vem depois do passo 5, onde o botão é usado. */}
+          <ResumoPedido {...resumoProps} className="mt-8 lg:hidden" />
         </div>
       </Container>
-    </>
+    </section>
+  );
+}
+
+// Telas grandes (27" Full HD e 2K): a página abre mais em vez de ficar no meio com sobra dos lados.
+const FORM_DADOS = "pedido-dados";
+const LARGO = "min-[112.5rem]:max-w-[1520px]"; // a partir de 1800 px; o Contato usa o mesmo
+// A coluna da prévia + resumo fica parada ao rolar só quando cabe inteira na altura da tela.
+const FIXA = "lg:[@media(min-height:1000px)]:sticky lg:top-24";
+
+/** Resumo do pedido na horizontal (protótipo em referencia/monte-sua-peca/prototipo-resumo.html). */
+function ResumoPedido({
+  itens,
+  aceso,
+  falta,
+  href,
+  onPedir,
+  className,
+}: {
+  itens: { rotulo: string; valor: string }[];
+  aceso: boolean;
+  falta: string[];
+  href: string;
+  onPedir: () => void;
+  className?: string;
+}) {
+  const botao = "inline-flex h-12 items-center justify-center gap-2 rounded-full px-5 text-sm font-semibold max-[600px]:w-full";
+  return (
+    <section aria-label="Resumo do pedido" className={cn("rounded-[24px] bg-primary px-4 pt-4 pb-5 text-primary-foreground min-[601px]:px-5", className)}>
+      <h3 className="text-[13px] font-semibold text-primary-foreground/85">Resumo do pedido</h3>
+      <dl className="mt-3 grid grid-cols-2 gap-2.5 min-[601px]:grid-cols-4">
+        {itens.map((i) => (
+          <div key={i.rotulo} className="min-h-16 min-w-0 rounded-[14px] bg-primary-foreground/8 px-3 py-2.5">
+            <dt className="text-[11px] font-medium text-primary-foreground/75">{i.rotulo}</dt>
+            <dd title={i.valor || undefined} className={cn("mt-0.5 line-clamp-2 text-[13px] leading-snug", i.valor ? "font-semibold" : "text-primary-foreground/75")}>
+              {i.valor || "Falta escolher"}
+            </dd>
+          </div>
+        ))}
+      </dl>
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-x-4 gap-y-3">
+        <div className="min-w-0 text-xs text-primary-foreground/80" aria-live="polite">
+          <p>Mínimo de {MINIMO} peças · produção em 20 a 30 dias</p>
+          {falta.length > 0 && <p className="mt-1 font-medium text-primary-foreground">Para pedir, falta: {juntar(falta)}.</p>}
+        </div>
+        {aceso ? (
+          <a href={href} target="_blank" rel="noopener noreferrer" onClick={onPedir} className={cn(botao, "bg-accent text-primary outline-none hover:bg-accent/90 focus-visible:ring-3 focus-visible:ring-accent/50")}>
+            Pedir orçamento no WhatsApp
+          </a>
+        ) : (
+          <button type="button" disabled className={cn(botao, "cursor-not-allowed bg-primary-foreground/14 text-primary-foreground/55")}>
+            Pedir orçamento no WhatsApp
+          </button>
+        )}
+      </div>
+    </section>
   );
 }
 

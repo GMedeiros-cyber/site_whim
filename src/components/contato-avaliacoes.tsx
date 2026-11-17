@@ -17,7 +17,8 @@ const MOSTRAR_AVALIACOES = false;
 export function ContatoAvaliacoes() {
   return (
     <section id="contato" aria-labelledby="contato-titulo" className={cn(secao, "bg-muted")}>
-      <Container>
+      {/* Telas grandes: a mesma largura do personalizador (1520 px a partir de 1800 px). */}
+      <Container className="min-[112.5rem]:max-w-[1520px]">
         <Titulo id="contato-titulo">
           Fale com <Destaque>a Whim.</Destaque>
         </Titulo>

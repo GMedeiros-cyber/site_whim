@@ -38,68 +38,111 @@ export function usePoucoMovimento() {
   );
 }
 
+type Banco = { quadros: (ImageBitmap | undefined)[]; parar: AbortController };
+
 /**
  * Uma peça pendurada: desenha no canvas o quadro que corresponde ao progresso
  * do giro (0 = de lado, quadro 001; 1 = de frente, último quadro), já pintado
  * na cor escolhida e com fundo transparente ({coresPasta}{cor}/NNN.webp).
+ * Os quadros chegam como ImageBitmap já decodificado no tamanho do canvas (o tamanho na tela
+ * × DPR), e o desenho só acontece no requestAnimationFrame: nada decodifica nem mede no giro.
  */
 function PecaGirando({ modelo, cor, deFrente, carregar, semGiro }: { modelo: Modelo; cor: string; deFrente: boolean; carregar: boolean; semGiro: boolean }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  // Quadros decodificados por pasta de cor: a atual e, durante a troca, a que está saindo.
-  const bancos = useRef(new Map<string, HTMLImageElement[]>());
+  // Quadros por pasta de cor: a atual e, durante a troca, a que está saindo.
+  const bancos = useRef(new Map<string, Banco>());
   const progresso = useRef(0);
   const desenhado = useRef("");
+  const pedido = useRef(0);
+  const [tamanho, setTamanho] = useState<[number, number] | null>(null);
   const pasta = `${modelo.coresPasta}${pastaDaCor(cor)}/`;
   const pastaRef = useRef(pasta);
   const total = modelo.coresQuadros;
 
   const desenhar = useCallback(() => {
+    pedido.current = 0;
     const atual = pastaRef.current;
     const i = Math.round(progresso.current * (total - 1));
-    const img = bancos.current.get(atual)?.[i];
+    const quadro = bancos.current.get(atual)?.quadros[i];
     const ctx = canvasRef.current?.getContext("2d");
     // Só desenha quadro já decodificado; até lá fica o que está na tela (inclusive o da cor anterior).
-    if (!img || !ctx || desenhado.current === `${atual}#${i}`) return;
-    ctx.clearRect(0, 0, modelo.largura, modelo.altura);
-    ctx.drawImage(img, 0, 0, modelo.largura, modelo.altura);
+    if (!quadro || !ctx || desenhado.current === `${atual}#${i}`) return;
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    ctx.drawImage(quadro, 0, 0, ctx.canvas.width, ctx.canvas.height);
     ctx.canvas.dataset.quadro = String(i + 1);
     ctx.canvas.dataset.cor = atual;
     desenhado.current = `${atual}#${i}`;
     // A cor anterior saiu da tela: libera os quadros dela.
-    for (const k of bancos.current.keys()) if (k !== atual) bancos.current.delete(k);
-  }, [modelo, total]);
+    for (const [k, b] of bancos.current) {
+      if (k === atual) continue;
+      liberar(b);
+      bancos.current.delete(k);
+    }
+  }, [total]);
+  // Quadro que acabou de decodificar: desenha no próximo frame (uma vez só, mesmo chegando vários).
+  const agendar = useCallback(() => {
+    if (!pedido.current) pedido.current = requestAnimationFrame(desenhar);
+  }, [desenhar]);
 
-  // Carrega os quadros da cor atual quando a arara entra na tela e a cada troca de cor.
-  // Primeiro e último quadros vão na frente da fila.
+  // Tamanho do canvas = tamanho na tela × DPR (até 2), medido uma vez (e se a tela mudar de largura).
+  useEffect(() => {
+    const canvas = canvasRef.current!;
+    const ro = new ResizeObserver(([e]) => {
+      const dpr = Math.min(2, devicePixelRatio || 1);
+      const w = Math.round(e.contentRect.width * dpr);
+      if (!w) return;
+      if (canvas.width !== w) {
+        canvas.width = w;
+        canvas.height = Math.round((w * modelo.altura) / modelo.largura);
+        desenhado.current = "";
+        agendar();
+      }
+      setTamanho((t) => t ?? [canvas.width, canvas.height]);
+    });
+    ro.observe(canvas);
+    return () => ro.disconnect();
+  }, [modelo, agendar]);
+
+  // Carrega os quadros da cor atual quando a arara entra na tela e a cada troca de cor, já
+  // decodificados fora da thread principal. Primeiro e último quadros vão na frente da fila.
   useEffect(() => {
     pastaRef.current = pasta;
-    if (!carregar) return;
+    if (!carregar || !tamanho) return;
     if (bancos.current.has(pasta)) {
-      desenhar();
+      agendar();
       return;
     }
-    const banco: HTMLImageElement[] = [];
+    const banco: Banco = { quadros: [], parar: new AbortController() };
     bancos.current.set(pasta, banco);
+    const [resizeWidth, resizeHeight] = tamanho;
     for (let i = 0; i < total; i++) {
-      const img = new window.Image();
-      img.fetchPriority = i === 0 || i === total - 1 ? "high" : "low";
-      img.src = `${pasta}${String(i + 1).padStart(3, "0")}.webp`;
-      img.decode().then(
-        () => {
-          banco[i] = img;
-          desenhar();
-        },
-        () => {}
-      );
+      fetch(`${pasta}${String(i + 1).padStart(3, "0")}.webp`, { priority: i === 0 || i === total - 1 ? "high" : "low", signal: banco.parar.signal })
+        .then((r) => r.blob())
+        .then((b) => createImageBitmap(b, { resizeWidth, resizeHeight, resizeQuality: "high" }))
+        .then((bitmap) => {
+          if (banco.parar.signal.aborted) return bitmap.close();
+          banco.quadros[i] = bitmap;
+          agendar();
+        })
+        .catch(() => {});
     }
-  }, [carregar, pasta, total, desenhar]);
+  }, [carregar, pasta, total, tamanho, agendar]);
+
+  useEffect(() => {
+    const mapa = bancos.current;
+    return () => {
+      cancelAnimationFrame(pedido.current);
+      mapa.forEach(liberar);
+      mapa.clear();
+    };
+  }, []);
 
   // Gira até o alvo, quadro a quadro; com movimento reduzido, pula direto.
   useEffect(() => {
     const alvo = deFrente ? 1 : 0;
     if (semGiro) {
       progresso.current = alvo;
-      desenhar();
+      agendar();
       return;
     }
     let raf = 0;
@@ -114,19 +157,22 @@ function PecaGirando({ modelo, cor, deFrente, carregar, semGiro }: { modelo: Mod
     };
     raf = requestAnimationFrame(passo);
     return () => cancelAnimationFrame(raf);
-  }, [deFrente, semGiro, desenhar]);
+  }, [deFrente, semGiro, desenhar, agendar]);
 
   return (
     <canvas
       ref={canvasRef}
-      width={modelo.largura}
-      height={modelo.altura}
       aria-hidden
       // A curva do gancho fica a 42/640 da altura do quadro (manifest.gancho): sobe o
       // canvas para ela cair no eixo do cano (metade do cano + 42/640 × 4/3 da largura).
-      className="pointer-events-none -mt-[calc(var(--cano)/2+var(--w)*0.0875)] w-(--w) max-w-none shrink-0"
+      className="pointer-events-none -mt-[calc(var(--cano)/2+var(--w)*0.0875)] aspect-[3/4] w-(--w) max-w-none shrink-0"
     />
   );
+}
+
+function liberar(b: Banco) {
+  b.parar.abort();
+  b.quadros.forEach((q) => q?.close());
 }
 
 /**
@@ -161,7 +207,7 @@ export function Arara({ selecionada, cor, onEscolher }: { selecionada: string; c
   return (
     <>
       {/* --w: largura do quadro; --cano: altura do cano (proporção da prévia em referencia/arara). */}
-      <div ref={araraRef} className="[--cano:calc(var(--w)*0.1067)] [--w:170px] min-[601px]:[--w:230px]">
+      <div ref={araraRef} className="[--cano:calc(var(--w)*0.1067)] [--w:170px] min-[601px]:[--w:230px] min-[112.5rem]:[--w:280px]">
         <div className="-mx-5 snap-x snap-proximity overflow-x-auto px-5 pb-2 min-[601px]:mx-0 min-[601px]:px-0">
           <div className="mx-auto w-max min-w-full">
             {/* Cano cromado esticado na largura da arara; o fundo branco some com multiply,
@@ -174,7 +220,8 @@ export function Arara({ selecionada, cor, onEscolher }: { selecionada: string; c
             />
             <ul aria-label="Arara de modelos" className="flex justify-center px-4">
               {MODELOS.map((m, i) => (
-                <li key={m.id} className="flex snap-center">
+                // Cada peça na sua camada: a largura que anima não repinta as vizinhas.
+                <li key={m.id} className="flex snap-center will-change-transform">
                   <button
                     type="button"
                     aria-label={m.nome}
