@@ -32,6 +32,12 @@ export function errosContato(c: DadosContato) {
   };
 }
 export const contatoValido = (c: DadosContato) => Object.values(errosContato(c)).every((e) => !e);
+/** Foco no primeiro campo com problema (a caixa de autorização é a última). */
+export function focarErro(form: HTMLFormElement, id: string, c: DadosContato) {
+  const erros = errosContato(c);
+  const k = (["nome", "telefone", "email", "autoriza"] as const).find((k) => erros[k]);
+  if (k) form.querySelector<HTMLElement>(`#${id}-${k}`)?.focus();
+}
 type Chave = keyof DadosContato;
 
 /**
@@ -107,6 +113,7 @@ export function Autorizacao({
     <div className="grid gap-1">
       <label className="flex min-h-11 cursor-pointer items-center gap-3 text-[13px] leading-snug">
         <Checkbox
+          id={`${id}-autoriza`}
           checked={valor.autoriza}
           onCheckedChange={(v) => onValor({ ...valor, autoriza: !!v })}
           aria-invalid={!!erro || undefined}

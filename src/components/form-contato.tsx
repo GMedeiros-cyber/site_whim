@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import { Seta } from "@/components/blocos";
 import { CampoIsca } from "@/components/campo-isca";
-import { Autorizacao, CamposContato, CONTATO_VAZIO, contatoValido, errosContato, TEXTO_AUTORIZACAO } from "@/components/campos-contato";
+import { Autorizacao, CamposContato, CONTATO_VAZIO, contatoValido, focarErro, TEXTO_AUTORIZACAO } from "@/components/campos-contato";
 import { medir } from "@/components/medicao";
 import { Button } from "@/components/ui/button";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
@@ -26,10 +26,7 @@ export function FormContato({ className }: { className?: string }) {
     const form = e.currentTarget;
     if (!contatoValido(contato)) {
       setTentou(true);
-      // Foco no primeiro campo com problema (a caixa de autorização é a última).
-      const erros = errosContato(contato);
-      const primeiro = (["nome", "telefone", "email"] as const).find((k) => erros[k]);
-      (primeiro ? form.querySelector<HTMLElement>(`#c-${primeiro}`) : form.querySelector<HTMLElement>("[role=checkbox]"))?.focus();
+      focarErro(form, "c", contato);
       return;
     }
     const dados = new FormData(form);

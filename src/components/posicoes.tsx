@@ -77,118 +77,115 @@ const escura = (hex: string) => {
   return 0.2126 * r + 0.7152 * g + 0.0722 * b < 0.3;
 };
 
+type Escolha = { modelo: Modelo; numeros: Map<string, number>; onAlternar: (chave: string, lado: Lado) => void };
+
 /**
- * Mapa clicável: frente e costas da peça na cor escolhida com as áreas tracejadas por cima.
+ * Onde vai a estampa: Frente embaixo da camiseta da frente e Costas embaixo da das costas, com
+ * uma linha vertical entre as duas colunas; Mangas embaixo, ocupando as duas.
+ */
+export function EscolhaPosicoes({ cor, ...props }: Escolha & { cor: Cor }) {
+  const [frente, costas, mangas] = GRUPOS;
+  return (
+    <div className="max-w-[440px]">
+      <div className="grid grid-cols-2 divide-x divide-primary/12">
+        {([["frente", frente], ["costas", costas]] as const).map(([lado, grupo], i) => (
+          <div key={lado} className={cn("min-w-0", i ? "pl-3" : "pr-3")}>
+            <MapaLado lado={lado} cor={cor} {...props} />
+            <GrupoPosicoes grupo={grupo} className="mt-2.5" {...props} />
+          </div>
+        ))}
+      </div>
+      <GrupoPosicoes grupo={mangas} colunas className="mt-3" {...props} />
+    </div>
+  );
+}
+
+/**
+ * Mapa clicável de um lado: a peça na cor escolhida com as áreas tracejadas por cima.
  * Tocar marca/desmarca; marcada fica com contorno turquesa e o número. Cada área é um botão
  * (teclado e leitor de tela); o toque passa pelo mapa, que acha a área pelo ponto.
  */
-export function MapaPosicoes({
-  modelo,
-  cor,
-  numeros,
-  onAlternar,
-}: {
-  modelo: Modelo;
-  cor: Cor;
-  numeros: Map<string, number>;
-  onAlternar: (chave: string, lado: Lado) => void;
-}) {
+function MapaLado({ lado, cor, modelo, numeros, onAlternar }: Escolha & { lado: Lado; cor: Cor }) {
+  // Maiores primeiro: as pequenas ficam por cima.
+  const areas = areasDoLado(modelo, lado).sort(([, a], [, b]) => b[2] * b[3] - a[2] * a[3]);
   return (
-    <div className="grid grid-cols-2 gap-3">
-      {(["frente", "costas"] as const).map((lado) => {
-        // Maiores primeiro: as pequenas ficam por cima.
-        const areas = areasDoLado(modelo, lado).sort(([, a], [, b]) => b[2] * b[3] - a[2] * a[3]);
+    <div
+      data-mapa={lado}
+      className="relative cursor-pointer touch-manipulation overflow-hidden rounded-xl bg-muted"
+      onClick={(e) => {
+        if (e.detail === 0) return; // teclado: o próprio botão trata
+        const r = e.currentTarget.getBoundingClientRect();
+        const k = areaNoPonto(areas, ((e.clientX - r.left) / r.width) * 900, ((e.clientY - r.top) / r.height) * 1200, (22 * 900) / r.width);
+        if (k) onAlternar(k, lado);
+      }}
+    >
+      <Image
+        src={`${modelo.coresPasta}${cor.pasta}/${lado}.webp`}
+        alt=""
+        width={900}
+        height={1200}
+        sizes="210px"
+        draggable={false}
+        className="h-auto w-full select-none"
+      />
+      {areas.map(([k, a]) => {
+        const n = numeros.get(k);
         return (
-          <figure key={lado} className="mx-auto w-full max-w-[200px]">
-            <div
-              data-mapa={lado}
-              className="relative cursor-pointer touch-manipulation overflow-hidden rounded-xl bg-muted"
-              onClick={(e) => {
-                if (e.detail === 0) return; // teclado: o próprio botão trata
-                const r = e.currentTarget.getBoundingClientRect();
-                const k = areaNoPonto(areas, ((e.clientX - r.left) / r.width) * 900, ((e.clientY - r.top) / r.height) * 1200, (22 * 900) / r.width);
-                if (k) onAlternar(k, lado);
-              }}
-            >
-              <Image
-                src={`${modelo.coresPasta}${cor.pasta}/${lado}.webp`}
-                alt=""
-                width={900}
-                height={1200}
-                sizes="200px"
-                draggable={false}
-                className="h-auto w-full select-none"
-              />
-              {areas.map(([k, a]) => {
-                const n = numeros.get(k);
-                return (
-                  <button
-                    key={k}
-                    type="button"
-                    aria-pressed={n !== undefined}
-                    aria-label={k.startsWith("manga") ? `${NOME[k]}, vista ${lado === "frente" ? "de frente" : "das costas"}` : NOME[k]}
-                    onClick={() => onAlternar(k, lado)}
-                    className={cn(
-                      "pointer-events-none absolute rounded-[3px] outline-none focus-visible:ring-3 focus-visible:ring-ring",
-                      n !== undefined
-                        ? "border-2 border-accent"
-                        : cn("border border-dashed", escura(cor.hex) ? "border-primary-foreground/75" : "border-primary/55")
-                    )}
-                    // Geometria vem do manifesto (posição e ângulo da área), não é estilo.
-                    style={{ left: `${a[0] * 100}%`, top: `${a[1] * 100}%`, width: `${a[2] * 100}%`, height: `${a[3] * 100}%`, rotate: a[4] ? `${a[4]}deg` : undefined }}
-                  >
-                    {n !== undefined && (
-                      <span
-                        aria-hidden
-                        className="absolute top-1/2 left-1/2 grid size-[18px] -translate-1/2 place-items-center rounded-full bg-accent text-[10px] font-bold text-primary"
-                        style={{ rotate: a[4] ? `${-a[4]}deg` : undefined }}
-                      >
-                        {n}
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-            <figcaption className="mt-1.5 text-center text-xs font-medium text-muted-foreground">{lado === "frente" ? "Frente" : "Costas"}</figcaption>
-          </figure>
+          <button
+            key={k}
+            type="button"
+            aria-pressed={n !== undefined}
+            aria-label={k.startsWith("manga") ? `${NOME[k]}, vista ${lado === "frente" ? "de frente" : "das costas"}` : NOME[k]}
+            onClick={() => onAlternar(k, lado)}
+            className={cn(
+              "pointer-events-none absolute rounded-[3px] outline-none focus-visible:ring-3 focus-visible:ring-ring",
+              n !== undefined
+                ? "border-2 border-accent"
+                : cn("border border-dashed", escura(cor.hex) ? "border-primary-foreground/75" : "border-primary/55")
+            )}
+            // Geometria vem do manifesto (posição e ângulo da área), não é estilo.
+            style={{ left: `${a[0] * 100}%`, top: `${a[1] * 100}%`, width: `${a[2] * 100}%`, height: `${a[3] * 100}%`, rotate: a[4] ? `${a[4]}deg` : undefined }}
+          >
+            {n !== undefined && (
+              <span
+                aria-hidden
+                className="absolute top-1/2 left-1/2 grid size-[18px] -translate-1/2 place-items-center rounded-full bg-accent text-[10px] font-bold text-primary"
+                style={{ rotate: a[4] ? `${-a[4]}deg` : undefined }}
+              >
+                {n}
+              </span>
+            )}
+          </button>
         );
       })}
     </div>
   );
 }
 
-/** A mesma escolha em caixas de marcar: Frente, Costas e Mangas, cada grupo com título e uma linha entre eles. */
-export function ListaPosicoes({
+/** A mesma escolha em caixas de marcar, com o nome do grupo (Frente, Costas ou Mangas) em cima. */
+function GrupoPosicoes({
+  grupo: [nome, chaves],
+  colunas,
+  className,
   modelo,
   numeros,
   onAlternar,
-}: {
-  modelo: Modelo;
-  numeros: Map<string, number>;
-  onAlternar: (chave: string, lado: Lado) => void;
-}) {
+}: Escolha & { grupo: [string, string[]]; colunas?: boolean; className?: string }) {
+  const existem = chaves.filter((k) => temPosicao(modelo, k));
+  if (!existem.length) return null;
   return (
-    <div className="mt-4">
-      {GRUPOS.map(([grupo, chaves]) => {
-        const existem = chaves.filter((k) => temPosicao(modelo, k));
-        if (!existem.length) return null;
-        return (
-          <fieldset key={grupo} className="min-w-0 border-t border-primary/10 pt-3 pb-1 first:border-t-0 first:pt-0">
-            {/* float + w-full: o título fica dentro do grupo, não em cima da linha. */}
-            <legend className="float-left w-full text-[13px] font-semibold">{grupo}</legend>
-            <div className="clear-left grid grid-cols-2 gap-x-3">
-              {existem.map((k) => (
-                <label key={k} className="flex min-h-11 cursor-pointer items-center gap-2.5 text-[13px] leading-tight">
-                  <Checkbox checked={numeros.has(k)} onCheckedChange={() => onAlternar(k, ladoDe(k))} className="size-5 shrink-0" />
-                  {NOME[k]}
-                </label>
-              ))}
-            </div>
-          </fieldset>
-        );
-      })}
-    </div>
+    <fieldset className={cn("min-w-0", className)}>
+      <legend className="text-[13px] font-semibold">{nome}</legend>
+      {/* Mangas em duas colunas, alinhadas com Frente e Costas em cima. */}
+      <div className={cn("grid", colunas && "grid-cols-2")}>
+        {existem.map((k) => (
+          <label key={k} className={cn("flex min-h-11 cursor-pointer items-center gap-2.5 text-[13px] leading-tight", colunas && "odd:pr-3 even:pl-3")}>
+            <Checkbox checked={numeros.has(k)} onCheckedChange={() => onAlternar(k, ladoDe(k))} className="size-5 shrink-0" />
+            {NOME[k]}
+          </label>
+        ))}
+      </div>
+    </fieldset>
   );
 }
 
@@ -250,6 +247,7 @@ export function LinhaPosicao({
       id={`arte-${chave}`}
       type="file"
       accept={ARTE_TIPOS.join(",")}
+      aria-label={`Arte de ${nome.toLowerCase()}`}
       className="sr-only"
       onChange={(e) => {
         escolher(e.target.files?.[0]);
