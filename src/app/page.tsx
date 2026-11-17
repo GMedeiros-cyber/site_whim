@@ -6,6 +6,7 @@ import { Container, Destaque, Seta, Titulo, secao } from "@/components/blocos";
 import { Abertura } from "@/components/home/abertura";
 import { Carrossel } from "@/components/home/carrossel";
 import { DUVIDAS } from "@/components/home/duvidas";
+import { DuvidasAcordeao } from "@/components/home/duvidas-acordeao";
 import { Etapas } from "@/components/home/etapas";
 import { PalavraTinta } from "@/components/home/palavra-tinta";
 import "@/components/home/transicoes.css";
@@ -127,7 +128,7 @@ export default function Home() {
           <Convite />
         </div>
       </main>
-      <SiteFooter className="home-grande" />
+      <SiteFooter />
       <JsonLd dados={perguntas(DUVIDAS)} />
     </>
   );
@@ -403,29 +404,25 @@ function Clientes() {
 function Duvidas() {
   return (
     <section id="duvidas" className={cn(secao, sobrepoe, "bg-background")}>
-      <Container className="grid gap-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:items-start lg:gap-16">
+      {/* Foto da oficina à esquerda e perguntas à direita; no celular a foto vem em cima, menor. */}
+      <Container className="grid gap-8 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:items-start lg:gap-16">
+        <div className="relative aspect-[16/10] overflow-hidden rounded-[24px] bg-muted sm:aspect-[2/1] lg:aspect-[4/5]">
+          <Image
+            src="/images/f35.webp"
+            alt="Camisetas pretas estampadas na mesa da oficina"
+            fill
+            sizes="(min-width: 1024px) 440px, 100vw"
+            className="object-cover"
+          />
+        </div>
         <div>
           <Titulo className={sobe}>
             Antes de <Destaque>pedir o orçamento.</Destaque>
           </Titulo>
           <p className={cn(apoio, sobe)}>As perguntas que mais chegam no WhatsApp, respondidas aqui.</p>
-        </div>
-        <div className="border-t">
-          {DUVIDAS.map((d, i) => (
-            <details key={d.pergunta} open={i === 0} className="group border-b">
-              <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-5 rounded-sm py-5 text-base font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring sm:text-lg [&::-webkit-details-marker]:hidden">
-                {d.pergunta}
-                {/* + que vira − (o traço vertical deita) com fundo turquesa quando aberta */}
-                <span
-                  aria-hidden
-                  className="relative size-7 shrink-0 rounded-full bg-muted transition-colors group-open:bg-accent before:absolute before:inset-x-2 before:top-[13px] before:h-0.5 before:rounded-full before:bg-primary after:absolute after:inset-x-2 after:top-[13px] after:h-0.5 after:rotate-90 after:rounded-full after:bg-primary after:transition-transform group-open:after:rotate-0"
-                />
-              </summary>
-              <p className="mb-[22px] max-w-[60ch] text-[15.5px] leading-[1.65] text-pretty text-muted-foreground">
-                {d.resposta}
-              </p>
-            </details>
-          ))}
+          <div className="mt-8 md:mt-10">
+            <DuvidasAcordeao />
+          </div>
         </div>
       </Container>
     </section>

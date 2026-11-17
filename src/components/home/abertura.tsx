@@ -9,7 +9,6 @@ import {
   SCRIPT_CARGA,
   aberturaNaTela,
   avisarFimDaAbertura,
-  faseIntro,
   travarRolagem,
 } from "@/lib/abertura";
 
@@ -25,9 +24,9 @@ const assinar = (avisar: () => void) => {
 /**
  * Abertura da home: o símbolo da Whim é pintado pela tinta e a escrita entra (~3,5 s).
  * Toca em toda carga da home e quando o logo da barra é clicado (src/lib/abertura.ts).
- * Vem no HTML do servidor para aparecer antes de tudo, parada ("espera") até a página
- * hidratar e as imagens decodificarem: assim a hidratação não engasga a animação.
- * Um toque (ou tecla) pula. No fim, a tinta da palavra "Vista" começa.
+ * Vem no HTML do servidor e anima já no 1º desenho, só com transform e opacity (no
+ * compositor, a hidratação não engasga). O React decide se ela fica na árvore; o nó
+ * nunca é tirado à mão. Um toque (ou tecla) pula. No fim, a tinta do "Vista" começa.
  */
 export function Abertura() {
   const ref = useRef<HTMLDivElement>(null);
@@ -40,42 +39,32 @@ export function Abertura() {
     if (!tocando || !el) return;
     travarRolagem(true);
 
-    let vivo = true;
-    let comecou = false;
+    let acabou = false;
     let fim = 0;
     const terminar = () => {
+      if (acabou) return;
+      acabou = true;
       clearTimeout(fim);
       travarRolagem(false);
       avisarFimDaAbertura(); // a fase vira "tinta" e a abertura sai da árvore
     };
-    const comecar = () => {
-      if (!vivo || comecou) return;
-      comecou = true;
-      if (faseIntro() === "espera") document.documentElement.dataset.intro = "abertura";
-      clearTimeout(fim);
-      fim = window.setTimeout(terminar, 4800); // garantia, se o animationend não vier
-    };
-    const imagens = [...el.querySelectorAll("img")].map((i) => i.decode().catch(() => {}));
-    Promise.all(imagens).then(() => requestAnimationFrame(comecar));
-    fim = window.setTimeout(comecar, 1500); // imagem lenta não segura a abertura
+    // A saída já pode ter acabado antes da hidratação (celular lento): o `finished`
+    // resolve na hora nesse caso. O timer é só a garantia.
+    const saida = el.getAnimations().find((a) => a instanceof CSSAnimation && a.animationName === "abertura-sai");
+    saida?.finished.then(terminar, () => {});
+    fim = window.setTimeout(terminar, 4800);
 
     const pular = () => {
-      comecar();
       el.dataset.pulou = "";
       clearTimeout(fim);
       fim = window.setTimeout(terminar, 600);
     };
-    const aoAcabar = (e: AnimationEvent) => {
-      if (e.target === el && e.animationName === "abertura-sai") terminar();
-    };
-    el.addEventListener("animationend", aoAcabar);
     el.addEventListener("pointerdown", pular, { once: true });
     window.addEventListener("keydown", pular, { once: true });
 
     return () => {
-      vivo = false;
+      acabou = true;
       clearTimeout(fim);
-      el.removeEventListener("animationend", aoAcabar);
       el.removeEventListener("pointerdown", pular);
       window.removeEventListener("keydown", pular);
       travarRolagem(false);
@@ -89,10 +78,14 @@ export function Abertura() {
         <div className="abertura-palco">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img className="abertura-fantasma" src="/brand/abertura/fantasma.webp" alt="" fetchPriority="low" />
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img className="abertura-tinta1" src="/brand/abertura/contorno.webp" alt="" />
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img className="abertura-tinta2" src="/brand/whim-simbolo-camiseta.webp" alt="" />
+          <div className="abertura-rodo abertura-rodo1">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/brand/abertura/contorno.webp" alt="" />
+          </div>
+          <div className="abertura-rodo abertura-rodo2">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/brand/whim-simbolo-camiseta.webp" alt="" />
+          </div>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img className="abertura-palavra" src="/brand/whim-escrita.svg" alt="" />
         </div>

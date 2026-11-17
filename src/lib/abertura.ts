@@ -1,19 +1,18 @@
 /**
- * Entrada da home, em sequência: abertura (logo pintado) → tinta da palavra "Vista"
- * → barra de navegação. Toca em toda carga da home e quando se clica no logo da barra
- * (pedido de 17/11). Chegando à home por outro link, tudo já aparece pronto.
+ * Entrada da home, em sequência: abertura (logo pintado) → tinta da palavra "Vista".
+ * Toca em toda carga da home e quando se clica no logo da barra (pedidos de 17/11).
+ * Chegando à home por outro link, tudo já aparece pronto.
  *
- * A fase fica em <html data-intro>, para o CSS esconder a barra antes da 1ª pintura:
- *   "espera"   abertura na tela, parada até a página hidratar e as imagens decodificarem
- *   "abertura" abertura tocando
+ * A fase fica em <html data-intro>:
+ *   "abertura" abertura tocando (começa no 1º desenho; a rolagem fica travada)
  *   "tinta"    a tinta pintando o "Vista"
  *   (ausente)  tudo pronto
- * Na carga, quem marca "espera" é SCRIPT_CARGA (script em linha: só roda na carga).
+ * Na carga, quem marca "abertura" é SCRIPT_CARGA (script em linha: só roda na carga).
  */
 export const EVENTO_FIM = "whim:abertura-fim";
 export const EVENTO_REINICIO = "whim:abertura-reinicio";
 
-type Fase = "espera" | "abertura" | "tinta";
+type Fase = "abertura" | "tinta";
 
 const html = () => document.documentElement;
 const marcar = (fase?: Fase) => {
@@ -22,13 +21,13 @@ const marcar = (fase?: Fase) => {
 };
 
 export const faseIntro = () => html().dataset.intro as Fase | undefined;
-export const aberturaNaTela = () => faseIntro() === "espera" || faseIntro() === "abertura";
+export const aberturaNaTela = () => faseIntro() === "abertura";
 
 /**
- * Antes da 1ª pintura: marca a espera e trava a rolagem (o gutter fica, para a página
+ * Antes da 1ª pintura: marca a abertura e trava a rolagem (o gutter fica, para a página
  * não mudar de largura ao destravar). Com movimento reduzido, nada disso.
  */
-export const SCRIPT_CARGA = `(function(){try{if(!matchMedia("(prefers-reduced-motion: reduce)").matches){var h=document.documentElement;h.dataset.intro="espera";h.style.overflow="hidden";h.style.scrollbarGutter="stable"}}catch(e){}})()`;
+export const SCRIPT_CARGA = `(function(){try{if(!matchMedia("(prefers-reduced-motion: reduce)").matches){var h=document.documentElement;h.dataset.intro="abertura";h.style.overflow="hidden";h.style.scrollbarGutter="stable"}}catch(e){}})()`;
 
 export function travarRolagem(trava: boolean) {
   html().style.overflow = trava ? "hidden" : "";
@@ -38,7 +37,7 @@ export function travarRolagem(trava: boolean) {
 /** Clique no logo da barra: na home a entrada recomeça já; fora dela, quando a home montar. */
 export function pedirIntro(naHome: boolean) {
   if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-  marcar("espera");
+  marcar("abertura");
   if (naHome) window.dispatchEvent(new Event(EVENTO_REINICIO));
 }
 
@@ -47,7 +46,7 @@ export function avisarFimDaAbertura() {
   window.dispatchEvent(new Event(EVENTO_FIM));
 }
 
-/** A palavra ficou pronta: a barra de navegação entra. */
+/** A palavra ficou pronta: fim da entrada. */
 export function avisarVistaPronta() {
   marcar();
 }
