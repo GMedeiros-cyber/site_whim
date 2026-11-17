@@ -309,3 +309,11 @@ Uma entrada por tarefa, sempre acrescentada no fim (nunca reescrever as anterior
 - Conferido: lint e tsc ok; build webpack ok (Poppins trocada só localmente); Playwright 390/1280: 4 páginas sem rolagem lateral e console limpo, home → Monte sua peça → voltar sem erro, barra visível na hora, some ao descer e volta ao subir; capturas das seções novas.
 - Commit: `5e8aac1` (main, um deploy só).
 - Pendente: medir PageSpeed no site publicado.
+
+### 2026-11-17 20:35 · Agente 1 · Monte sua peça, pedidos da noite de 17/11 e checklist do agente 3 (Claude Code)
+- Feito (`agente-1/ajustes-17-11-c`): passo 5 só com "Pedir orçamento no WhatsApp" (sem dados; conversão pelo ouvinte do wa.me); vitrine do PC com a altura da ficha (vão ≤ 32 px nos 5 passos a 1920/2560 × zoom 100/67/50%); quadro parado de cada peça no HTML (arara e vitrine) e quadros de cada cor num `quadros.bin` (`scripts/emendar-quadros.mjs`), baixado no load e decodificado depois da transição; áreas refeitas pela costura da gola (nuca 8 × 4 cm a 2,5 cm; frente sem encostar na gola; Polo abaixo da carcela); itens 1 a 9 do checklist do agente 3.
+- Medido (celular 390, 4G rápido + CPU 4×, `next start` local, main e branch intercalados, mediana de 5, `getEntriesByType('resource')`): peças visíveis 3,5 s → 0,2 s (carga direta, antes do 1º desenho) e 7,1 s → 1,6 s (vindo da home); 171 → 12 pedidos e 1,70 → 1,48 MB; animação da arara pronta ~4,6 s nos dois.
+- Lighthouse mobile (mediana de 3): nota 67 → 82, TBT 1,32 → 0,20 s, Speed Index 2,9 → 2,6 s, CLS 0 → 0, LCP 3,7 → 4,2 s (o maior elemento passou do título para a camiseta da vitrine; o atraso de render de ~3 s é da página toda). Com os pacotes no `<head>` o LCP estimado ia a 11 s, por isso baixam no load.
+- Comandos: `git checkout main && git pull && git checkout -b agente-1/ajustes-17-11-c`, `node scripts/emendar-quadros.mjs`, `npm run lint` (ok), `npx tsc --noEmit` (ok), `npm run build` (webpack, ok); Playwright no build de produção a 390, 1280, 1920 e 2560: 93 + 22 checagens, 0 falhas (no dev, com ID de medição de teste, as 4 da conversão também passaram).
+- Commit: `24043fe`. Não toquei em header, footer, abertura, home nem `contato-avaliacoes.tsx`.
+- Pendente: espaço embaixo da ficha no passo Peça a ≥ 1920 (decisão do Gabriel); medir no site publicado depois do deploy.
