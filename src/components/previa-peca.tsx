@@ -4,7 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { MinusIcon, PlusIcon } from "lucide-react";
 
-import { CANO, CORES, usePoucoMovimento, type Cor, type Modelo } from "@/components/arara";
+import { CANO, CORES, lerPacote, usePoucoMovimento, type Cor, type Modelo } from "@/components/arara";
+import { depoisDaTransicao } from "@/components/transicao-pinta";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
@@ -32,7 +33,8 @@ const numero = (i: number) => String(i + 1).padStart(3, "0");
 
 /**
  * O giro e o pêndulo, fora do React: bancos de quadros por pasta de cor (carregados aos poucos,
- * já decodificados como ImageBitmap no tamanho do canvas), espelho com histerese, crossfade na
+ * já decodificados como ImageBitmap no tamanho original, porque no PC a vitrine muda de altura com
+ * a ficha e o canvas junto; o drawImage escala), espelho com histerese, crossfade na
  * troca de cor e o laço de animação (pausa fora da tela). O canvas só é redesenhado quando o
  * quadro muda; o balanço do pêndulo é só transform numa camada própria.
  */
@@ -69,35 +71,65 @@ function criarMotor(painel: HTMLElement, canvas: HTMLCanvasElement, pendulo: HTM
       });
   }
 
-  // Canvas no tamanho da tela × DPR (até 2), medido fora do laço.
+  // Canvas no tamanho da tela × DPR (até 2), medido fora do laço. Mudar o tamanho limpa o canvas:
+  // redesenha na hora (antes da pintura), sem piscar ao trocar de passo.
   const ro = new ResizeObserver(([e]) => {
     const w = Math.round(e.contentRect.width * Math.min(2, devicePixelRatio || 1));
     if (!w || w === canvas.width) return;
     canvas.width = w;
     canvas.height = Math.round((w * 4) / 3);
-    agendar();
+    desenhado = "";
+    desenhar();
   });
   ro.observe(canvas);
 
-  function pedir(pasta: string, n: number, indices: number[], alta: boolean) {
-    let banco = bancos.get(pasta);
-    if (!banco) bancos.set(pasta, (banco = []));
+  function guardar(pasta: string, i: number, blob: Promise<Blob>) {
+    const b = bancos.get(pasta);
+    blob
+      .then((blob) => createImageBitmap(blob))
+      .then((q) => {
+        if (!b || bancos.get(pasta) !== b) return q.close(); // a cor saiu enquanto decodificava
+        b[i] = q;
+        trocar();
+        agendar();
+      }, () => {});
+  }
+  function banco(pasta: string) {
+    if (!bancos.has(pasta)) bancos.set(pasta, []);
     let feitos = pedidos.get(pasta);
     if (!feitos) pedidos.set(pasta, (feitos = new Set()));
-    const b = banco;
+    return feitos;
+  }
+  // Os quadros perto do θ, um a um (a troca de cor aparece logo)…
+  function pedir(pasta: string, n: number, indices: number[], alta: boolean) {
+    const feitos = banco(pasta);
     for (const i of indices) {
       if (i < 0 || i >= n || feitos.has(i)) continue;
       feitos.add(i);
-      fetch(`${pasta}${numero(i)}.webp`, { priority: alta ? "high" : "low" })
-        .then((r) => r.blob())
-        .then((blob) => createImageBitmap(blob, { resizeWidth: canvas.width, resizeHeight: canvas.height, resizeQuality: "high" }))
-        .then((q) => {
-          if (bancos.get(pasta) !== b) return q.close(); // a cor saiu enquanto decodificava
-          b[i] = q;
-          trocar();
-          agendar();
-        }, () => {});
+      guardar(pasta, i, fetch(`${pasta}${numero(i)}.webp`, { priority: alta ? "high" : "low" }).then((r) => r.blob()));
     }
+  }
+  // …e o resto de uma vez, no pacote (o mesmo download da arara, depois do load da página),
+  // decodificado depois da transição de tinta.
+  function pedirTodos(pasta: string, n: number) {
+    const feitos = banco(pasta);
+    if (feitos.has(-1)) return;
+    feitos.add(-1);
+    lerPacote(pasta).then(
+      (quadros) =>
+        depoisDaTransicao(() =>
+          quadros.slice(0, n).forEach((q, i) => {
+            if (feitos.has(i)) return;
+            feitos.add(i);
+            guardar(pasta, i, Promise.resolve(q));
+          })
+        ),
+      // sem o pacote, quadro a quadro
+      () => {
+        feitos.delete(-1);
+        pedir(pasta, n, todos(n), false);
+      }
+    );
   }
 
   // Troca para a cor pedida assim que os quadros do θ atual dela estiverem prontos.
@@ -115,7 +147,7 @@ function criarMotor(painel: HTMLElement, canvas: HTMLCanvasElement, pendulo: HTM
       descartar(atual.pasta);
     }
     atual = { ...alvo };
-    if (!semGiro) pedir(alvo.pasta, alvo.n, todos(alvo.n), false); // o resto em segundo plano
+    if (!semGiro) pedirTodos(alvo.pasta, alvo.n); // o resto em segundo plano
   }
 
   function maisPerto(b: (ImageBitmap | undefined)[], i: number, n: number) {
@@ -158,6 +190,7 @@ function criarMotor(painel: HTMLElement, canvas: HTMLCanvasElement, pendulo: HTM
     if (chave !== desenhado) {
       desenhado = chave;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.imageSmoothingQuality = "high";
       ctx.save();
       if (s.espelho) {
         ctx.translate(canvas.width, 0);
@@ -226,7 +259,7 @@ function criarMotor(painel: HTMLElement, canvas: HTMLCanvasElement, pendulo: HTM
         Object.assign(s, { theta: 0, destino: 0, espelho: false, ang: 0, vel: 0, arrasto: null });
         agendar();
       } else {
-        if (atual) pedir(atual.pasta, atual.n, todos(atual.n), false);
+        if (atual) pedirTodos(atual.pasta, atual.n);
         ligar();
       }
     },
@@ -504,7 +537,7 @@ export function PreviaPeca({
   const gira = !comEstampa && !semGiro;
   const limpo = z > 1; // com zoom: sem cano, sem sombra e sem o selo "Prévia"
   const ultimo = numero(n - 1);
-  const posicaoCanvas = "absolute top-[7.77%] left-1/2 h-[54%] w-auto -translate-x-1/2 min-[601px]:top-[8.21%] min-[601px]:h-[59%]";
+  const posicaoCanvas = "absolute top-[7.77%] left-1/2 h-[54%] w-auto -translate-x-1/2 min-[601px]:top-[8.21%] min-[601px]:h-[59%] lg:top-[min(8.21cqh,16.42cqw)] lg:h-[min(59cqh,118cqw)]";
 
   return (
     <div
@@ -518,7 +551,7 @@ export function PreviaPeca({
       onPointerUp={soltar}
       onPointerCancel={soltar}
       className={cn(
-        "group/painel relative mx-auto aspect-[358/530] w-full overflow-hidden rounded-[22px] border border-primary/10 bg-muted outline-none select-none focus-visible:ring-3 focus-visible:ring-ring/50 min-[601px]:aspect-[662/640] min-[601px]:max-w-[662px] min-[601px]:rounded-[26px] lg:aspect-[4/5] lg:max-h-[calc(100svh-8rem)] lg:min-h-[30rem] lg:max-w-none",
+        "group/painel relative mx-auto aspect-[358/530] w-full overflow-hidden rounded-[22px] border border-primary/10 bg-muted outline-none select-none focus-visible:ring-3 focus-visible:ring-ring/50 min-[601px]:aspect-[662/640] min-[601px]:max-w-[662px] min-[601px]:rounded-[26px] lg:aspect-auto lg:h-full lg:max-w-none lg:[container-type:size]",
         editar && limpo ? "cursor-grab touch-none data-arrastando:cursor-grabbing" : "touch-pan-y",
         gira && "cursor-grab data-arrastando:cursor-grabbing"
       )}
@@ -527,26 +560,27 @@ export function PreviaPeca({
         ref={palcoRef}
         className="absolute inset-0 origin-top-left bg-muted group-data-arrastando/painel:transition-none motion-safe:transition-transform motion-safe:duration-300"
       >
-        {/* A curva do gancho (42/640 do quadro) cai no eixo do cano; no PC o eixo fica preso a ela
-            (12,08% do topo), em qualquer proporção da prévia. */}
+        {/* A curva do gancho (42/640 do quadro) cai no eixo do cano (12,08% do topo). No PC a
+            vitrine pode ser bem mais alta que larga (acompanha a ficha): cano, gancho, peça e
+            sombra medem pela altura até o dobro da largura (cqh/cqw do painel), sem sair dele. */}
         <Image
           src={CANO.arquivo}
           alt=""
           width={CANO.largura}
           height={CANO.altura}
-          sizes="(min-width: 601px) 380px, 55vw"
+          sizes="(min-width: 1024px) 660px, (min-width: 601px) 380px, 55vw"
           className={cn(
-            "absolute top-[10%] left-[22.5%] h-auto w-[55%] mix-blend-multiply transition-opacity min-[601px]:top-[12.08%] min-[601px]:left-[21.5%] min-[601px]:w-[57%] min-[601px]:-translate-y-1/2",
+            "absolute top-[10%] left-[22.5%] h-auto w-[55%] mix-blend-multiply transition-opacity min-[601px]:top-[12.08%] min-[601px]:left-[21.5%] min-[601px]:w-[57%] min-[601px]:-translate-y-1/2 lg:top-[min(12.08cqh,24.16cqw)] lg:left-1/2 lg:w-[min(45.6cqh,91.2cqw)] lg:-translate-x-1/2",
             limpo && "opacity-0"
           )}
         />
         {/* Pêndulo: peça e sombra giram em torno do gancho (no eixo do cano). */}
-        <div ref={penduloRef} className="absolute inset-0 origin-[50%_11.31%] will-change-transform min-[601px]:origin-[50%_12.08%]">
+        <div ref={penduloRef} className="absolute inset-0 origin-[50%_11.31%] will-change-transform min-[601px]:origin-[50%_12.08%] lg:origin-[50%_min(12.08cqh,24.16cqw)]">
           <div
             ref={sombraRef}
             aria-hidden
             className={cn(
-              "absolute top-[57%] left-[33%] h-[3%] w-[34%] rounded-[50%] bg-primary/14 blur-md transition-opacity min-[601px]:top-[62%] min-[601px]:left-[35%] min-[601px]:w-[30%]",
+              "absolute top-[57%] left-[33%] h-[3%] w-[34%] rounded-[50%] bg-primary/14 blur-md transition-opacity min-[601px]:top-[62%] min-[601px]:left-[35%] min-[601px]:w-[30%] lg:top-[min(62cqh,124cqw)] lg:left-1/2 lg:h-[min(3cqh,6cqw)] lg:w-[min(24cqh,48cqw)] lg:-translate-x-1/2",
               limpo && "opacity-0"
             )}
           />
@@ -557,7 +591,19 @@ export function PreviaPeca({
             role="img"
             aria-label={`${modelo.nome} na cor ${cor.nome}`}
             aria-hidden={comEstampa || undefined}
-            className={posicaoCanvas}
+            className={cn("peer", posicaoCanvas)}
+          />
+          {/* A peça de frente já no HTML (sem esperar o JS); some quando o giro desenha. */}
+          <Image
+            src={`${pasta}${ultimo}.webp`}
+            alt=""
+            width={modelo.largura}
+            height={modelo.altura}
+            unoptimized
+            loading="eager"
+            fetchPriority="high"
+            decoding="async"
+            className={cn(posicaoCanvas, "peer-data-quadro:invisible")}
           />
         </div>
         <canvas
@@ -618,7 +664,8 @@ export function PreviaPeca({
               step={0.1}
               value={[zoom]}
               onValueChange={(v) => setZoom(Array.isArray(v) ? v[0] : v)}
-              className="min-h-0 flex-1 py-1 [&_[data-slot=slider-thumb]]:size-4 [&_[data-slot=slider-track]]:bg-primary/12 [&>div]:min-h-0"
+              // Polegar com 44 × 44 px para o dedo; o ponto que aparece continua com 16 px (o ::before).
+              className="min-h-0 flex-1 [&_[data-slot=slider-thumb]]:size-11 [&_[data-slot=slider-thumb]]:border-0 [&_[data-slot=slider-thumb]]:bg-transparent [&_[data-slot=slider-thumb]]:ring-0! [&_[data-slot=slider-thumb]]:before:absolute [&_[data-slot=slider-thumb]]:before:inset-3.5 [&_[data-slot=slider-thumb]]:before:rounded-full [&_[data-slot=slider-thumb]]:before:border [&_[data-slot=slider-thumb]]:before:border-ring [&_[data-slot=slider-thumb]]:before:bg-white [&_[data-slot=slider-thumb]]:before:ring-ring/50 [&_[data-slot=slider-thumb]]:hover:before:ring-3 [&_[data-slot=slider-thumb]]:focus-visible:before:ring-3 [&_[data-slot=slider-track]]:bg-primary/12 [&>div]:min-h-0"
             />
             <Button variant="ghost" size="icon-lg" aria-label="Afastar" disabled={zoom <= 1} onClick={() => setZoom((v) => Math.max(1, Math.round(v * 2 - 1) / 2))} className="size-11 shrink-0 rounded-full">
               <MinusIcon />

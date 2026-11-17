@@ -37,12 +37,30 @@ export function carregar(src: string) {
   return img.decode().then(() => img);
 }
 
+/**
+ * A arte como ImageBitmap. SVG só com viewBox (sem width/height) não tem tamanho próprio: o Chrome
+ * diz 300 × 150 e o createImageBitmap falha (e, com resize, devolve tudo transparente). Aí o tamanho
+ * vem da proporção do viewBox (1024 no lado maior) e a arte é desenhada num canvas.
+ */
+async function bitmapDe(url: string) {
+  const img = await carregar(url);
+  try {
+    return await createImageBitmap(img);
+  } catch {
+    const vb = /viewBox\s*=\s*["']\s*[-\d.e]+[\s,]+[-\d.e]+[\s,]+([\d.e]+)[\s,]+([\d.e]+)/i.exec(await (await fetch(url)).text());
+    const r = vb ? Number(vb[1]) / Number(vb[2]) || 1 : 1;
+    const [w, h] = r >= 1 ? [1024, Math.round(1024 / r)] : [Math.round(1024 * r), 1024];
+    const tela = new OffscreenCanvas(w, h);
+    tela.getContext("2d")!.drawImage(img, 0, 0, w, h);
+    return tela.transferToImageBitmap();
+  }
+}
+
 /** Manda a arte para o Worker uma vez; `false` se o arquivo não abrir como imagem. */
 function enviar(url: string) {
   let p = enviadas.get(url);
   if (!p) {
-    p = carregar(url)
-      .then((img) => createImageBitmap(img, img.naturalWidth ? undefined : { resizeWidth: 1024, resizeHeight: 1024 }))
+    p = bitmapDe(url)
       .then((bitmap) => {
         obter().postMessage({ tipo: "arte", url, bitmap } satisfies Pedido, [bitmap]);
         return true;
@@ -90,6 +108,8 @@ export async function comporEstampa(o: {
       return { area, manter, marcador: m };
     })
   );
+  // Marcadores primeiro: nenhum "Sua arte" fica por cima de uma arte anexada.
+  camadas.sort((a, b) => Number(!("marcador" in a)) - Number(!("marcador" in b)));
   const absoluta = (u: string) => new URL(u, location.href).href;
   const r = await pedir(
     { tipo: "compor", id: ++seq, largura: o.largura, altura: o.altura, peca: absoluta(o.peca), branco: absoluta(o.branco), tecnica: o.tecnica, camadas },

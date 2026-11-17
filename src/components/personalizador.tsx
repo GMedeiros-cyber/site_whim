@@ -6,18 +6,6 @@ import { CheckIcon, DownloadIcon, InfoIcon, MinusIcon, PlusIcon, Share2Icon } fr
 
 import { Arara, CORES, MODELOS, usePoucoMovimento, type Cor } from "@/components/arara";
 import { Container, Destaque, Seta, Titulo } from "@/components/blocos";
-import { CampoIsca } from "@/components/campo-isca";
-import {
-  Autorizacao,
-  CamposContato,
-  CONTATO_VAZIO,
-  contatoValido,
-  focarErro,
-  TEXTO_AUTORIZACAO,
-  TEXTO_OFERTAS,
-  type DadosContato,
-} from "@/components/campos-contato";
-import { medir } from "@/components/medicao";
 import {
   conflitos,
   EscolhaPosicoes,
@@ -32,12 +20,11 @@ import {
   type Posicao,
 } from "@/components/posicoes";
 import { PreviaPeca, tintaPara, type EstampaPrevia } from "@/components/previa-peca";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { areaDe, FRASE_TECNICA, TECNICAS, type InfoArte, type Lado, type Tecnica } from "@/lib/estampa";
-import { enviarContato } from "@/lib/contatos";
 import { analisarArte } from "@/lib/estampa-cliente";
 import { gerarFicha, nomeFicha } from "@/lib/ficha";
 import { cn } from "@/lib/utils";
@@ -90,6 +77,22 @@ const INICIAL: Pedido = {
 };
 
 const modeloDe = (peca: string) => MODELOS.find((m) => m.nome === peca) ?? MODELOS[0];
+
+const GUARDA = "whim-pedido";
+/** O pedido guardado nesta aba (sem as artes); null se não houver ou não fizer sentido. */
+function lerPedido(): { pedido: Pedido; passo: number; alcancado: number } | null {
+  try {
+    const s = JSON.parse(sessionStorage.getItem(GUARDA) ?? "null");
+    const p = s?.pedido;
+    const cor = CORES.find((c) => c.pasta === p?.cor);
+    if (!cor || !PECAS.includes(p.peca) || !Array.isArray(p.posicoes) || !Array.isArray(p.tamanhos)) return null;
+    const passo = Math.min(4, Math.max(0, Number(s.passo) || 0));
+    const alcancado = Math.min(4, Math.max(passo, Number(s.alcancado) || 0));
+    return { pedido: { ...INICIAL, ...p, cor, posicoes: p.posicoes.map((x: Posicao) => ({ chave: x.chave, manterFundo: x.manterFundo })) }, passo, alcancado };
+  } catch {
+    return null;
+  }
+}
 // Select nativo com a mesma cara do Input (16 px no celular para o iOS não dar zoom).
 const campo =
   "h-11 w-full min-w-0 rounded-lg border border-input bg-background px-2.5 text-base text-foreground outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:text-sm";
@@ -105,8 +108,6 @@ export function Personalizador() {
   const [aviso, setAviso] = useState("");
   const [infos, setInfos] = useState<Record<string, InfoArte>>({}); // análise de cada arte, por URL
   const [ficha, setFicha] = useState<Ficha | null>(null);
-  const [contato, setContato] = useState<DadosContato>(CONTATO_VAZIO);
-  const [tentou, setTentou] = useState(false); // depois de tentar enviar, mostra todos os erros
   const tituloRef = useRef<HTMLParagraphElement>(null);
   const previaRef = useRef<HTMLDivElement>(null);
   const focar = useRef(false);
@@ -125,6 +126,28 @@ export function Personalizador() {
 
   // Libera as URLs das artes que saíram do pedido (trocar, remover) e do rascunho do "Cancelar";
   // ao sair da página, todas.
+  // Recarregar a página (F5, puxar no celular) mantém o pedido e o passo, nesta aba; as artes não
+  // (são arquivos do aparelho). O 1º efeito lê o que ficou guardado; os seguintes guardam.
+  const lido = useRef(false);
+  useEffect(() => {
+    if (!lido.current) {
+      lido.current = true;
+      const salvo = lerPedido();
+      if (salvo) {
+        /* eslint-disable react-hooks/set-state-in-effect -- sessionStorage só existe no navegador */
+        setPedido(salvo.pedido);
+        setPasso(salvo.passo);
+        setAlcancado(salvo.alcancado);
+        /* eslint-enable react-hooks/set-state-in-effect */
+        return;
+      }
+    }
+    try {
+      const guardar = { ...pedido, cor: cor.pasta, posicoes: posicoes.map((p) => ({ chave: p.chave, manterFundo: p.manterFundo })) };
+      sessionStorage.setItem(GUARDA, JSON.stringify({ pedido: guardar, passo, alcancado }));
+    } catch {}
+  }, [pedido, cor, posicoes, passo, alcancado]);
+
   const urls = useRef(new Set<string>());
   useEffect(() => {
     const usadas = new Set([pedido, antes].flatMap((p) => (p?.posicoes ?? []).flatMap((x) => (x.arte ? [x.arte.url] : []))));
@@ -135,7 +158,6 @@ export function Personalizador() {
 
   const resumo = [
     "Olá, Whim! Montei minha peça no site:",
-    ...(contatoValido(contato) ? [`• Contato: ${contato.nome.trim()} · ${contato.telefone} · ${contato.email.trim()}`] : []),
     `• Peça: ${peca} · Cor: ${nomeCor}`,
     `• Tecido: ${tecido}`,
     `• Técnica: ${tecnica}`,
@@ -295,7 +317,7 @@ export function Personalizador() {
     { nome: "Cor", valor: usaOutra ? `Outra: ${nomeCor}` : cor.nome, depois: "Na vitrine da prévia" },
     { nome: "Estampa", valor: `${posicoes.length ? posicoes.map((p) => NOME[p.chave]).join(", ") : "A definir"} · ${tecnica}`, depois: "Posições, artes e técnica" },
     { nome: "Quantidade", valor: `${pecas(total)}${listaTamanhos ? ` · ${listaTamanhos}` : ""}`, depois: `A partir de ${MINIMO} peças` },
-    { nome: "Resumo", valor: "", depois: "Seus dados, ficha e WhatsApp" },
+    { nome: "Resumo", valor: "", depois: "Ficha e WhatsApp" },
   ];
   const ultimo = passos.length - 1;
 
@@ -452,7 +474,7 @@ export function Personalizador() {
               {fichaPronta ? (
                 <Image
                   src={ficha.url}
-                  alt={`Ficha da estampa: ${peca}, ${nomeCor}, ${tecido}, ${tecnica},${posicoes.length} ${posicoes.length === 1 ? "posição" : "posições"}`}
+                  alt={`Ficha da estampa: ${peca}, ${nomeCor}, ${tecido}, ${tecnica}, ${posicoes.length} ${posicoes.length === 1 ? "posição" : "posições"}`}
                   width={1600}
                   height={1000}
                   unoptimized
@@ -479,8 +501,11 @@ export function Personalizador() {
             </div>
             <ol className="mt-3.5 grid list-inside list-decimal gap-1 text-sm marker:font-semibold marker:text-accent">
               <li>Baixe ou compartilhe a ficha.</li>
-              <li>Preencha seus dados e envie a mensagem pelo WhatsApp.</li>
-              <li>Na conversa, anexe a ficha{temArte ? " e os arquivos das artes" : ""}.</li>
+              <li>
+                <span className="pointer-coarse:hidden">Clique</span>
+                <span className="hidden pointer-coarse:inline">Toque</span> em Pedir orçamento no WhatsApp.
+              </li>
+              <li>Na conversa, anexe a ficha{temArte ? " e as artes" : ""}.</li>
             </ol>
             <div className="mt-3.5 grid gap-1 rounded-[14px] bg-muted p-3.5 text-[13px]">
               <p>
@@ -488,47 +513,20 @@ export function Personalizador() {
               </p>
               <p>Quem responde é a equipe da Whim.</p>
             </div>
-            <form noValidate onSubmit={enviar} className="relative mt-5 grid gap-4 border-t border-primary/10 pt-4">
-              <CampoIsca />
-              <p className="text-sm text-muted-foreground">
-                <span className="font-semibold text-foreground">Seus dados</span> · para a equipe da Whim responder.
-              </p>
-              <CamposContato id="pedido" valor={contato} onValor={setContato} mostrarErros={tentou} />
-              <Autorizacao id="pedido" valor={contato} onValor={setContato} mostrarErros={tentou} />
-              <Button type="submit" size="xl">
-                Enviar pelo WhatsApp <Seta />
-              </Button>
-            </form>
+            {/* Sem pedir dados: os dados ficam no formulário de Contato, embaixo. O clique conta como
+                conversão (contato_whatsapp + orcamento_personalizador) pelo ouvinte do medicao.tsx. */}
+            <a
+              href={linkWhatsApp(resumo)}
+              target="_blank"
+              rel="noopener noreferrer"
+              // No celular ocupa a largura do cartão e quebra a linha se não couber (telas de 320 px).
+              className={cn(buttonVariants({ size: "xl" }), "mt-3.5 h-auto min-h-12 w-full gap-2 px-3.5 py-3 text-center tracking-normal whitespace-normal has-data-[icon=inline-end]:pr-3.5 min-[601px]:w-auto min-[601px]:gap-2.5 min-[601px]:px-6 min-[601px]:tracking-[0.02em] min-[601px]:has-data-[icon=inline-end]:pr-5")}
+            >
+              Pedir orçamento no WhatsApp <Seta />
+            </a>
           </>
         );
     }
-  }
-
-  // Com os dados certos: grava o contato (sem esperar) e abre o WhatsApp no mesmo clique.
-  function enviar(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    const form = e.currentTarget;
-    if (!contatoValido(contato)) {
-      setTentou(true);
-      focarErro(form, "pedido", contato);
-      return;
-    }
-    const isca = form.elements.namedItem("site");
-    enviarContato({
-      origem: "monte-sua-peca",
-      nome: contato.nome.trim(),
-      email: contato.email.trim(),
-      telefone: contato.telefone,
-      pedido: resumo,
-      consentimento: true,
-      consentimento_texto: TEXTO_AUTORIZACAO,
-      ofertas: contato.ofertas,
-      ofertas_texto: TEXTO_OFERTAS,
-      site: isca instanceof HTMLInputElement ? isca.value : "",
-    });
-    medir("contato_whatsapp", { origem: "personalizador" });
-    medir("orcamento_personalizador");
-    window.open(linkWhatsApp(resumo), "_blank", "noopener,noreferrer");
   }
 
   return (
@@ -567,9 +565,13 @@ export function Personalizador() {
           LARGO
         )}
       >
-        {/* PC: a prévia vai até a altura da tela e acompanha a ficha nos passos longos. */}
-        <div ref={previaRef} className={cn("min-w-0", FIXA)}>
-          <PreviaPeca modelo={modelo} cor={cor} onCor={(c) => mudar({ cor: c, usaOutra: false })} estampa={estampa} />
+        {/* PC: a vitrine tem a altura da ficha (até a altura da tela; nunca menos que 4/5 da
+            largura) e fica parada ao rolar os passos longos: não sobra vão embaixo dela, nem
+            com zoom de 50% (pedido do Gabriel, 17/11 noite). */}
+        <div className="min-w-0 @container lg:self-stretch">
+          <div ref={previaRef} className={cn("lg:h-[min(100%,100svh-8rem)] lg:min-h-[max(30rem,min(125cqw,100svh-8rem))]", FIXA)}>
+            <PreviaPeca modelo={modelo} cor={cor} onCor={(c) => mudar({ cor: c, usaOutra: false })} estampa={estampa} />
+          </div>
         </div>
 
         {/* Ficha do pedido: 5 passos numa linha vertical (feito, atual, depois). */}
@@ -595,7 +597,7 @@ export function Personalizador() {
                         estado === "depois" && "border border-primary/18 text-muted-foreground"
                       )}
                     >
-                      {estado === "feito" ? <CheckIcon aria-label="feito" className="size-3.5" strokeWidth={3} /> : i + 1}
+                      {estado === "feito" ? <CheckIcon role="img" aria-label="feito" className="size-3.5" strokeWidth={3} /> : i + 1}
                     </span>
                     {i < ultimo && (
                       <span aria-hidden className={cn("min-h-4 w-0.5 flex-1", estado === "feito" ? "bg-primary" : "bg-primary/14")} />
@@ -669,8 +671,10 @@ export function Personalizador() {
 
 // Telas grandes (27" Full HD e 2K): a página abre mais em vez de ficar no meio com sobra dos lados.
 const LARGO = "min-[112.5rem]:max-w-[1520px]"; // a partir de 1800 px; o Contato usa o mesmo
-// Parada ao rolar só quando cabe inteira (a prévia tem no mínimo 30rem e no máximo a tela − 8rem).
+// Parada ao rolar só quando cabe inteira (a vitrine tem no mínimo 30rem e no máximo a tela − 8rem).
 const FIXA = "lg:[@media(min-height:640px)]:sticky lg:top-24";
+
+const QTD_DIGITOS = 5;
 
 function Opcao(props: React.ComponentProps<typeof ToggleGroupItem>) {
   return (
@@ -691,7 +695,7 @@ function Tamanhos({ tamanhos, onTamanhos }: { tamanhos: Tamanho[]; onTamanhos: (
   const [novo, setNovo] = useState<string | null>(null);
   const nomeNovo = novo?.trim() ?? "";
   const repetido = tamanhos.some((t) => t.grupo === grupo && t.nome.toLowerCase() === nomeNovo.toLowerCase());
-  const mudarQtd = (i: number, qtd: number) => onTamanhos(tamanhos.map((t, j) => (j === i ? { ...t, qtd: Math.max(0, qtd) } : t)));
+  const mudarQtd = (i: number, qtd: number) => onTamanhos(tamanhos.map((t, j) => (j === i ? { ...t, qtd: Math.max(0, Math.min(10 ** QTD_DIGITOS - 1, qtd)) } : t)));
   const soma = (g: Grupo) => tamanhos.reduce((s, t) => s + (t.grupo === g ? t.qtd : 0), 0);
 
   return (
@@ -732,8 +736,10 @@ function Tamanhos({ tamanhos, onTamanhos }: { tamanhos: Tamanho[]; onTamanhos: (
                 aria-label={`Quantidade ${nomeTamanho(t)}`}
                 inputMode="numeric"
                 value={String(t.qtd)}
-                onChange={(e) => mudarQtd(i, Number(e.target.value.replace(/\D/g, "")) || 0)}
-                className="h-11 w-14 text-center tabular-nums"
+                maxLength={QTD_DIGITOS}
+                // Só dígitos, até 5 (99.999 peças): número longo virava "1e+25" e não cabia no campo.
+                onChange={(e) => mudarQtd(i, Number(e.target.value.replace(/\D/g, "").slice(0, QTD_DIGITOS)) || 0)}
+                className="h-11 w-16 px-1 text-center tabular-nums"
               />
               <Button variant="outline" size="icon-lg" aria-label={`Mais ${nomeTamanho(t)}`} onClick={() => mudarQtd(i, t.qtd + 1)} className="size-11 rounded-full">
                 <PlusIcon />

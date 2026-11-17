@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
+import Image from "next/image";
 
 import manifest from "../../public/arara/manifest.json";
 import { depoisDaTransicao } from "@/components/transicao-pinta";
@@ -27,6 +28,44 @@ export function pastaDaCor(hex: string) {
 /** Cor própria de cada peça na arara (manifest.pecas[].cor casado com manifest.cores[].nome). */
 const corPropria = (m: Modelo) => (CORES.find((c) => c.nome === m.cor) ?? CORES[0]).hex;
 
+/** Todos os quadros de uma pasta de cor num arquivo só (gerado por scripts/emendar-quadros.mjs). */
+export const pacoteDe = (pasta: string) => `${pasta}quadros.bin`;
+
+// ponytail: guarda os pacotes já baixados na sessão (no máximo os 25, ~7 MB); a arara e a vitrine
+// usam o mesmo download. Limitar por quantidade se a memória pesar no celular.
+const pacotes = new Map<string, Promise<Blob[]>>();
+
+/**
+ * Resolve no `load` da página (na hora, se já passou, como vindo da home). Os pacotes somam
+ * 1,4 MB: começando antes do primeiro desenho (no <head> ou ao montar), o Lighthouse mobile
+ * conta esse download no LCP e estimou 11 s. A arara já aparece pelos quadros parados do HTML.
+ */
+const carregada = () =>
+  new Promise<void>((pronto) => (document.readyState === "complete" ? pronto() : addEventListener("load", () => pronto(), { once: true })));
+
+/** Baixa o pacote (uma vez, depois do load) e separa os .webp emendados ("RIFF" + tamanho de 4 bytes + dados). */
+export function lerPacote(pasta: string) {
+  let p = pacotes.get(pasta);
+  if (!p) {
+    p = carregada().then(async () => {
+      const r = await fetch(pacoteDe(pasta));
+      if (!r.ok) throw new Error(`pacote ${r.status}`);
+      const dados = await r.arrayBuffer();
+      const v = new DataView(dados);
+      const quadros: Blob[] = [];
+      for (let o = 0; o + 8 <= dados.byteLength; ) {
+        const fim = o + 8 + v.getUint32(o + 4, true);
+        quadros.push(new Blob([dados.slice(o, fim)], { type: "image/webp" }));
+        o = fim;
+      }
+      return quadros;
+    });
+    pacotes.set(pasta, p);
+    p.catch(() => pacotes.delete(pasta)); // falhou: tenta de novo na próxima vez
+  }
+  return p;
+}
+
 export function usePoucoMovimento() {
   return useSyncExternalStore(
     (avisar) => {
@@ -47,8 +86,21 @@ type Banco = { quadros: (ImageBitmap | undefined)[]; parar: AbortController };
  * na cor escolhida e com fundo transparente ({coresPasta}{cor}/NNN.webp).
  * Os quadros chegam como ImageBitmap já decodificado no tamanho do canvas (o tamanho na tela
  * × DPR), e o desenho só acontece no requestAnimationFrame: nada decodifica nem mede no giro.
+ * Até o canvas desenhar, aparece o quadro parado (<img> do HTML do servidor), no mesmo lugar.
  */
-function PecaGirando({ modelo, cor, deFrente, carregar, semGiro }: { modelo: Modelo; cor: string; deFrente: boolean; carregar: boolean; semGiro: boolean }) {
+function PecaGirando({
+  modelo,
+  cor,
+  deFrente,
+  parado,
+  semGiro,
+}: {
+  modelo: Modelo;
+  cor: string;
+  deFrente: boolean; // escolhida ou com o mouse/foco em cima
+  parado: "lado" | "frente"; // como fica sem o mouse (o quadro do HTML)
+  semGiro: boolean;
+}) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   // Quadros por pasta de cor: a atual e, durante a troca, a que está saindo.
   const bancos = useRef(new Map<string, Banco>());
@@ -104,11 +156,13 @@ function PecaGirando({ modelo, cor, deFrente, carregar, semGiro }: { modelo: Mod
     return () => ro.disconnect();
   }, [modelo, agendar]);
 
-  // Carrega os quadros da cor atual quando a arara entra na tela e a cada troca de cor, já
-  // decodificados fora da thread principal. Primeiro e último quadros vão na frente da fila.
+  // Os quadros da cor atual (e a cada troca de cor) vêm num pacote só, baixado no load da página
+  // (vindo da home, na hora, por baixo da tinta). Só a decodificação (fora da thread principal)
+  // espera a transição de tinta acabar, para ela não engasgar (pedido do agente 2, 17/11):
+  // primeiro o quadro parado de lado e o de frente, depois o resto.
   useEffect(() => {
     pastaRef.current = pasta;
-    if (!carregar || !tamanho) return;
+    if (!tamanho) return;
     if (bancos.current.has(pasta)) {
       agendar();
       return;
@@ -116,18 +170,26 @@ function PecaGirando({ modelo, cor, deFrente, carregar, semGiro }: { modelo: Mod
     const banco: Banco = { quadros: [], parar: new AbortController() };
     bancos.current.set(pasta, banco);
     const [resizeWidth, resizeHeight] = tamanho;
-    for (let i = 0; i < total; i++) {
-      fetch(`${pasta}${String(i + 1).padStart(3, "0")}.webp`, { priority: i === 0 || i === total - 1 ? "high" : "low", signal: banco.parar.signal })
-        .then((r) => r.blob())
-        .then((b) => createImageBitmap(b, { resizeWidth, resizeHeight, resizeQuality: "high" }))
-        .then((bitmap) => {
-          if (banco.parar.signal.aborted) return bitmap.close();
-          banco.quadros[i] = bitmap;
-          agendar();
-        })
-        .catch(() => {});
-    }
-  }, [carregar, pasta, total, tamanho, agendar]);
+    const decodificar = (b: Blob, i: number) =>
+      createImageBitmap(b, { resizeWidth, resizeHeight, resizeQuality: "high" }).then((bitmap) => {
+        if (banco.parar.signal.aborted) return bitmap.close();
+        banco.quadros[i] = bitmap;
+        agendar();
+      });
+    lerPacote(pasta)
+      .then((quadros) => {
+        if (banco.parar.signal.aborted) return;
+        const cancelar = depoisDaTransicao(() => {
+          const pontas = [0, total - 1];
+          Promise.allSettled(pontas.map((i) => decodificar(quadros[i], i))).then(() => {
+            if (banco.parar.signal.aborted) return;
+            quadros.forEach((q, i) => !pontas.includes(i) && decodificar(q, i).catch(() => {}));
+          });
+        });
+        banco.parar.signal.addEventListener("abort", cancelar);
+      })
+      .catch(() => {});
+  }, [pasta, total, tamanho, agendar]);
 
   useEffect(() => {
     const mapa = bancos.current;
@@ -161,13 +223,24 @@ function PecaGirando({ modelo, cor, deFrente, carregar, semGiro }: { modelo: Mod
   }, [deFrente, semGiro, desenhar, agendar]);
 
   return (
-    <canvas
-      ref={canvasRef}
-      aria-hidden
-      // A curva do gancho fica a 42/640 da altura do quadro (manifest.gancho): sobe o
-      // canvas para ela cair no eixo do cano (metade do cano + 42/640 × 4/3 da largura).
-      className="pointer-events-none -mt-[calc(var(--cano)/2+var(--w)*0.0875)] aspect-[3/4] w-(--w) max-w-none shrink-0"
-    />
+    // A curva do gancho fica a 42/640 da altura do quadro (manifest.gancho): sobe a peça
+    // para ela cair no eixo do cano (metade do cano + 42/640 × 4/3 da largura).
+    <span className="pointer-events-none relative -mt-[calc(var(--cano)/2+var(--w)*0.0875)] aspect-[3/4] w-(--w) max-w-none shrink-0">
+      <canvas ref={canvasRef} aria-hidden className="peer absolute inset-0 size-full" />
+      {/* Quadro parado, no HTML: a peça aparece sem esperar o JS; some quando o canvas desenha.
+          Prioridade alta nas cinco: todas aparecem juntas na primeira tela (~45 KB no total). */}
+      <Image
+        src={`${pasta}${String(parado === "frente" ? total : 1).padStart(3, "0")}.webp`}
+        alt=""
+        width={modelo.largura}
+        height={modelo.altura}
+        unoptimized
+        loading="eager"
+        fetchPriority="high"
+        decoding="async"
+        className="absolute inset-0 size-full peer-data-quadro:invisible"
+      />
+    </span>
   );
 }
 
@@ -182,46 +255,26 @@ function liberar(b: Banco) {
  * cor própria do manifesto.
  */
 export function Arara({ selecionada, cor, onEscolher }: { selecionada: string; cor: string; onEscolher: (nome: string) => void }) {
-  const araraRef = useRef<HTMLDivElement>(null);
-  const [carregar, setCarregar] = useState(false);
   const [foco, setFoco] = useState<number | null>(null);
   const semGiro = usePoucoMovimento();
-
-  // Só começa a decodificar os quadros depois da transição de tinta entre páginas,
-  // para ela não engasgar (pedido do agente 2, 17/11).
-  useEffect(() => {
-    const el = araraRef.current;
-    if (!el) return;
-    let io: IntersectionObserver | undefined;
-    const cancelar = depoisDaTransicao(() => {
-      io = new IntersectionObserver(
-        ([e]) => {
-          if (e.isIntersecting) {
-            setCarregar(true);
-            io?.disconnect();
-          }
-        },
-        { rootMargin: "200px" }
-      );
-      io.observe(el);
-    });
-    return () => {
-      cancelar();
-      io?.disconnect();
-    };
-  }, []);
 
   const corDe = (m: Modelo) => (m.nome === selecionada ? cor : corPropria(m));
 
   return (
     <>
       {/* --w: largura do quadro; --cano: altura do cano (proporção da prévia em referencia/arara). */}
-      <div ref={araraRef} className="[--cano:calc(var(--w)*0.1067)] [--w:170px] min-[601px]:[--w:230px] min-[112.5rem]:[--w:280px]">
+      <div className="[--cano:calc(var(--w)*0.1067)] [--w:170px] min-[601px]:[--w:230px] min-[112.5rem]:[--w:280px]">
         <div className="-mx-5 snap-x snap-proximity overflow-x-auto px-5 pb-2 min-[601px]:mx-0 min-[601px]:px-0">
-          <div className="mx-auto w-max min-w-full">
+          {/* PC: o cano vai das peças até ~0,6 peça de cada lado (antes ia de ponta a ponta da página
+              e ficava vazio dos lados a 1920). A largura conta duas peças abertas (a escolhida e a
+              do mouse), para o cano não mudar de tamanho no hover. */}
+          <div
+            className="mx-auto w-max min-w-full min-[601px]:w-(--arara) min-[601px]:max-w-full min-[601px]:min-w-0"
+            style={{ "--arara": `calc(var(--w) * ${(0.88 * 2 + 0.3 * (MODELOS.length - 2) + 1.2).toFixed(2)})` } as React.CSSProperties}
+          >
             {/* Cano cromado esticado na largura da arara; o fundo branco some com multiply,
-                por isso nenhum ancestral dele pode criar stacking context. É fundo CSS, não <img>,
-                porque o esticão é de propósito (o Lighthouse reprova <img> fora da proporção). */}
+                por isso nenhum ancestral dele pode criar stacking context. É fundo CSS, não tag de
+                imagem, porque o esticão é de propósito (o Lighthouse reprova imagem fora da proporção). */}
             <div
               aria-hidden
               className="h-(--cano) w-full bg-size-[100%_100%] mix-blend-multiply"
@@ -246,7 +299,13 @@ export function Arara({ selecionada, cor, onEscolher }: { selecionada: string; c
                       foco === i || selecionada === m.nome ? "w-[calc(var(--w)*0.88)]" : "w-[calc(var(--w)*0.3)]"
                     )}
                   >
-                    <PecaGirando modelo={m} cor={corDe(m)} deFrente={foco === i || selecionada === m.nome} carregar={carregar} semGiro={semGiro} />
+                    <PecaGirando
+                      modelo={m}
+                      cor={corDe(m)}
+                      deFrente={foco === i || selecionada === m.nome}
+                      parado={selecionada === m.nome ? "frente" : "lado"}
+                      semGiro={semGiro}
+                    />
                     {selecionada === m.nome && (
                       <span aria-hidden className="absolute bottom-0 left-1/2 -ml-3 h-1 w-6 rounded-full bg-accent" />
                     )}
