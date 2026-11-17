@@ -309,3 +309,9 @@ Uma entrada por tarefa, sempre acrescentada no fim (nunca reescrever as anterior
 - Conferido: lint e tsc ok; build webpack ok (Poppins trocada só localmente); Playwright 390/1280: 4 páginas sem rolagem lateral e console limpo, home → Monte sua peça → voltar sem erro, barra visível na hora, some ao descer e volta ao subir; capturas das seções novas.
 - Commit: `5e8aac1` (main, um deploy só).
 - Pendente: medir PageSpeed no site publicado.
+
+### 2026-11-17 17:45 · Claude · depoimento real e foto das dúvidas
+- Depoimento da Patricia (Electrochemical) no "O que dizem de nós", texto exato, sem estrelas; 2 cartões vazios completam a linha.
+- Foto das dúvidas: `camiseta-whim-mesa.webp` (IA + logo oficial `whim-logo-branco.svg` aplicado com textura do tecido); grade `lg:items-stretch`, foto com a altura das perguntas.
+- Comandos: lint, tsc, `npm run build` (troca temporária da Poppins, desfeita); Playwright a 1280 e 390: sem rolagem lateral, console limpo.
+- Pendente: merge com as branches dos agentes 1, 2 e 3 desta rodada.

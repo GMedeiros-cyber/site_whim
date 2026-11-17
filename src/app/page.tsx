@@ -404,15 +404,17 @@ function Clientes() {
 function Duvidas() {
   return (
     <section id="duvidas" className={cn(secao, sobrepoe, "bg-background")}>
-      {/* Foto da oficina à esquerda e perguntas à direita; no celular a foto vem em cima, menor. */}
-      <Container className="grid gap-8 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:items-start lg:gap-16">
-        <div className="relative aspect-[16/10] overflow-hidden rounded-[24px] bg-muted sm:aspect-[2/1] lg:aspect-[4/5]">
+      {/* Foto à esquerda e perguntas à direita; no PC a foto acompanha a altura das perguntas
+          (cresce junto quando uma resposta abre). No celular a foto vem em cima, menor.
+          Imagem gerada com IA; o logo é o arquivo oficial aplicado por cima, sem redesenho. */}
+      <Container className="grid gap-8 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:items-stretch lg:gap-16">
+        <div className="relative aspect-[16/10] overflow-hidden rounded-[24px] bg-muted sm:aspect-[2/1] lg:aspect-auto lg:min-h-[560px]">
           <Image
-            src="/images/f35.webp"
-            alt="Camisetas pretas estampadas na mesa da oficina"
+            src="/images/camiseta-whim-mesa.webp"
+            alt="Camiseta azul-marinho dobrada com o logo da Whim estampado, na mesa de silk ao lado do rodo e da tinta turquesa"
             fill
             sizes="(min-width: 1024px) 440px, 100vw"
-            className="object-cover"
+            className="object-cover object-[50%_42%]"
           />
         </div>
         <div>
