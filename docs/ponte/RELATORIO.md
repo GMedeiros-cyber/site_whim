@@ -280,3 +280,11 @@ Uma entrada por tarefa, sempre acrescentada no fim (nunca reescrever as anterior
 - Conferido: lint e tsc ok; build webpack ok (Poppins trocada só localmente, também no `global-error.tsx`); Playwright 390/1280: home → Monte sua peça → voltar, durante e depois da abertura, sem a tela de erro e com console limpo; 4 páginas sem rolagem lateral; capturas em 390/1280/2560.
 - Commit: `7e245a2` (main, um deploy só).
 - Pendente: texto da autorização para anúncios/prospecção; espera de ~2,5 s da abertura em celular lento (decisão do Gabriel); rodapé em 1180 px nas telas grandes.
+
+### 2026-11-17 15:56 · Agente 2 · Ajustes da home de 17/11 à tarde (Claude Code)
+- Feito: "Vista" 30% menor; barra na hora, some descendo e volta subindo (todas as páginas, sempre no topo, movimento reduzido sem deslizar); abertura no 1º desenho só com transform/opacity (máscara fixa num "rodo" que desliza e imagem em contramovimento, mesmo visual); tinta entre páginas como faixa fixa do React animada por WAAPI + `depoisDaTransicao`; Dúvidas com foto `f35` e acordeão acessível (uma aberta, seta girando, abertura suave); rodapé e home em 1520 px a partir de 1800 px.
+- Medido (CPU 4×, trace do Chrome): abertura começa 17–85 ms antes do 1º desenho e nenhuma animação dela sai do compositor; ainda caem quadros nos primeiros ~0,75 s (raster da GPU da página que carrega por baixo; uma página só com uma animação perde 0–4%). Tinta: faixa no compositor; a tela fica coberta ~1,3 s com CPU 4× (0,1–0,3 s sem) esperando o Monte sua peça renderizar.
+- Conferido no Chrome: 77 checagens em 390/1280/1920/2560 e movimento reduzido (Vista, barra, abertura, tinta só de/para o Monte sua peça, dúvidas com aria-expanded e inert, larguras, sem rolagem lateral); home → Monte sua peça pelo menu sem erro.
+- Comandos: `npm run lint`, `npm run build` (webpack, ok), `next start` + Playwright e traces.
+- Commit: `0269a39`. `package-lock.json` com só `"peer": true` do `npm install` antigo ficou guardado num stash, não descartado.
+- Pendente: o agente 1 ligar `depoisDaTransicao` na arara; o agente 3 ver o aviso de CSS pré-carregado do `global-error.tsx` (os dois em PEDIDOS).
