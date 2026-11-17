@@ -273,8 +273,8 @@ export function Arara({ selecionada, cor, onEscolher }: { selecionada: string; c
             style={{ "--arara": `calc(var(--w) * ${(0.88 * 2 + 0.3 * (MODELOS.length - 2) + 1.2).toFixed(2)})` } as React.CSSProperties}
           >
             {/* Cano cromado esticado na largura da arara; o fundo branco some com multiply,
-                por isso nenhum ancestral dele pode criar stacking context. É fundo CSS, não <img>,
-                porque o esticão é de propósito (o Lighthouse reprova <img> fora da proporção). */}
+                por isso nenhum ancestral dele pode criar stacking context. É fundo CSS, não tag de
+                imagem, porque o esticão é de propósito (o Lighthouse reprova imagem fora da proporção). */}
             <div
               aria-hidden
               className="h-(--cano) w-full bg-size-[100%_100%] mix-blend-multiply"
