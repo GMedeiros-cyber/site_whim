@@ -356,3 +356,11 @@ Uma entrada por tarefa, sempre acrescentada no fim (nunca reescrever as anterior
 - Comandos: `git checkout main && git pull && git checkout -b agente-1/celular-18-11 && git merge --no-edit origin/claude/ref-celular`, `npm run lint` (ok), `npx tsc --noEmit` (ok), `npm run build` (webpack, ok); Playwright no build de produção: celular a 360, 390 e 430 (101 checagens: vitrine presa, barra no pé, alvos ≥ 44 px, sem rolagem lateral, axe, teclado, recarregar, WhatsApp), checklist do agente 3 sem falhas; a bateria do PC passa a 1280 e dá 6 falhas a 1920/2560 que já vêm do `zoom` de telas grandes (ver Pendente), com as fotos do PC iguais às de antes.
 - Commit: `96200f0`. Home e header não foram tocados (o botão flutuante só ganhou uma classe CSS).
 - Pendente: no PC a 1920 e 2560 a vitrine fica 0,85×/0,75× da altura da ficha e o cano sai do eixo nas medidas da tela, por causa do `zoom` de telas grandes (`557fa5f`, aviso do agente 2 em PEDIDOS); a correção está pronta para quando o Gabriel liberar mexer no PC.
+
+### 2026-11-18 18:25 · Agente 3 · Teste do celular de 18/11 (Claude Code)
+- Feito (`agente-3/teste-celular-18-11`: main + `agente-1/celular-18-11` + `agente-2/celular-18-11`, merge `c2c0e48`; conflito só no PEDIDOS e no RELATORIO, resolvido mantendo os dois lados): comparação com `referencia/celular-18-11/` a 360, 390 e 430 px no Chromium e no WebKit do Playwright, e PC antes e depois.
+- Resultado: 161 verificações, 149 ok e 12 com falha (`docs/qualidade/celular-18-11.md`, com a leitura ao lado da referência). A 1280 e a 1920, as 4 páginas iguais pixel a pixel ao main de antes (`c3c0cb6`). Falhas e diferenças passadas aos agentes 1 e 2 em PEDIDOS.
+- Script para rodar de novo, sem mudar código de produção: `scripts/testes-celular.mjs` (o "antes" sai de um worktree separado; o teclado é simulado).
+- Comandos: `git checkout main && git pull && git checkout -b agente-3/teste-celular-18-11 && git merge --no-edit origin/agente-1/celular-18-11 origin/agente-2/celular-18-11`, `npx playwright-core install chromium webkit`, `npm run build` (webpack, ok) + `next start` (3417 e 3418), o script, `npm run lint` (ok).
+- Commit: `1baf7c0`.
+- Pendente: teclado de verdade num iPhone; prévia e ficha no iOS abaixo do 16.4 (sem `OffscreenCanvas`).
