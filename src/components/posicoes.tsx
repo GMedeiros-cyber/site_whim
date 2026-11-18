@@ -92,7 +92,7 @@ export function EscolhaPosicoes({ cor, ...props }: Escolha & { cor: Cor }) {
         {([["frente", frente], ["costas", costas]] as const).map(([lado, grupo], i) => (
           <div key={lado} className={cn("min-w-0", i ? "pl-3" : "pr-3")}>
             <MapaLado lado={lado} cor={cor} {...props} />
-            <GrupoPosicoes grupo={grupo} className="mt-2.5" {...props} />
+            <GrupoPosicoes grupo={grupo} className="mt-2.5 max-[600px]:mt-0" {...props} />
           </div>
         ))}
       </div>
@@ -112,7 +112,8 @@ function MapaLado({ lado, cor, modelo, numeros, onAlternar }: Escolha & { lado: 
   return (
     <div
       data-mapa={lado}
-      className="relative cursor-pointer touch-manipulation overflow-hidden rounded-xl bg-muted"
+      // Celular: sem o mapa (a vitrine presa no alto já mostra a peça); ficam as caixas.
+      className="relative cursor-pointer touch-manipulation overflow-hidden rounded-xl bg-muted max-[600px]:hidden"
       onClick={(e) => {
         if (e.detail === 0) return; // teclado: o próprio botão trata
         const r = e.currentTarget.getBoundingClientRect();

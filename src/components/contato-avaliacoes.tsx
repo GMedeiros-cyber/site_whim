@@ -1,6 +1,7 @@
-import { QuoteIcon, StarIcon } from "lucide-react";
+import { MailIcon, MapPinIcon, MessageCircleIcon, QuoteIcon, StarIcon } from "lucide-react";
 
 import { Container, Destaque, Titulo, secao } from "@/components/blocos";
+import { DepoimentoCelular, type Depoimento } from "@/components/depoimento-celular";
 import { FormContato } from "@/components/form-contato";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
@@ -14,8 +15,6 @@ const linkInfo =
 // com o texto exatamente como a pessoa mandou. Sem estrelas: os depoimentos chegam pelo
 // WhatsApp, sem nota. Os cartões vazios completam 3 até chegarem os outros.
 const MOSTRAR_AVALIACOES = true;
-
-type Depoimento = { texto: string; nome: string; empresa: string };
 
 const DEPOIMENTOS: Depoimento[] = [
   {
@@ -37,8 +36,15 @@ export function ContatoAvaliacoes() {
           Fale com <Destaque>a Whim.</Destaque>
         </Titulo>
 
+        {/* Celular (proposta de 18/11): o depoimento primeiro, depois o formulário e, no fim, os
+            contatos como atalhos de toque. No PC fica como está. */}
+        <p className="mt-2 text-sm text-muted-foreground min-[601px]:hidden">A equipe responde pelo WhatsApp, de segunda a sexta.</p>
+        {MOSTRAR_AVALIACOES && (
+          <DepoimentoCelular depoimentos={DEPOIMENTOS} emBreve={DEPOIMENTOS.length < 3} mapa={CONTATO.mapa} className="mt-6 min-[601px]:hidden" />
+        )}
+
         <div className={cn(
-            "mt-8 grid rounded-[28px] bg-background p-2 shadow-[0_24px_56px_-24px] shadow-primary/20 sm:mt-10 lg:rounded-[36px] lg:p-3",
+            "mt-8 grid rounded-[28px] bg-background p-2 shadow-[0_24px_56px_-24px] shadow-primary/20 max-[600px]:mt-4 sm:mt-10 lg:rounded-[36px] lg:p-3",
             MOSTRAR_AVALIACOES ? "lg:grid-cols-[minmax(0,600px)_minmax(0,1fr)]" : "max-w-[720px]"
           )}>
           <div className="px-4 pt-6 pb-8 sm:px-7 sm:pt-8 lg:px-9 lg:py-10">
@@ -53,6 +59,7 @@ export function ContatoAvaliacoes() {
         </div>
 
         <InfoContato />
+        <AtalhosContato />
       </Container>
     </section>
   );
@@ -72,7 +79,7 @@ function Avaliacoes() {
   return (
     <div
       id="avaliacoes"
-      className="scroll-mt-24 overflow-hidden rounded-[22px] bg-muted px-4 py-6 sm:px-7 sm:py-8 lg:rounded-[28px] lg:p-7"
+      className="scroll-mt-24 overflow-hidden rounded-[22px] bg-muted px-4 py-6 max-[600px]:hidden sm:px-7 sm:py-8 lg:rounded-[28px] lg:p-7"
     >
       <h3 className="text-xl font-semibold tracking-[-0.01em]">O que dizem de nós</h3>
       {vazios.length > 0 && (
@@ -168,7 +175,7 @@ function InfoContato() {
   ];
 
   return (
-    <dl className="mt-9 grid gap-6 px-1 md:grid-cols-[minmax(0,1fr)_auto_auto] md:gap-x-12 lg:grid-cols-[minmax(0,300px)_auto_auto] lg:justify-start lg:gap-x-20 lg:px-3">
+    <dl className="mt-9 grid gap-6 px-1 max-[600px]:hidden md:grid-cols-[minmax(0,1fr)_auto_auto] md:gap-x-12 lg:grid-cols-[minmax(0,300px)_auto_auto] lg:justify-start lg:gap-x-20 lg:px-3">
       {info.map((i) => (
         <div key={i.titulo} className="relative pl-5">
           <span aria-hidden className="absolute top-[7px] left-0 size-2 rounded-full bg-accent" />
@@ -177,5 +184,37 @@ function InfoContato() {
         </div>
       ))}
     </dl>
+  );
+}
+
+/** Celular: os contatos como atalhos de toque (WhatsApp com o horário, e-mail e o endereço no mapa). */
+function AtalhosContato() {
+  const [rua, ...resto] = CONTATO.endereco.split(" · ");
+  const horario = CONTATO.horario.charAt(0).toLowerCase() + CONTATO.horario.slice(1);
+  const atalhos = [
+    { href: `https://wa.me/${WHATSAPP}`, Icone: MessageCircleIcon, titulo: CONTATO.whatsapp, detalhe: `WhatsApp · ${horario}`, fora: true },
+    { href: `mailto:${CONTATO.email}`, Icone: MailIcon, titulo: CONTATO.email, detalhe: "E-mail", fora: false },
+    { href: CONTATO.mapa, Icone: MapPinIcon, titulo: rua, detalhe: `${resto.join(" · ")} · abrir no mapa`, fora: true },
+  ];
+  return (
+    <ul aria-label="Contatos" className="mt-4 grid gap-2.5 min-[601px]:hidden">
+      {atalhos.map(({ href, Icone, titulo, detalhe, fora }) => (
+        <li key={href}>
+          <a
+            href={href}
+            {...(fora ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+            className="flex min-h-16 items-center gap-3 rounded-2xl bg-background px-4 py-3 outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+          >
+            <span aria-hidden className="grid size-10 shrink-0 place-items-center rounded-full bg-accent/16 text-primary">
+              <Icone className="size-[18px]" />
+            </span>
+            <span className="grid min-w-0">
+              <span className="text-sm font-semibold break-words">{titulo}</span>
+              <span className="text-xs text-muted-foreground">{detalhe}</span>
+            </span>
+          </a>
+        </li>
+      ))}
+    </ul>
   );
 }

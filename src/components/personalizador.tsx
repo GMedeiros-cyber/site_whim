@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { CheckIcon, DownloadIcon, InfoIcon, MinusIcon, PlusIcon, Share2Icon } from "lucide-react";
+import { ArrowLeftIcon, CheckIcon, DownloadIcon, InfoIcon, MinusIcon, PlusIcon, Share2Icon } from "lucide-react";
 
 import { Arara, CORES, MODELOS, usePoucoMovimento, type Cor } from "@/components/arara";
 import { Container, Destaque, Seta, Titulo } from "@/components/blocos";
@@ -19,7 +19,7 @@ import {
   type Arte,
   type Posicao,
 } from "@/components/posicoes";
-import { PreviaPeca, tintaPara, type EstampaPrevia } from "@/components/previa-peca";
+import { CoresVitrine, PreviaPeca, tintaPara, type EstampaPrevia } from "@/components/previa-peca";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -240,6 +240,15 @@ export function Personalizador() {
     if (celular()) el.scrollIntoView({ block: "start", behavior: semGiro ? "auto" : "smooth" });
   }, [passo, semGiro]);
 
+  // Celular: a linha de passos desliza para o passo atual ficar no meio.
+  const linhaRef = useRef<HTMLOListElement>(null);
+  useEffect(() => {
+    const ol = linhaRef.current;
+    const li = ol?.querySelector<HTMLElement>(`[data-passo="${passo}"]`);
+    if (!ol || !li || !ol.clientWidth) return;
+    ol.scrollTo({ left: li.offsetLeft - (ol.clientWidth - li.offsetWidth) / 2, behavior: semGiro ? "auto" : "smooth" });
+  }, [passo, semGiro]);
+
   // Ficha em PNG para a equipe da Whim, gerada ao chegar no Resumo (e a cada mudança).
   const chaveFicha =
     passo === 4
@@ -313,13 +322,16 @@ export function Personalizador() {
 
   // Ficha do pedido: nome do passo, o valor quando feito e o texto de quando ainda vem depois.
   const passos = [
-    { nome: "Peça", valor: `${peca} · ${tecido}`, depois: "Modelo e tecido" },
-    { nome: "Cor", valor: usaOutra ? `Outra: ${nomeCor}` : cor.nome, depois: "Na vitrine da prévia" },
-    { nome: "Estampa", valor: `${posicoes.length ? posicoes.map((p) => NOME[p.chave]).join(", ") : "A definir"} · ${tecnica}`, depois: "Posições, artes e técnica" },
-    { nome: "Quantidade", valor: `${pecas(total)}${listaTamanhos ? ` · ${listaTamanhos}` : ""}`, depois: `A partir de ${MINIMO} peças` },
-    { nome: "Resumo", valor: "", depois: "Ficha e WhatsApp" },
+    { nome: "Peça", pergunta: "Qual peça?", valor: `${peca} · ${tecido}`, depois: "Modelo e tecido" },
+    { nome: "Cor", pergunta: "Qual cor?", valor: usaOutra ? `Outra: ${nomeCor}` : cor.nome, depois: "Na vitrine da prévia" },
+    { nome: "Estampa", pergunta: "Onde vai a estampa?", valor: `${posicoes.length ? posicoes.map((p) => NOME[p.chave]).join(", ") : "A definir"} · ${tecnica}`, depois: "Posições, artes e técnica" },
+    { nome: "Quantidade", pergunta: "Quantas peças?", valor: `${pecas(total)}${listaTamanhos ? ` · ${listaTamanhos}` : ""}`, depois: `A partir de ${MINIMO} peças` },
+    { nome: "Resumo", pergunta: "Confira o pedido", valor: "", depois: "Ficha e WhatsApp" },
   ];
   const ultimo = passos.length - 1;
+  // Resumo curto da vitrine do celular: o total de peças a partir do passo Quantidade; antes, as posições.
+  const resumoDireita =
+    passo >= 3 && total > 0 ? pecas(total) : posicoes.length ? `${posicoes.length} ${posicoes.length === 1 ? "posição" : "posições"}` : "";
 
   // Prévia com as artes: no passo Estampa (com zoom) e, depois dele, a prévia final.
   const final = alcancado > 2 && passo !== 2 && posicoes.length > 0;
@@ -340,8 +352,13 @@ export function Personalizador() {
       case 0:
         return (
           <>
-            <p className="text-sm text-muted-foreground">Também dá para escolher direto na arara.</p>
-            <ToggleGroup aria-label="Peça" value={[peca]} onValueChange={escolha(trocarPeca)} className="mt-3.5 flex-wrap">
+            <p className="text-sm text-muted-foreground max-[600px]:hidden">Também dá para escolher direto na arara.</p>
+            {/* Celular: a arara do topo vira este passo, para a vitrine ficar presa no alto (a
+                margem de 4 px faz o trilho da arara ir de ponta a ponta da tela). */}
+            <div className="mx-1 min-[601px]:hidden">
+              <Arara selecionada={peca} cor={cor.hex} onEscolher={trocarPeca} />
+            </div>
+            <ToggleGroup aria-label="Peça" value={[peca]} onValueChange={escolha(trocarPeca)} className="mt-3.5 flex-wrap max-[600px]:hidden">
               {PECAS.map((p) => (
                 <Opcao key={p} value={p}>{p}</Opcao>
               ))}
@@ -360,6 +377,7 @@ export function Personalizador() {
         return (
           <>
             <p className="text-sm text-muted-foreground">As cores da vitrine são exemplos. Toque numa das camisas para ver na prévia.</p>
+            <CoresVitrine modelo={modelo} cor={cor} onCor={(c) => mudar({ cor: c, usaOutra: false })} className="mt-3.5 min-[601px]:hidden" />
             <ToggleGroup
               aria-label="Cor"
               value={[usaOutra ? "outra" : "vitrine"]}
@@ -520,7 +538,7 @@ export function Personalizador() {
               target="_blank"
               rel="noopener noreferrer"
               // No celular ocupa a largura do cartão e quebra a linha se não couber (telas de 320 px).
-              className={cn(buttonVariants({ size: "xl" }), "mt-3.5 h-auto min-h-12 w-full gap-2 px-3.5 py-3 text-center tracking-normal whitespace-normal has-data-[icon=inline-end]:pr-3.5 min-[601px]:w-auto min-[601px]:gap-2.5 min-[601px]:px-6 min-[601px]:tracking-[0.02em] min-[601px]:has-data-[icon=inline-end]:pr-5")}
+              className={cn(buttonVariants({ size: "xl" }), "mt-3.5 h-auto min-h-12 w-full gap-2 px-3.5 py-3 text-center tracking-normal whitespace-normal has-data-[icon=inline-end]:pr-3.5 max-[600px]:hidden min-[601px]:w-auto min-[601px]:gap-2.5 min-[601px]:px-6 min-[601px]:tracking-[0.02em] min-[601px]:has-data-[icon=inline-end]:pr-5")}
             >
               Pedir orçamento no WhatsApp <Seta />
             </a>
@@ -530,14 +548,19 @@ export function Personalizador() {
   }
 
   return (
-    <section id="personalizar" className="scroll-mt-24 pt-[132px] sm:pt-[168px]">
-      <Container className={cn("pb-3 sm:pb-8", LARGO)}>
-        <Titulo as="h1">
+    <section
+      id="personalizar"
+      // --vitrine: altura da vitrine presa do celular (270 px, menos em telas baixas).
+      className="scroll-mt-24 pt-[132px] [--vitrine:clamp(170px,32svh,270px)] max-[600px]:pt-[calc(env(safe-area-inset-top)+82px)] sm:pt-[168px]"
+    >
+      <Container className={cn("pb-3 max-[600px]:p-0 sm:pb-8", LARGO)}>
+        <Titulo as="h1" className="max-[600px]:sr-only">
           Escolha na arara <Destaque>e personalize.</Destaque>
         </Titulo>
 
-        {/* Arara: um clique ou toque já escolhe a peça (no começo, leva ao passo da cor). */}
-        <div className="mt-10">
+        {/* Arara: um clique ou toque já escolhe a peça (no começo, leva ao passo da cor). No
+            celular ela fica no passo Peça. */}
+        <div className="mt-10 max-[600px]:hidden">
           <Arara
             selecionada={peca}
             cor={cor.hex}
@@ -561,26 +584,75 @@ export function Personalizador() {
 
       <Container
         className={cn(
-          "grid items-start gap-8 pt-3 pb-7 sm:pt-8 sm:pb-10 lg:grid-cols-[1.2fr_0.8fr] lg:gap-[clamp(20px,4vw,48px)] min-[112.5rem]:grid-cols-2 min-[112.5rem]:gap-16",
+          "grid items-start gap-8 pt-3 pb-7 max-[600px]:block max-[600px]:p-0 sm:pt-8 sm:pb-10 lg:grid-cols-[1.2fr_0.8fr] lg:gap-[clamp(20px,4vw,48px)] min-[112.5rem]:grid-cols-2 min-[112.5rem]:gap-16",
           LARGO
         )}
       >
         {/* PC: a vitrine tem a altura da ficha (até a altura da tela; nunca menos que 4/5 da
             largura) e fica parada ao rolar os passos longos: não sobra vão embaixo dela, nem
             com zoom de 50% (pedido do Gabriel, 17/11 noite). */}
-        <div className="min-w-0 @container lg:self-stretch">
-          <div ref={previaRef} className={cn("lg:h-[min(100%,100svh-8rem)] lg:min-h-[max(30rem,min(125cqw,100svh-8rem))]", FIXA)}>
+        {/* Celular: vitrine e linha de passos presas embaixo da barra; quando a barra some (rolando
+            para baixo), sobem junto com ela. A faixa branca de cima cobre o que rola por trás da barra. */}
+        <div className={cn("min-w-0 @container lg:self-stretch", PRESA)}>
+          <div ref={previaRef} className={cn("lg:h-[min(100%,100svh-8rem)] lg:min-h-[max(30rem,min(125cqw,100svh-8rem))] max-[600px]:relative", FIXA)}>
             <PreviaPeca modelo={modelo} cor={cor} onCor={(c) => mudar({ cor: c, usaOutra: false })} estampa={estampa} />
+            <p className="pointer-events-none absolute inset-x-2.5 bottom-2.5 flex items-center justify-between gap-3 rounded-[14px] bg-background/92 px-3 py-2 text-xs min-[601px]:hidden">
+              <span className="min-w-0 truncate">
+                <span className="font-semibold">{peca}</span> · {nomeCor}
+                {alcancado >= 2 || passo >= 2 ? ` · ${tecnica}` : ""}
+              </span>
+              {resumoDireita && <span className="shrink-0 tabular-nums">{resumoDireita}</span>}
+            </p>
           </div>
+          <nav aria-label="Passos" className="mt-2.5 min-[601px]:hidden">
+            <ol ref={linhaRef} className="relative -mx-3 flex gap-1.5 overflow-x-auto px-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              {passos.map((p, i) => {
+                const estado = i === passo ? "atual" : i < alcancado ? "feito" : "depois";
+                const miolo = (
+                  <>
+                    <span
+                      className={cn(
+                        "grid size-7 shrink-0 place-items-center rounded-full text-xs font-bold tabular-nums",
+                        estado === "feito" ? "bg-primary text-primary-foreground" : estado === "atual" ? "bg-accent text-primary" : "bg-muted text-foreground"
+                      )}
+                    >
+                      {estado === "feito" ? <CheckIcon aria-hidden className="size-3.5" strokeWidth={3} /> : i + 1}
+                    </span>
+                    {p.nome}
+                  </>
+                );
+                const chip = cn(
+                  "flex h-11 shrink-0 items-center gap-1.5 rounded-full border pr-3.5 pl-2 text-[13px] whitespace-nowrap",
+                  estado === "atual" ? "border-transparent bg-accent/16 font-semibold" : "border-primary/12 font-medium text-muted-foreground"
+                );
+                return (
+                  <li key={p.nome} data-passo={i} aria-current={estado === "atual" ? "step" : undefined}>
+                    {estado === "feito" ? (
+                      // Tocar num passo feito volta para ele (como o "Alterar" do PC).
+                      <button type="button" onClick={() => abrir(i)} aria-label={`${p.nome}, feito: voltar para este passo`} className={cn(chip, "outline-none focus-visible:ring-3 focus-visible:ring-ring/50")}>
+                        {miolo}
+                      </button>
+                    ) : (
+                      <span className={chip}>
+                        {miolo}
+                        {estado === "depois" && <span className="sr-only">, ainda não</span>}
+                      </span>
+                    )}
+                  </li>
+                );
+              })}
+            </ol>
+          </nav>
         </div>
 
         {/* Ficha do pedido: 5 passos numa linha vertical (feito, atual, depois). */}
         {/* No PC, os textos do pedido ficam 8% maiores (pedido do Gabriel, 17/11 à noite): o zoom
             aumenta tudo da coluna por igual e a largura dela continua a mesma. */}
-        <div className="min-w-0 lg:[zoom:1.08]">
-          <h2 className="text-xl font-semibold min-[601px]:text-2xl">Seu pedido</h2>
-          <p className="mt-1 text-sm text-muted-foreground">Monte em 5 passos e receba o orçamento pelo WhatsApp.</p>
-          <ol aria-label="Passos do pedido" className="mt-6">
+        <div className="min-w-0 max-[600px]:px-4 max-[600px]:pt-4 lg:[zoom:1.08]">
+          <h2 className="text-xl font-semibold max-[600px]:sr-only min-[601px]:text-2xl">Seu pedido</h2>
+          <p className="mt-1 text-sm text-muted-foreground max-[600px]:sr-only">Monte em 5 passos e receba o orçamento pelo WhatsApp.</p>
+          {/* Celular: só o passo atual aparece (os outros estão na linha de passos, lá em cima). */}
+          <ol aria-label="Passos do pedido" className="mt-6 max-[600px]:mt-0">
             {passos.map((p, i) => {
               const estado = i === passo ? "atual" : i < alcancado ? "feito" : "depois";
               return (
@@ -588,9 +660,9 @@ export function Personalizador() {
                   key={p.nome}
                   aria-current={estado === "atual" ? "step" : undefined}
                   data-estado={estado}
-                  className="grid grid-cols-[26px_minmax(0,1fr)] gap-x-3.5 min-[601px]:grid-cols-[30px_minmax(0,1fr)] min-[601px]:gap-x-4"
+                  className={cn("grid grid-cols-[26px_minmax(0,1fr)] gap-x-3.5 max-[600px]:block min-[601px]:grid-cols-[30px_minmax(0,1fr)] min-[601px]:gap-x-4", estado !== "atual" && "max-[600px]:hidden")}
                 >
-                  <div className="flex flex-col items-center">
+                  <div className="flex flex-col items-center max-[600px]:hidden">
                     <span
                       className={cn(
                         "grid size-[26px] shrink-0 place-items-center rounded-full text-xs font-semibold tabular-nums min-[601px]:size-[30px] min-[601px]:text-[13px]",
@@ -606,7 +678,7 @@ export function Personalizador() {
                     )}
                   </div>
 
-                  <div className={cn("min-w-0", i < ultimo && "pb-5")}>
+                  <div className={cn("min-w-0", i < ultimo && "pb-5 max-[600px]:pb-0")}>
                     {estado === "feito" && (
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0 pt-0.5 min-[601px]:pt-1">
@@ -620,12 +692,20 @@ export function Personalizador() {
                     )}
                     {estado === "atual" && (
                       <>
-                        <p ref={tituloRef} tabIndex={-1} className="scroll-mt-28 pt-0.5 font-semibold outline-none min-[601px]:pt-1">
-                          {p.nome}
+                        {/* Celular: a pergunta do passo; a página rola até ela abaixo da vitrine presa. */}
+                        <p
+                          ref={tituloRef}
+                          tabIndex={-1}
+                          className="scroll-mt-28 pt-0.5 font-semibold outline-none max-[600px]:scroll-mt-[calc(env(safe-area-inset-top)+var(--vitrine)+158px)] max-[600px]:text-lg max-[600px]:font-bold min-[601px]:pt-1"
+                        >
+                          <span className="max-[600px]:hidden">{p.nome}</span>
+                          <span className="hidden max-[600px]:inline">{p.pergunta}</span>
                         </p>
-                        <div className="mt-3 rounded-[18px] border border-primary/12 bg-background p-4 shadow-sm min-[601px]:p-5">
+                        {/* Celular: sem o cartão; a altura mínima deixa a barra de ações no pé da tela. */}
+                        <div className="mt-3 rounded-[18px] border border-primary/12 bg-background p-4 shadow-sm max-[600px]:mt-1 max-[600px]:flex max-[600px]:min-h-[calc(100svh-env(safe-area-inset-top)-var(--vitrine)-200px)] max-[600px]:flex-col max-[600px]:rounded-none max-[600px]:border-0 max-[600px]:p-0 max-[600px]:shadow-none min-[601px]:p-5">
                           {conteudo(i)}
-                          <div className="mt-5 flex gap-2.5">
+                          {/* Celular: Voltar e Continuar presos no pé da tela, dizendo o próximo passo. */}
+                          <div data-barra-acoes className={cn("mt-5 flex gap-2.5", BARRA)}>
                             {editando ? (
                               <>
                                 <Button variant="outline" size="xl" onClick={cancelar} className="flex-1 min-[601px]:flex-none">
@@ -638,14 +718,29 @@ export function Personalizador() {
                             ) : (
                               <>
                                 {i > 0 && (
-                                  <Button variant="outline" size="xl" onClick={() => abrir(i - 1)} className="flex-1 min-[601px]:flex-none">
-                                    Voltar
+                                  <Button variant="outline" size="xl" onClick={() => abrir(i - 1)} className="flex-none max-[600px]:px-5">
+                                    {/* No último passo do celular, só a seta: o botão do WhatsApp precisa da largura. */}
+                                    {i === ultimo && <ArrowLeftIcon aria-hidden className="hidden max-[600px]:block" />}
+                                    <span className={cn(i === ultimo && "max-[600px]:sr-only")}>Voltar</span>
                                   </Button>
                                 )}
                                 {i < ultimo && (
-                                  <Button size="xl" onClick={continuar} className="flex-[2] min-[601px]:ml-auto min-[601px]:flex-none">
-                                    Continuar <Seta />
+                                  <Button size="xl" onClick={continuar} className="flex-1 min-[601px]:ml-auto min-[601px]:flex-none">
+                                    <span>
+                                      Continuar<span className="min-[601px]:hidden"> · {passos[i + 1].nome}</span>
+                                    </span>{" "}
+                                    <Seta />
                                   </Button>
+                                )}
+                                {i === ultimo && (
+                                  <a
+                                    href={linkWhatsApp(resumo)}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className={cn(buttonVariants({ size: "xl" }), "h-auto min-h-12 flex-1 gap-2 px-3.5 py-3 text-center tracking-normal whitespace-normal has-data-[icon=inline-end]:pr-3.5 min-[601px]:hidden")}
+                                  >
+                                    Pedir orçamento no WhatsApp <Seta />
+                                  </a>
                                 )}
                               </>
                             )}
@@ -675,6 +770,19 @@ export function Personalizador() {
 const LARGO = "min-[112.5rem]:max-w-[1520px]"; // a partir de 1800 px; o Contato usa o mesmo
 // Parada ao rolar só quando cabe inteira (a vitrine tem no mínimo 30rem e no máximo a tela − 8rem).
 const FIXA = "lg:[@media(min-height:640px)]:sticky lg:top-24";
+// Celular: o bloco da vitrine preso logo abaixo da barra (82 px) e, quando a barra some ao rolar
+// para baixo, no topo; só em telas com altura para isso. A faixa de cima (::before) cobre o vão.
+const PRESA = cn(
+  "max-[600px]:relative max-[600px]:top-[calc(env(safe-area-inset-top)+82px)] max-[600px]:z-30 max-[600px]:bg-background max-[600px]:px-3 max-[600px]:pb-2.5",
+  "max-[600px]:shadow-[0_14px_20px_-18px] max-[600px]:shadow-primary/50 max-[600px]:transition-[top] max-[600px]:duration-300 max-[600px]:ease-out motion-reduce:transition-none",
+  "max-[600px]:[@media(min-height:560px)]:sticky max-[600px]:[body:has(header[data-oculta]:not(:focus-within))_&]:top-[env(safe-area-inset-top)]",
+  "max-[600px]:before:absolute max-[600px]:before:inset-x-0 max-[600px]:before:bottom-full max-[600px]:before:h-[calc(env(safe-area-inset-top)+82px)] max-[600px]:before:bg-background"
+);
+// Celular: a barra de Voltar/Continuar presa no pé da tela (acima da área segura).
+const BARRA = cn(
+  "max-[600px]:sticky max-[600px]:bottom-0 max-[600px]:z-20 max-[600px]:-mx-4 max-[600px]:mt-auto max-[600px]:bg-background max-[600px]:px-4 max-[600px]:pt-3",
+  "max-[600px]:pb-[calc(env(safe-area-inset-bottom)+0.75rem)] max-[600px]:shadow-[0_-12px_22px_-18px] max-[600px]:shadow-primary/55"
+);
 
 const QTD_DIGITOS = 5;
 

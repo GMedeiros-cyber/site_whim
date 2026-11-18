@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { MinusIcon, PlusIcon } from "lucide-react";
 
-import { CANO, CORES, lerPacote, usePoucoMovimento, type Cor, type Modelo } from "@/components/arara";
+import { CANO, CORES, lerPacote, useCelular, usePoucoMovimento, type Cor, type Modelo } from "@/components/arara";
 import { depoisDaTransicao } from "@/components/transicao-pinta";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -428,7 +428,9 @@ export function PreviaPeca({
     const a = estampa && areaDe(modelo, lado, estampa.foco.chave);
     if (a) setZoom(zoomPara(a));
   }
-  const z = editar ? zoom : 1;
+  // Celular: a vitrine é baixa e não tem a barra de zoom; a peça aparece inteira.
+  const celular = useCelular();
+  const z = editar && !celular ? zoom : 1;
 
   // Posições que aparecem no lado da tela e a área onde o zoom aproxima.
   const naTela = estampa?.posicoes.filter((p) => areaDe(modelo, lado, p.chave)) ?? [];
@@ -476,8 +478,10 @@ export function PreviaPeca({
       const cw = tela.offsetWidth, ch = tela.offsetHeight, cl = (W - cw) / 2, ct = tela.offsetTop;
       // Espaço livre: de 8 px da borda esquerda até 8 px antes da barra de zoom (16 + 44 px), e
       // acima da legenda da técnica. As peças vão até 95% da largura do quadro e 93,7% da altura.
-      const cx = (W - 60) / 2;
-      const b = Math.min((H - 56) / (ct + 0.937 * ch), (W - 76) / 2 / (0.47 * cw));
+      // No celular não há a barra de zoom à direita nem a legenda (o resumo curto fica no pé).
+      const [barra, legenda] = celular ? [0, 44] : [60, 56];
+      const cx = (W - barra) / 2;
+      const b = Math.min((H - legenda) / (ct + 0.937 * ch), (W - barra - 16) / 2 / (0.47 * cw));
       const a = areaDe(modelo, lado, foco) ?? [0.3, 0.27, 0.4, 0.4];
       const R = { x: cl + (a[0] + a[2] / 2) * cw, y: ct + (a[1] + a[3] / 2) * ch };
       const R1 = { x: cx + (R.x - W / 2) * b, y: R.y * b };
@@ -493,7 +497,7 @@ export function PreviaPeca({
     const ro = new ResizeObserver(() => aplicar.current());
     ro.observe(painel);
     return () => ro.disconnect();
-  }, [editar, z, foco, lado, modelo]);
+  }, [editar, z, foco, lado, modelo, celular]);
 
   // Arrastar (botão apertado ou dedo) gira; com zoom no passo Estampa, move a imagem.
   // Os controles do painel (cartão, Frente/Costas, zoom) ficam fora disso.
@@ -537,7 +541,7 @@ export function PreviaPeca({
   const gira = !comEstampa && !semGiro;
   const limpo = z > 1; // com zoom: sem cano, sem sombra e sem o selo "Prévia"
   const ultimo = numero(n - 1);
-  const posicaoCanvas = "absolute top-[7.77%] left-1/2 h-[54%] w-auto -translate-x-1/2 min-[601px]:top-[8.21%] min-[601px]:h-[59%] lg:top-[min(8.21cqh,16.42cqw)] lg:h-[min(59cqh,118cqw)]";
+  const posicaoCanvas = "absolute top-[1.2%] left-1/2 h-[111%] w-auto -translate-x-1/2 min-[601px]:top-[8.21%] min-[601px]:h-[59%] lg:top-[min(8.21cqh,16.42cqw)] lg:h-[min(59cqh,118cqw)]";
 
   return (
     <div
@@ -551,7 +555,7 @@ export function PreviaPeca({
       onPointerUp={soltar}
       onPointerCancel={soltar}
       className={cn(
-        "group/painel relative mx-auto aspect-[358/530] w-full overflow-hidden rounded-[22px] border border-primary/10 bg-muted outline-none select-none focus-visible:ring-3 focus-visible:ring-ring/50 min-[601px]:aspect-[662/640] min-[601px]:max-w-[662px] min-[601px]:rounded-[26px] lg:aspect-auto lg:h-full lg:max-w-none lg:[container-type:size]",
+        "group/painel relative mx-auto h-(--vitrine,270px) w-full overflow-hidden rounded-[22px] border border-primary/10 bg-muted outline-none select-none focus-visible:ring-3 focus-visible:ring-ring/50 min-[601px]:aspect-[662/640] min-[601px]:h-auto min-[601px]:max-w-[662px] min-[601px]:rounded-[26px] lg:aspect-auto lg:h-full lg:max-w-none lg:[container-type:size]",
         editar && limpo ? "cursor-grab touch-none data-arrastando:cursor-grabbing" : "touch-pan-y",
         gira && "cursor-grab data-arrastando:cursor-grabbing"
       )}
@@ -570,17 +574,17 @@ export function PreviaPeca({
           height={CANO.altura}
           sizes="(min-width: 1024px) 660px, (min-width: 601px) 380px, 55vw"
           className={cn(
-            "absolute top-[10%] left-[22.5%] h-auto w-[55%] mix-blend-multiply transition-opacity min-[601px]:top-[12.08%] min-[601px]:left-[21.5%] min-[601px]:w-[57%] min-[601px]:-translate-y-1/2 lg:top-[min(12.08cqh,24.16cqw)] lg:left-1/2 lg:w-[min(45.6cqh,91.2cqw)] lg:-translate-x-1/2",
+            "absolute top-[8.5%] left-[18%] h-auto w-[64%] -translate-y-1/2 mix-blend-multiply transition-opacity min-[601px]:top-[12.08%] min-[601px]:left-[21.5%] min-[601px]:w-[57%] lg:top-[min(12.08cqh,24.16cqw)] lg:left-1/2 lg:w-[min(45.6cqh,91.2cqw)] lg:-translate-x-1/2",
             limpo && "opacity-0"
           )}
         />
         {/* Pêndulo: peça e sombra giram em torno do gancho (no eixo do cano). */}
-        <div ref={penduloRef} className="absolute inset-0 origin-[50%_11.31%] will-change-transform min-[601px]:origin-[50%_12.08%] lg:origin-[50%_min(12.08cqh,24.16cqw)]">
+        <div ref={penduloRef} className="absolute inset-0 origin-[50%_8.5%] will-change-transform min-[601px]:origin-[50%_12.08%] lg:origin-[50%_min(12.08cqh,24.16cqw)]">
           <div
             ref={sombraRef}
             aria-hidden
             className={cn(
-              "absolute top-[57%] left-[33%] h-[3%] w-[34%] rounded-[50%] bg-primary/14 blur-md transition-opacity min-[601px]:top-[62%] min-[601px]:left-[35%] min-[601px]:w-[30%] lg:top-[min(62cqh,124cqw)] lg:left-1/2 lg:h-[min(3cqh,6cqw)] lg:w-[min(24cqh,48cqw)] lg:-translate-x-1/2",
+              "absolute top-[57%] left-[33%] h-[3%] w-[34%] rounded-[50%] bg-primary/14 blur-md transition-opacity max-[600px]:hidden min-[601px]:top-[62%] min-[601px]:left-[35%] min-[601px]:w-[30%] lg:top-[min(62cqh,124cqw)] lg:left-1/2 lg:h-[min(3cqh,6cqw)] lg:w-[min(24cqh,48cqw)] lg:-translate-x-1/2",
               limpo && "opacity-0"
             )}
           />
@@ -617,7 +621,7 @@ export function PreviaPeca({
         />
       </div>
 
-      <Badge variant="outline" className={cn("absolute top-4 right-4 bg-background/60 backdrop-blur-sm transition-opacity", limpo && "opacity-0")}>
+      <Badge variant="outline" className={cn("absolute top-4 right-4 bg-background/60 backdrop-blur-sm transition-opacity max-[600px]:hidden", limpo && "opacity-0")}>
         Prévia
       </Badge>
 
@@ -631,7 +635,7 @@ export function PreviaPeca({
             spacing={0}
             variant="outline"
             // Na prévia final do celular, quem troca o lado é a miniatura (o botão cobriria o cano).
-            className={cn("absolute top-4 left-4 rounded-full bg-background/85 backdrop-blur-sm", !editar && "max-[600px]:hidden")}
+            className="absolute top-2.5 left-2.5 rounded-full bg-background/85 backdrop-blur-sm min-[601px]:top-4 min-[601px]:left-4"
           >
             {(["frente", "costas"] as const).map((l) => (
               <ToggleGroupItem
@@ -651,7 +655,7 @@ export function PreviaPeca({
           {/* Zoom: barra vertical à direita, centralizada na altura (+ em cima, − embaixo). */}
           <div
             data-controle
-            className="absolute top-1/2 right-4 flex h-1/2 w-11 -translate-y-1/2 flex-col items-center rounded-full border border-primary/10 bg-background/85 backdrop-blur-sm"
+            className="absolute top-1/2 right-4 flex h-1/2 w-11 -translate-y-1/2 flex-col items-center rounded-full border border-primary/10 bg-background/85 backdrop-blur-sm max-[600px]:hidden"
           >
             <Button variant="ghost" size="icon-lg" aria-label="Aproximar" disabled={zoom >= ZOOM_MAX} onClick={() => setZoom((v) => Math.min(ZOOM_MAX, Math.round(v * 2 + 1) / 2))} className="size-11 shrink-0 rounded-full">
               <PlusIcon />
@@ -673,14 +677,14 @@ export function PreviaPeca({
           </div>
 
           {/* Legenda da técnica no rodapé da prévia. */}
-          <p data-controle className="absolute inset-x-3 bottom-3 rounded-xl bg-background/85 px-3 py-1.5 text-center text-xs text-muted-foreground backdrop-blur-sm">
+          <p data-controle className="absolute inset-x-3 bottom-3 rounded-xl bg-background/85 px-3 py-1.5 text-center text-xs text-muted-foreground backdrop-blur-sm max-[600px]:hidden">
             <span className="font-semibold text-foreground">{estampa.tecnica}</span> · {FRASE_TECNICA[estampa.tecnica]}
           </p>
         </>
       )}
 
       {!editar && (
-        <div className="pointer-events-none absolute inset-x-3 bottom-3 grid justify-items-end gap-2 min-[601px]:inset-x-6 min-[601px]:bottom-6 min-[601px]:gap-3">
+        <div className="pointer-events-none absolute inset-x-3 bottom-3 grid justify-items-end gap-2 max-[600px]:hidden min-[601px]:inset-x-6 min-[601px]:bottom-6 min-[601px]:gap-3">
           {/* Prévia final: o outro lado em miniatura; um clique troca. */}
           {estampa && (
             <button
@@ -699,45 +703,69 @@ export function PreviaPeca({
               <span className="text-base font-semibold min-[601px]:text-lg">{modelo.nome}</span>
               <span className="text-[13px] text-muted-foreground min-[601px]:text-sm">{cor.nome}</span>
             </p>
-            <div role="group" aria-label="Cor do tecido" className="mt-2.5 grid grid-cols-5 gap-1 min-[601px]:mt-3 min-[601px]:gap-2">
-              {CORES.map((c) => {
-                const ativa = c.pasta === cor.pasta;
-                return (
-                  <button
-                    key={c.pasta}
-                    type="button"
-                    aria-pressed={ativa}
-                    aria-label={c.nome}
-                    onClick={() => onCor(c)}
-                    onPointerEnter={() => preCarregar(c)}
-                    onPointerDown={() => preCarregar(c)}
-                    onFocus={() => preCarregar(c)}
-                    className="flex min-h-11 flex-col items-center justify-end gap-1 rounded-xl pb-1 outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
-                  >
-                    <Image
-                      src={`${modelo.coresPasta}${c.pasta}/${ultimo}.webp`}
-                      alt=""
-                      width={modelo.largura}
-                      height={modelo.altura}
-                      sizes="(min-width: 1024px) 80px, 64px"
-                      className={cn(
-                        "w-auto motion-safe:transition-[height,width] motion-safe:duration-300",
-                        // PC: miniaturas com 64 px de largura ou mais.
-                        ativa ? "h-12 min-[601px]:h-16 lg:h-auto lg:w-20" : "h-10 min-[601px]:h-12 lg:h-auto lg:w-16"
-                      )}
-                    />
-                    <span className={cn("text-[11px] leading-none whitespace-nowrap lg:text-xs", ativa ? "font-semibold" : "text-muted-foreground")}>
-                      <span className="min-[601px]:hidden">{c.curto ?? c.nome}</span>
-                      <span className="hidden min-[601px]:inline">{c.nome}</span>
-                    </span>
-                    <span aria-hidden className={cn("h-[3px] w-[22px] rounded-full", ativa ? "bg-accent" : "bg-transparent")} />
-                  </button>
-                );
-              })}
-            </div>
+            <CoresVitrine modelo={modelo} cor={cor} onCor={onCor} onAntes={preCarregar} className="mt-2.5 min-[601px]:mt-3" />
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+/**
+ * As cores do tecido em miniatura (a camisa de frente em cada cor). Na vitrine do PC e, no
+ * celular, no passo Cor (a vitrine do celular é baixa e não tem o cartão). `onAntes`: mouse, foco
+ * ou toque num botão, antes do clique (a vitrine já pede os quadros daquela cor).
+ */
+export function CoresVitrine({
+  modelo,
+  cor,
+  onCor,
+  onAntes,
+  className,
+}: {
+  modelo: Modelo;
+  cor: Cor;
+  onCor: (cor: Cor) => void;
+  onAntes?: (cor: Cor) => void;
+  className?: string;
+}) {
+  const ultimo = numero(modelo.coresQuadros - 1);
+  return (
+    <div role="group" aria-label="Cor do tecido" className={cn("grid grid-cols-5 gap-1 min-[601px]:gap-2", className)}>
+      {CORES.map((c) => {
+        const ativa = c.pasta === cor.pasta;
+        return (
+          <button
+            key={c.pasta}
+            type="button"
+            aria-pressed={ativa}
+            aria-label={c.nome}
+            onClick={() => onCor(c)}
+            onPointerEnter={() => onAntes?.(c)}
+            onPointerDown={() => onAntes?.(c)}
+            onFocus={() => onAntes?.(c)}
+            className="flex min-h-11 flex-col items-center justify-end gap-1 rounded-xl pb-1 outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+          >
+            <Image
+              src={`${modelo.coresPasta}${c.pasta}/${ultimo}.webp`}
+              alt=""
+              width={modelo.largura}
+              height={modelo.altura}
+              sizes="(min-width: 1024px) 80px, 64px"
+              className={cn(
+                "w-auto motion-safe:transition-[height,width] motion-safe:duration-300",
+                // PC: miniaturas com 64 px de largura ou mais.
+                ativa ? "h-12 min-[601px]:h-16 lg:h-auto lg:w-20" : "h-10 min-[601px]:h-12 lg:h-auto lg:w-16"
+              )}
+            />
+            <span className={cn("text-[11px] leading-none whitespace-nowrap lg:text-xs", ativa ? "font-semibold" : "text-muted-foreground")}>
+              <span className="min-[601px]:hidden">{c.curto ?? c.nome}</span>
+              <span className="hidden min-[601px]:inline">{c.nome}</span>
+            </span>
+            <span aria-hidden className={cn("h-[3px] w-[22px] rounded-full", ativa ? "bg-accent" : "bg-transparent")} />
+          </button>
+        );
+      })}
     </div>
   );
 }

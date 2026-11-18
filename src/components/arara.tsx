@@ -69,17 +69,21 @@ export function lerPacote(pasta: string) {
   return p;
 }
 
-export function usePoucoMovimento() {
+function useMidia(consulta: string) {
   return useSyncExternalStore(
     (avisar) => {
-      const mq = matchMedia("(prefers-reduced-motion: reduce)");
+      const mq = matchMedia(consulta);
       mq.addEventListener("change", avisar);
       return () => mq.removeEventListener("change", avisar);
     },
-    () => matchMedia("(prefers-reduced-motion: reduce)").matches,
+    () => matchMedia(consulta).matches,
     () => false
   );
 }
+
+export const usePoucoMovimento = () => useMidia("(prefers-reduced-motion: reduce)");
+/** O layout do celular do site (abaixo de 601 px). No servidor, falso (o HTML sai como o do PC). */
+export const useCelular = () => useMidia("(max-width: 600px)");
 
 type Banco = { quadros: (ImageBitmap | undefined)[]; parar: AbortController };
 
