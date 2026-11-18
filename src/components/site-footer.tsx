@@ -112,6 +112,17 @@ export function SiteFooter() {
               Política de privacidade
             </Link>
             <PreferenciasCookies className={cn(link, "cursor-pointer")} />
+            {/* Crédito de quem fez o site. Usa api.whatsapp.com (e não wa.me) para não contar
+                como contato com a Whim na medição (medicao.tsx ouve os links do wa.me). */}
+            <a
+              href="https://api.whatsapp.com/send?phone=5511940807393"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={link}
+            >
+              Desenvolvido por Tribus Labs
+              <span className="sr-only"> (abre o WhatsApp em nova aba)</span>
+            </a>
           </div>
         </div>
       </Container>
