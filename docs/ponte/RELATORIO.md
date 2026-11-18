@@ -335,3 +335,9 @@ Uma entrada por tarefa, sempre acrescentada no fim (nunca reescrever as anterior
 - Foto das dúvidas: `camiseta-whim-mesa.webp` (IA + logo oficial `whim-logo-branco.svg` aplicado com textura do tecido); grade `lg:items-stretch`, foto com a altura das perguntas.
 - Comandos: lint, tsc, `npm run build` (troca temporária da Poppins, desfeita); Playwright a 1280 e 390: sem rolagem lateral, console limpo.
 - Pendente: merge com as branches dos agentes 1, 2 e 3 desta rodada.
+
+### 2026-11-17 21:15 · Claude · revisão e publicação da noite de 17/11
+- Juntei em `revisao-17-11-c`: `agente-3/testes-monte`, `agente-1/ajustes-17-11-c`, `agente-2/ajustes-17-11-c` e `claude/conteudo-17-11-c`; conflitos só em PEDIDOS e RELATORIO.
+- Comandos: `npm ci`, lint, tsc, `npm run build` (troca temporária da Poppins, desfeita), `next start` + Playwright.
+- Resultado: sem rolagem lateral em /, /monte-sua-peca, /privacidade e 404 a 390, 1280, 1920 e 2560; console limpo (só o 404 esperado); home ↔ Monte sua peça sem erro; robots, sitemap, llms e manifest com 200.
+- Pendente (decisão do Gabriel): a 2560 o conteúdo ocupa ~45% da largura (zoom 0,75 × 1520 px); passo Peça a ≥ 1920 com espaço embaixo da ficha.
