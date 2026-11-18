@@ -575,7 +575,9 @@ export function Personalizador() {
         </div>
 
         {/* Ficha do pedido: 5 passos numa linha vertical (feito, atual, depois). */}
-        <div className="min-w-0">
+        {/* No PC, os textos do pedido ficam 8% maiores (pedido do Gabriel, 17/11 à noite): o zoom
+            aumenta tudo da coluna por igual e a largura dela continua a mesma. */}
+        <div className="min-w-0 lg:[zoom:1.08]">
           <h2 className="text-xl font-semibold min-[601px]:text-2xl">Seu pedido</h2>
           <p className="mt-1 text-sm text-muted-foreground">Monte em 5 passos e receba o orçamento pelo WhatsApp.</p>
           <ol aria-label="Passos do pedido" className="mt-6">
