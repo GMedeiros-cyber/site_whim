@@ -341,3 +341,11 @@ Uma entrada por tarefa, sempre acrescentada no fim (nunca reescrever as anterior
 - Comandos: `npm ci`, lint, tsc, `npm run build` (troca temporária da Poppins, desfeita), `next start` + Playwright.
 - Resultado: sem rolagem lateral em /, /monte-sua-peca, /privacidade e 404 a 390, 1280, 1920 e 2560; console limpo (só o 404 esperado); home ↔ Monte sua peça sem erro; robots, sitemap, llms e manifest com 200.
 - Pendente (decisão do Gabriel): a 2560 o conteúdo ocupa ~45% da largura (zoom 0,75 × 1520 px); passo Peça a ≥ 1920 com espaço embaixo da ficha.
+
+### 2026-11-18 16:38 · Agente 2 · Home nova no celular (Claude Code)
+- Feito (`agente-2/celular-18-11`, com `origin/claude/ref-celular`), só abaixo de 601 px: hero com texto embaixo e um botão; Quem somos só com o vídeo e etapas 2 × 2; técnicas em abas (setas, Home, End) com um cartão e linhas curtas; processo numa linha com a frase do passo tocado; dúvidas com 4 + "Ver as 8 perguntas"; rodapé com Navegação em `<details>` e "Ver no mapa" (mapa embutido não baixa). Balão do WhatsApp na home do celular só depois de rolar (cobria o botão de orçamento).
+- De 601 px para cima nada muda: páginas inteiras (movimento reduzido) iguais pixel a pixel antes e depois a 601, 768 e 1280; a 1920, só os 22 px de ruído do vídeo, que também aparecem entre duas rodadas do mesmo código.
+- Comandos: `npm run lint`, `npx tsc --noEmit`, `npm run build` (webpack, ok), `next start` + Playwright: 68 checagens a 360/390/430, movimento reduzido, 601 e 1280, 0 falhas (alvos ≥ 44 px, sem rolagem lateral, fotos que saíram não baixam, console limpo).
+- Prints a 390: `docs/ponte/prints/celular-18-11/` (`antes-390-pagina.webp` e `depois-390-pagina.webp`, página inteira; `antes-390-topo.webp` e `depois-390-topo.webp`, topo com a tinta). A página caiu de 7129 para 5179 px de altura.
+- Commit: `81a9c6f`.
+- Pendente: nada meu. Aviso ao agente 1 sobre o `botao-whatsapp.tsx` e o rodapé (PEDIDOS).
