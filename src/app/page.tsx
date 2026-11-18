@@ -8,6 +8,8 @@ import { Carrossel } from "@/components/home/carrossel";
 import { DUVIDAS } from "@/components/home/duvidas";
 import { DuvidasAcordeao } from "@/components/home/duvidas-acordeao";
 import { Etapas } from "@/components/home/etapas";
+import { TambemCartoes } from "@/components/home/tambem-cartoes";
+import { TecnicaFotos } from "@/components/home/tecnica-fotos";
 import { PalavraTinta } from "@/components/home/palavra-tinta";
 import "@/components/home/transicoes.css";
 import { SiteFooter } from "@/components/site-footer";
@@ -71,22 +73,31 @@ const FOTOS = [
 const TECNICAS = [
   {
     nome: "Silk",
-    imagem: "silk-close",
-    alt: "Estampa em silk com cores chapadas numa camiseta azul-marinho",
+    fotos: [
+      { src: "/images/estilos/silk-close.webp", alt: "Rodo passando tinta turquesa na tela de silk sobre uma camiseta azul-marinho" },
+      { src: "/images/estilos/silk-2.webp", alt: "Camiseta azul-marinho recém-estampada em silk, com arte geométrica em branco e turquesa e a tinta em relevo" },
+      { src: "/images/estilos/silk-3.webp", alt: "Oficina de silk com telas de serigrafia, rodos, latas de tinta turquesa e camisetas estampadas na mesa" },
+    ],
     texto: "Tinta grossa em cores chapadas, com o toque e a durabilidade da tinta na tela.",
     bomPara: "logos de poucas cores e tiragens maiores.",
   },
   {
     nome: "DTF",
-    imagem: "dtf",
-    alt: "Estampa colorida em DTF com degradê numa camiseta branca",
+    fotos: [
+      { src: "/images/estilos/dtf.webp", alt: "Estampa colorida em DTF com degradê numa camiseta branca" },
+      { src: "/images/estilos/dtf-2.webp", alt: "Mão tirando o filme transparente de uma estampa DTF colorida de flores numa camiseta branca, ao lado da prensa" },
+      { src: "/images/estilos/dtf-3.webp", alt: "Rolo de filme DTF impresso com várias artes coloridas, ao lado de uma camiseta preta dobrada" },
+    ],
     texto: "Todas as cores, degradês e fotos, com acabamento fotográfico.",
     bomPara: "artes coloridas e pedidos menores.",
   },
   {
     nome: "Bordado",
-    imagem: "bordado",
-    alt: "Logo bordado em linha numa polo azul-marinho",
+    fotos: [
+      { src: "/images/estilos/bordado.webp", alt: "Logo bordado em linha numa polo azul-marinho" },
+      { src: "/images/estilos/bordado-2.webp", alt: "Máquina de bordar costurando um emblema turquesa e branco numa polo azul-marinho presa no bastidor" },
+      { src: "/images/estilos/bordado-3.webp", alt: "Bordado em relevo de uma folha em azul-marinho e turquesa no peito de uma polo branca" },
+    ],
     texto: "A arte é costurada em linha, em relevo, e dura junto com a peça.",
     bomPara: "logo no peito de polos e uniformes.",
   },
@@ -159,18 +170,14 @@ function Topo() {
           className="absolute inset-0 -z-10 bg-radial-[90%_62%_at_50%_44%] from-primary/88 via-primary/74 via-55% to-primary/38"
         />
 
-        {/* Logo no canto de cima, abaixo da barra e na linha do conteúdo das seções (o
-            recuo negativo desfaz a margem do cartão). No celular não aparece nem é baixado
-            (fundo só a partir de 601 px): a barra já mostra o logo. */}
-        <div className="home-grande absolute -inset-x-2 top-24 hidden min-[601px]:block md:-inset-x-3 min-[2400px]:top-[106px]">
-          <Container>
-            <span
-              role="img"
-              aria-label="Whim Confecção e Estamparia"
-              className="block aspect-[444/138] h-9 bg-[url(/brand/whim-logo-branco.svg)] bg-contain bg-no-repeat opacity-95"
-            />
-          </Container>
-        </div>
+        {/* Logo no canto superior esquerdo do cartão da hero, na altura da barra (pedido do
+            Gabriel, 17/11 à noite). Só a partir de 1024 px: abaixo disso a barra ocupa o meio
+            da tela e já mostra o logo. */}
+        <span
+          role="img"
+          aria-label="Whim Confecção e Estamparia"
+          className="home-grande absolute top-[11px] left-5 hidden aspect-[444/138] h-10 bg-[url(/brand/whim-logo-branco.svg)] bg-contain bg-no-repeat opacity-95 lg:block"
+        />
         <h1>
           <PalavraTinta>Vista</PalavraTinta>{" "}
           <span className="home-grande mt-1.5 block text-[28px] leading-[1.1] font-semibold tracking-[-0.025em] text-balance md:text-[40px]">
@@ -279,18 +286,7 @@ function OQueFazemos() {
                 key={t.nome}
                 className="flex w-[76%] shrink-0 snap-start flex-col overflow-hidden rounded-[26px] border border-primary/6 bg-background md:w-auto"
               >
-                <div className="relative aspect-[3/4]">
-                  <Image
-                    src={`/images/estilos/${t.imagem}.webp`}
-                    alt={t.alt}
-                    fill
-                    sizes="(min-width: 1024px) 380px, (min-width: 768px) 33vw, 76vw"
-                    className="object-cover"
-                  />
-                  <span className="absolute top-3 left-3 rounded-full bg-background/85 px-2.5 py-[5px] text-[11px] text-foreground">
-                    Imagem ilustrativa
-                  </span>
-                </div>
+                <TecnicaFotos nome={t.nome} fotos={t.fotos} />
                 <div className="flex flex-col gap-2 px-[22px] pt-[22px] pb-6">
                   <h3 className="text-2xl font-semibold tracking-[-0.02em]">{t.nome}</h3>
                   <p className="text-[14.5px] leading-[1.55] text-muted-foreground">{t.texto}</p>
@@ -303,25 +299,7 @@ function OQueFazemos() {
           </Carrossel>
         </div>
 
-        <div className="mt-3 grid gap-3 md:mt-5 md:grid-cols-3 md:gap-5">
-          {TAMBEM.map((item, i) => {
-            const destaque = i === TAMBEM.length - 1;
-            return (
-              <div
-                key={item.nome}
-                className={cn(
-                  "rounded-[22px] border border-primary/6 bg-background px-5 py-[18px] md:p-[26px]",
-                  destaque && "border-transparent bg-primary text-primary-foreground"
-                )}
-              >
-                <h3 className="text-lg font-semibold md:mb-1.5 md:text-xl">{item.nome}</h3>
-                <p className={cn("text-[14.5px] leading-[1.55] text-muted-foreground", destaque && "text-primary-foreground/80")}>
-                  {item.texto}
-                </p>
-              </div>
-            );
-          })}
-        </div>
+        <TambemCartoes itens={TAMBEM} />
       </Container>
     </section>
   );
