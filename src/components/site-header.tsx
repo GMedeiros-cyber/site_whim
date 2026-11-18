@@ -31,6 +31,12 @@ export function SiteHeader({
   const menuRef = useRef<HTMLDivElement>(null);
   const [aberto, setAberto] = useState(false);
   const [descendo, setDescendo] = useState(false);
+  // Seção da home em que a pessoa está (ou a que ela acabou de clicar): marca o link na barra.
+  const [secao, setSecao] = useState<string | null>(null);
+  const listaRef = useRef<HTMLUListElement>(null);
+  const [pilula, setPilula] = useState<{ left: number; width: number } | null>(null);
+  const naHome = pathname === "/";
+  const hrefAtivo = naHome ? (secao ?? "/") : null;
   const ctaAtivo = useAtivo(cta.href);
   const fechar = () => menuRef.current?.hidePopover();
   // O botão de ação entra no menu, a não ser que já leve a uma seção listada.
@@ -61,6 +67,50 @@ export function SiteHeader({
       cancelAnimationFrame(raf);
     };
   }, []);
+
+  // Na home, a seção que cruza a linha de 40% da tela define o link marcado.
+  useEffect(() => {
+    if (!naHome) return;
+    const ids = links.map((l) => (l.href === "/" ? "topo" : l.href.split("#")[1])).filter(Boolean);
+    let raf = 0;
+    const ler = () => {
+      raf = 0;
+      const linha = window.innerHeight * 0.4;
+      let atual = ids[0];
+      for (const id of ids) {
+        const el = document.getElementById(id);
+        if (el && el.getBoundingClientRect().top <= linha) atual = id;
+      }
+      setSecao(atual === "topo" ? "/" : `/#${atual}`);
+    };
+    const aoRolar = () => {
+      raf ||= requestAnimationFrame(ler);
+    };
+    ler();
+    window.addEventListener("scroll", aoRolar, { passive: true });
+    window.addEventListener("resize", aoRolar);
+    return () => {
+      window.removeEventListener("scroll", aoRolar);
+      window.removeEventListener("resize", aoRolar);
+      cancelAnimationFrame(raf);
+    };
+  }, [naHome, links]);
+
+  // Posição da pílula: medida no link marcado, dentro da lista (o zoom das telas grandes
+  // vale para os dois, então as medidas batem).
+  useEffect(() => {
+    const lista = listaRef.current;
+    if (!lista) return;
+    const medir = () => {
+      const a = hrefAtivo ? lista.querySelector<HTMLElement>(`a[data-href="${hrefAtivo}"]`) : null;
+      const li = a?.parentElement;
+      setPilula(li && li.offsetWidth ? { left: li.offsetLeft, width: li.offsetWidth } : null);
+    };
+    medir();
+    const ro = new ResizeObserver(medir);
+    ro.observe(lista);
+    return () => ro.disconnect();
+  }, [hrefAtivo]);
 
   return (
     <header
@@ -103,17 +153,35 @@ export function SiteHeader({
         </LinkNav>
 
         {/* Desktop */}
-        <ul className="hidden min-[601px]:flex min-[601px]:gap-0.5">
-          {links.map((l) => (
-            <li key={l.href} className={cn(l.opcional && "hidden min-[821px]:block")}>
-              <LinkNav
-                href={l.href}
-                className="block rounded-full px-4 py-3 text-[15px] font-medium whitespace-nowrap text-muted-foreground transition-colors hover:text-foreground"
-              >
-                {l.label}
-              </LinkNav>
-            </li>
-          ))}
+        <ul ref={listaRef} className="relative hidden min-[601px]:flex min-[601px]:gap-0.5">
+          {/* Pílula turquesa clara atrás do link da seção atual; desliza de um link para o outro. */}
+          <span
+            aria-hidden
+            className={cn(
+              "pointer-events-none absolute inset-y-0 rounded-full bg-accent/16 transition-[left,width,opacity] duration-350 ease-[cubic-bezier(.3,.7,.2,1)] motion-reduce:transition-none",
+              pilula ? "opacity-100" : "opacity-0"
+            )}
+            style={pilula ? { left: pilula.left, width: pilula.width } : undefined}
+          />
+          {links.map((l) => {
+            const marcado = hrefAtivo === l.href;
+            return (
+              <li key={l.href} className={cn(l.opcional && "hidden min-[821px]:block")}>
+                <LinkNav
+                  href={l.href}
+                  data-href={l.href}
+                  aria-current={marcado ? "location" : undefined}
+                  onClick={() => naHome && setSecao(l.href)}
+                  className={cn(
+                    "block rounded-full px-4 py-3 text-[15px] font-medium whitespace-nowrap text-muted-foreground transition-colors hover:text-foreground",
+                    marcado && "font-semibold text-foreground"
+                  )}
+                >
+                  {l.label}
+                </LinkNav>
+              </li>
+            );
+          })}
         </ul>
         <LinkNav
           href={cta.href}

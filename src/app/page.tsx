@@ -10,6 +10,7 @@ import { DuvidasAcordeao } from "@/components/home/duvidas-acordeao";
 import { Etapas } from "@/components/home/etapas";
 import { TambemCartoes } from "@/components/home/tambem-cartoes";
 import { TecnicaFotos } from "@/components/home/tecnica-fotos";
+import { VideoOficina } from "@/components/home/video-oficina";
 import { PalavraTinta } from "@/components/home/palavra-tinta";
 import "@/components/home/transicoes.css";
 import { SiteFooter } from "@/components/site-footer";
@@ -63,10 +64,21 @@ const OFICINA = [
   { nome: "Acabamento", texto: "Conferência e embalagem." },
 ];
 
-const FOTOS = [
-  { src: "/images/f41.webp", alt: "Estampador trabalhando na mesa longa com peças azuis", legenda: "Estampa em série na mesa longa" },
+// Mosaico do Quem somos (17/11 à noite): o vídeo e a foto são da própria Whim (pasta do
+// Drive, tratados e sem som); só o rodo é ilustrativo (IA).
+const FOTOS: { src: string; alt: string; legenda: string; video?: string }[] = [
+  {
+    src: "/images/oficina-silk-poster.webp",
+    video: "/videos/oficina-silk.mp4",
+    alt: "Estampador espalhando tinta branca na tela de silk sobre a mesa longa, com camisetas pretas estampadas",
+    legenda: "Silk na mesa longa",
+  },
+  {
+    src: "/images/oficina-mesa-silk.webp",
+    alt: "Tela de silk com tinta branca e o rodo sobre a mesa longa, ao lado de camisetas pretas estampadas com uma guitarra",
+    legenda: "Tela pronta para a próxima peça",
+  },
   { src: "/images/rodo-tela.webp", alt: "Mãos passando o rodo na tela de silk", legenda: "Rodo na tela de silk · ilustrativa" },
-  { src: "/images/f35.webp", alt: "Camisetas pretas estampadas na mesa", legenda: "Peças na mesa de estampa" },
 ];
 
 // Imagens geradas por IA: sempre com o selo "Imagem ilustrativa".
@@ -240,13 +252,17 @@ function QuemSomos() {
                   i === 0 && "md:row-span-2"
                 )}
               >
-                <Image
-                  src={f.src}
-                  alt={f.alt}
-                  fill
-                  sizes="(min-width: 1024px) 340px, (min-width: 768px) 50vw, 80vw"
-                  className="object-cover"
-                />
+                {f.video ? (
+                  <VideoOficina src={f.video} poster={f.src} rotulo={f.alt} />
+                ) : (
+                  <Image
+                    src={f.src}
+                    alt={f.alt}
+                    fill
+                    sizes="(min-width: 1024px) 340px, (min-width: 768px) 50vw, 80vw"
+                    className="object-cover"
+                  />
+                )}
                 <figcaption className="absolute bottom-3 left-3 rounded-full bg-background/90 px-2.5 py-1.5 text-xs text-foreground">
                   {f.legenda}
                 </figcaption>
