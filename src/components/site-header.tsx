@@ -6,7 +6,6 @@ import { usePathname } from "next/navigation";
 import { MenuIcon, XIcon } from "lucide-react";
 
 import { LinkNav, useAtivo } from "@/components/link-nav";
-import { faseIntro, pedirIntro } from "@/lib/abertura";
 import { destinoTravado, idDaSecao, soltarTrava } from "@/lib/rolagem";
 import { ACAO, NAVEGACAO, type ItemNav } from "@/lib/navegacao";
 import { cn } from "@/lib/utils";
@@ -22,7 +21,7 @@ const MENU_ID = "menu-principal";
  * popover nativo (fecha ao tocar fora e com Esc; ao escolher, fechamos aqui).
  * Some ao rolar para baixo e volta ao rolar para cima; perto do topo, com o menu aberto
  * ou com o foco dentro dela fica sempre à vista (com movimento reduzido, sem deslizar).
- * O logo recomeça a entrada da home (src/lib/abertura.ts).
+ * O logo leva à home, sem repetir a abertura.
  */
 export function SiteHeader({
   links = NAVEGACAO,
@@ -145,18 +144,9 @@ export function SiteHeader({
         aria-label="Navegação principal"
         className="pointer-events-auto flex w-full items-center justify-between gap-1 rounded-full border border-primary/10 bg-background/90 p-1.5 shadow-[0_10px_40px_-18px] shadow-primary/40 backdrop-blur-xl backdrop-saturate-150 min-[601px]:w-auto min-[601px]:gap-1.5 min-[601px]:p-2"
       >
+        {/* O logo só leva à home (no topo, se já estiver nela); a abertura não toca de novo (pedido de 18/11). */}
         <LinkNav
           href="/"
-          onClick={(e) => {
-            const naHome = pathname === "/";
-            pedirIntro(naHome);
-            if (naHome && faseIntro()) {
-              // A abertura cobre a tela: rola ao topo na hora, sem a rolagem suave.
-              e.preventDefault();
-              window.history.replaceState(window.history.state, "", "/");
-              window.scrollTo({ top: 0, behavior: "instant" });
-            }
-          }}
           aria-label="Whim Confecção e Estamparia, página inicial"
           className="flex min-h-11 shrink-0 items-center gap-2 rounded-full"
         >

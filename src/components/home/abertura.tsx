@@ -23,7 +23,7 @@ const assinar = (avisar: () => void) => {
 
 /**
  * Abertura da home: o símbolo da Whim é pintado pela tinta e a escrita entra (~3,5 s).
- * Toca em toda carga da home e quando o logo da barra é clicado (src/lib/abertura.ts).
+ * Toca em toda carga da home; o logo da barra não a repete (pedido de 18/11).
  * Vem no HTML do servidor e anima já no 1º desenho, só com transform e opacity (no
  * compositor, a hidratação não engasga). O React decide se ela fica na árvore; o nó
  * nunca é tirado à mão. Um toque (ou tecla) pula. No fim, a tinta do "Vista" começa.

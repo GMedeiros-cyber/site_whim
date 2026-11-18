@@ -1,7 +1,7 @@
 /**
  * Entrada da home, em sequência: abertura (logo pintado) → tinta da palavra "Vista".
- * Toca em toda carga da home e quando se clica no logo da barra (pedidos de 17/11).
- * Chegando à home por outro link, tudo já aparece pronto.
+ * Toca em toda carga da home. Chegando à home por um link (inclusive o logo da barra,
+ * pedido de 18/11), tudo já aparece pronto.
  *
  * A fase fica em <html data-intro>:
  *   "abertura" abertura tocando (começa no 1º desenho; a rolagem fica travada)
@@ -32,13 +32,6 @@ export const SCRIPT_CARGA = `(function(){try{if(!matchMedia("(prefers-reduced-mo
 export function travarRolagem(trava: boolean) {
   html().style.overflow = trava ? "hidden" : "";
   html().style.scrollbarGutter = trava ? "stable" : "";
-}
-
-/** Clique no logo da barra: na home a entrada recomeça já; fora dela, quando a home montar. */
-export function pedirIntro(naHome: boolean) {
-  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-  marcar("abertura");
-  if (naHome) window.dispatchEvent(new Event(EVENTO_REINICIO));
 }
 
 export function avisarFimDaAbertura() {

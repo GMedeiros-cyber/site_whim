@@ -45,7 +45,7 @@ Comandos: `npm run dev` · `npm run build` · `npm run lint`.
 
 ## Abertura do site
 
-Entrou em 16/11 (pedido do Gabriel para a reunião com a Whim): `src/components/home/abertura.tsx`, a mesma do protótipo aprovado (símbolo pintado pela tinta e a escrita entrando), toca em toda carga da home e ao clicar no logo da barra (pedido de 17/11), toque pula, sem movimento reduzido. A tinta da palavra "Vista" só começa quando ela acaba (`src/lib/abertura.ts`).
+Entrou em 16/11 (pedido do Gabriel para a reunião com a Whim): `src/components/home/abertura.tsx`, a mesma do protótipo aprovado (símbolo pintado pela tinta e a escrita entrando), toca em toda carga da home; o logo da barra só leva à home, sem repetir a abertura (pedido de 18/11), toque pula, sem movimento reduzido. A tinta da palavra "Vista" só começa quando ela acaba (`src/lib/abertura.ts`).
 
 ## SEO
 
