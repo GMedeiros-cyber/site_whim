@@ -46,7 +46,7 @@ Vale para o site inteiro (home, /monte-sua-peca, /privacidade). Quem executa: **
 
 ## 6. Schema (dados estruturados)
 
-- JSON-LD no `layout.tsx`: `LocalBusiness` com nome, razão social (Gallant Clothing Ltda), CNPJ em `taxID`, endereço completo (Av. Brigadeiro Faria Lima, 110, 2º andar, Bom Clima, Guarulhos/SP, 07130-000), telefone, e-mail, horário (segunda a sexta, das 9h às 18h, confirmado pela Whim em 17/11), `sameAs` com o Instagram, `areaServed` Guarulhos e Grande São Paulo (confirmado no briefing).
+- JSON-LD no `layout.tsx`: `LocalBusiness` com nome, razão social (Gallant Clothing Ltda), CNPJ em `taxID`, endereço completo (Av. Brigadeiro Faria Lima, 110, 2º andar, Cocaia, Guarulhos/SP, 07130-000), telefone, e-mail, horário (segunda a sexta, das 9h às 18h, confirmado pela Whim em 17/11), `sameAs` com o Instagram, `areaServed` Guarulhos e Grande São Paulo (confirmado no briefing).
 - `Service` para silk, DTF, bordado, confecção e uniformes (sem sublimação).
 - `FAQPage` com as perguntas da seção Dúvidas frequentes da home.
 - `BreadcrumbList` nas páginas internas.

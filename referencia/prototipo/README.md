@@ -17,7 +17,7 @@ No ar, só para consulta: https://whim-prototipo.vercel.app
 Formato e acabamento das seções, fotos (algumas tortas ou cortadas), textos provisórios, avaliações e logos de clientes (espaços reservados), mapa e envio de arte.
 
 ## Dados reais já no protótipo
-Fundada em 2021 por Wallan; Av. Brigadeiro Faria Lima, 110, 2º andar, Bom Clima, Guarulhos/SP; vendas@whimconfeccao.com.br; WhatsApp +55 11 94544-8802; horário de segunda a sexta, das 9h às 18h (confirmado em 17/11); peças: camiseta, polo, regata, moletom, baby look; técnicas: silk, DTF, bordado; pedido mínimo de 50 peças; prazo de 20 a 30 dias.
+Fundada em 2021 por Wallan; Av. Brigadeiro Faria Lima, 110, 2º andar, Cocaia, Guarulhos/SP; vendas@whimconfeccao.com.br; WhatsApp +55 11 94544-8802; horário de segunda a sexta, das 9h às 18h (confirmado em 17/11); peças: camiseta, polo, regata, moletom, baby look; técnicas: silk, DTF, bordado; pedido mínimo de 50 peças; prazo de 20 a 30 dias.
 
 ## Só do protótipo (não levar para o Next)
 A faixa "Protótipo", o checklist de aprovação e os `noindex`.

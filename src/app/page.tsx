@@ -69,7 +69,7 @@ const OFICINA = [
 const FOTOS: { src: string; alt: string; legenda: string; video?: string }[] = [
   {
     src: "/images/oficina-silk-poster.webp",
-    video: "/videos/oficina-silk.mp4",
+    video: "/videos/oficina-silk-loop.mp4",
     alt: "Estampador espalhando tinta branca na tela de silk sobre a mesa longa, com camisetas pretas estampadas",
     legenda: "Silk na mesa longa",
   },

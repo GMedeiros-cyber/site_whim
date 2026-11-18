@@ -20,7 +20,7 @@ Fonte: respostas da própria Whim. Senhas e logins do PDF **não** ficam no repo
 - **Seções pedidas:** Início, Sobre a Whim, Técnicas, Portfólio e clientes, Depoimentos, Contato.
 - **Dúvidas mais comuns:** quantidade e tipo de estampa.
 - **WhatsApp dos orçamentos:** 11 94544-8802, atendido pela equipe (no site, nunca citar nome pessoal).
-- **Endereço:** Av. Brigadeiro Faria Lima, 110, 2º andar, **Bom Clima**, Guarulhos/SP, CEP 07130-000 (decisão do Gabriel em 16/11; o contrato dizia Cocaia).
+- **Endereço:** Av. Brigadeiro Faria Lima, 110, 2º andar, **Cocaia**, Guarulhos/SP, CEP 07130-000 (confirmado pelo Gabriel em 17/11 à noite, como no contrato).
 - **CNPJ:** 35.356.367/0001-27. **E-mail:** vendas@whimconfeccao.com.br.
 - **Linha cristã no site:** não.
 - **Tom:** próximo e descontraído.

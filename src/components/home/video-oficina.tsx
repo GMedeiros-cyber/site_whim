@@ -3,12 +3,14 @@
 import { useEffect, useRef, useState } from "react";
 
 /**
- * Vídeo curto da oficina (sem som), em loop. Só baixa e toca quando aparece na tela e
+ * Vídeo curto da oficina (sem som), em loop contínuo (o fim já emenda no começo, com uma
+ * fusão de 0,6 s feita no arquivo). Só baixa e toca quando aparece na tela e
  * pausa quando sai. Com movimento reduzido fica parado no primeiro quadro (o pôster).
  */
 export function VideoOficina({ src, poster, rotulo }: { src: string; poster: string; rotulo: string }) {
   const ref = useRef<HTMLVideoElement>(null);
   const [carregar, setCarregar] = useState(false);
+  const [mover, setMover] = useState(false);
 
   useEffect(() => {
     const v = ref.current;
@@ -18,7 +20,8 @@ export function VideoOficina({ src, poster, rotulo }: { src: string; poster: str
       ([e]) => {
         if (e.isIntersecting) {
           setCarregar(true);
-          if (!reduzido) v.play().catch(() => {});
+          setMover(!reduzido);
+          if (!reduzido && v.currentSrc) v.play().catch(() => {});
         } else {
           v.pause();
         }
@@ -36,6 +39,7 @@ export function VideoOficina({ src, poster, rotulo }: { src: string; poster: str
       poster={poster}
       muted
       loop
+      autoPlay={mover}
       playsInline
       preload="none"
       aria-label={rotulo}
