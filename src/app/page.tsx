@@ -47,15 +47,16 @@ const apoio = "mt-[18px] max-w-[56ch] text-base leading-relaxed text-pretty text
 
 // Foto do topo com art direction: paisagem quando a tela é mais larga que alta, retrato
 // no resto (celular e tablet em pé). Mesma prioridade alta da foto anterior.
+// Hero provisória (18/11): imagem gerada com IA até a Whim ter fotos próprias boas o suficiente.
 const HERO = {
-  alt: "Camisetas marrons estampadas em silk, em série na mesa longa da oficina da Whim",
+  alt: "Pilhas de camisetas e uniformes azul-marinho, brancos e turquesa na mesa de uma oficina de costura (imagem ilustrativa)",
   sizes: "100vw",
   loading: "eager",
   fetchPriority: "high",
 } as const;
 const HERO_PAISAGEM = "(min-aspect-ratio: 1/1)";
-const { srcSet: heroPaisagem } = getImageProps({ ...HERO, src: "/images/hero-mesa-pc.webp", width: 1200, height: 744 }).props;
-const heroRetrato = getImageProps({ ...HERO, src: "/images/hero-mesa-celular.webp", width: 1200, height: 1600 }).props;
+const { srcSet: heroPaisagem } = getImageProps({ ...HERO, src: "/images/hero-oficina-pc.webp", width: 2400, height: 1340 }).props;
+const heroRetrato = getImageProps({ ...HERO, src: "/images/hero-oficina-celular.webp", width: 1152, height: 1536 }).props;
 
 const OFICINA = [
   { nome: "Gravação de telas", texto: "A arte vira tela para o silk." },
@@ -173,7 +174,7 @@ function Topo() {
           <img
             {...heroRetrato}
             alt={HERO.alt}
-            className="absolute inset-0 -z-20 size-full object-cover object-[38%_50%] [@media(min-aspect-ratio:1/1)]:object-[50%_74%]"
+            className="absolute inset-0 -z-20 size-full object-cover object-[50%_50%] [@media(min-aspect-ratio:1/1)]:object-[50%_55%]"
           />
         </picture>
         {/* Véu azul: forte atrás do texto, mais leve nas bordas e embaixo, onde a estampa aparece. */}
