@@ -56,7 +56,7 @@ const HERO = {
 } as const;
 const HERO_PAISAGEM = "(min-aspect-ratio: 1/1)";
 const { srcSet: heroPaisagem } = getImageProps({ ...HERO, src: "/images/hero-oficina-pc.webp", width: 2400, height: 1340 }).props;
-const heroRetrato = getImageProps({ ...HERO, src: "/images/hero-oficina-celular.webp", width: 1152, height: 1536 }).props;
+const heroRetrato = getImageProps({ ...HERO, src: "/images/hero-oficina-celular-v2.webp", width: 1152, height: 2064 }).props;
 
 const OFICINA = [
   { nome: "Gravação de telas", texto: "A arte vira tela para o silk." },

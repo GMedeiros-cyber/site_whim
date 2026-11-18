@@ -281,6 +281,25 @@ function liberar(b: Banco) {
 export function Arara({ selecionada, cor, onEscolher }: { selecionada: string; cor: string; onEscolher: (nome: string) => void }) {
   const [foco, setFoco] = useState<number | null>(null);
   const semGiro = usePoucoMovimento();
+  // Quanto do trilho sobra para cada lado (só aparece no celular, quando as peças não cabem).
+  const trilhoRef = useRef<HTMLDivElement>(null);
+  const [sobra, setSobra] = useState({ esq: false, dir: false });
+  const medirTrilho = useCallback(() => {
+    const el = trilhoRef.current;
+    if (!el) return;
+    const esq = el.scrollLeft > 4;
+    const dir = el.scrollLeft + el.clientWidth < el.scrollWidth - 4;
+    setSobra((s) => (s.esq === esq && s.dir === dir ? s : { esq, dir }));
+  }, []);
+  useEffect(() => {
+    const el = trilhoRef.current;
+    if (!el) return;
+    medirTrilho();
+    const ro = new ResizeObserver(medirTrilho);
+    ro.observe(el);
+    if (el.firstElementChild) ro.observe(el.firstElementChild);
+    return () => ro.disconnect();
+  }, [medirTrilho]);
 
   const corDe = (m: Modelo) => (m.nome === selecionada ? cor : corPropria(m));
 
@@ -288,7 +307,15 @@ export function Arara({ selecionada, cor, onEscolher }: { selecionada: string; c
     <>
       {/* --w: largura do quadro; --cano: altura do cano (proporção da prévia em referencia/arara). */}
       <div className="[--cano:calc(var(--w)*0.1067)] [--w:170px] min-[601px]:[--w:230px] min-[112.5rem]:[--w:280px]">
-        <div className="-mx-5 snap-x snap-proximity overflow-x-auto px-5 pb-2 min-[601px]:mx-0 min-[601px]:px-0">
+        {/* Celular: sem barra de rolagem; se as peças não couberem, um esmaecido discreto nas
+            bordas mostra que dá para arrastar (some quando chega na ponta). */}
+        <div
+          ref={trilhoRef}
+          onScroll={medirTrilho}
+          data-mais-esq={sobra.esq || undefined}
+          data-mais-dir={sobra.dir || undefined}
+          className="-mx-5 snap-x snap-proximity overflow-x-auto px-5 pb-2 [scrollbar-width:none] data-mais-dir:mask-r-from-85% data-mais-esq:mask-l-from-85% min-[601px]:mx-0 min-[601px]:px-0 [&::-webkit-scrollbar]:hidden"
+        >
           {/* PC: o cano vai das peças até ~0,6 peça de cada lado (antes ia de ponta a ponta da página
               e ficava vazio dos lados a 1920). A largura conta duas peças abertas (a escolhida e a
               do mouse), para o cano não mudar de tamanho no hover. */}

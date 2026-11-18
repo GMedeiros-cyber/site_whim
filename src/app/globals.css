@@ -171,3 +171,41 @@
     @apply font-sans;
   }
 }
+/* Menu do celular (popover): desce e aparece ao abrir; os itens entram em sequência curta.
+   Com movimento reduzido, só aparece. */
+.menu-celular {
+  opacity: 0;
+  translate: 0 -8px;
+  transition:
+    opacity 0.22s ease-out,
+    translate 0.22s ease-out,
+    display 0.22s allow-discrete,
+    overlay 0.22s allow-discrete;
+}
+.menu-celular:popover-open {
+  opacity: 1;
+  translate: 0 0;
+}
+@starting-style {
+  .menu-celular:popover-open {
+    opacity: 0;
+    translate: 0 -8px;
+  }
+}
+.menu-celular:popover-open li {
+  animation: menu-item 0.28s ease-out both;
+  animation-delay: calc(var(--i, 0) * 35ms + 40ms);
+}
+@keyframes menu-item {
+  from {
+    opacity: 0;
+    translate: 0 6px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .menu-celular,
+  .menu-celular:popover-open li {
+    transition: none;
+    animation: none;
+  }
+}

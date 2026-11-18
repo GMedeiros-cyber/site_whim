@@ -227,7 +227,21 @@ export function SiteHeader({
           aria-expanded={aberto}
           className="flex min-h-11 items-center gap-2.5 rounded-full bg-primary pr-[18px] pl-4 text-sm font-semibold text-primary-foreground min-[601px]:hidden"
         >
-          {aberto ? <XIcon aria-hidden className="size-[18px]" /> : <MenuIcon aria-hidden className="size-[18px]" />}
+          {/* Ícone que gira de ☰ para ✕ (e volta); com movimento reduzido só troca. */}
+          <span aria-hidden className="relative size-[18px]">
+            <MenuIcon
+              className={cn(
+                "absolute inset-0 size-full transition-[rotate,scale,opacity] duration-300 ease-out motion-reduce:transition-none",
+                aberto ? "scale-50 rotate-90 opacity-0" : "opacity-100"
+              )}
+            />
+            <XIcon
+              className={cn(
+                "absolute inset-0 size-full transition-[rotate,scale,opacity] duration-300 ease-out motion-reduce:transition-none",
+                aberto ? "opacity-100" : "scale-50 -rotate-90 opacity-0"
+              )}
+            />
+          </span>
           {aberto ? "Fechar" : "Menu"}
         </button>
         <div
@@ -235,17 +249,21 @@ export function SiteHeader({
           id={MENU_ID}
           popover="auto"
           onToggle={(e) => setAberto(e.newState === "open")}
-          className="inset-x-3 top-[calc(env(safe-area-inset-top)+4.75rem)] bottom-auto m-0 h-auto max-h-[calc(100svh-6rem)] w-auto overflow-y-auto rounded-3xl border bg-background p-2 text-foreground shadow-[0_18px_50px_-20px] shadow-primary/45 min-[601px]:hidden"
+          className="menu-celular inset-x-3 top-[calc(env(safe-area-inset-top)+4.75rem)] bottom-auto m-0 h-auto max-h-[calc(100svh-6rem)] w-auto overflow-y-auto rounded-3xl border bg-background p-2 text-foreground shadow-[0_18px_50px_-20px] shadow-primary/45 min-[601px]:hidden"
         >
           <ul className="flex flex-col gap-0.5">
-            {itensMenu.map((l) => {
-              const ativo = l.href === cta.href && ctaAtivo;
+            {itensMenu.map((l, i) => {
+              // A página aberta (Monte sua peça) ou, na home, a seção em que a pessoa está.
+              const ativo = (l.href === cta.href && ctaAtivo) || hrefAtivo === l.href;
               return (
-                <li key={l.href}>
+                <li key={l.href} style={{ "--i": i } as React.CSSProperties}>
                   <LinkNav
                     href={l.href}
-                    onClick={fechar}
-                    aria-current={ativo ? "page" : undefined}
+                    onClick={() => {
+                      fechar();
+                      if (naHome && l.href !== cta.href) setSecao(l.href);
+                    }}
+                    aria-current={ativo ? (l.href === cta.href ? "page" : "location") : undefined}
                     className={cn(
                       "flex min-h-12 items-center gap-2.5 rounded-2xl px-[18px] text-base font-medium transition-colors hover:bg-accent/15",
                       ativo && "bg-accent/15 font-semibold"
