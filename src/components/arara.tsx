@@ -17,8 +17,11 @@ export const CANO = manifest.cano;
 /** Medidas de referência de cada posição, [largura, altura] em cm (provisórias; a Whim confirma). */
 export const MEDIDAS: Record<string, number[]> = manifest.medidasReferencia;
 
+/** Peças cujas fotos giram para o lado contrário das outras (espelhadas só na arara). */
+const ESPELHADAS = new Set(["camiseta"]);
+
 /** Duração do giro de lado → de frente (a volta faz o mesmo caminho). */
-const DURACAO_MS = 900;
+const DURACAO_MS = 700; // igual à abertura da largura do botão (duration-700)
 
 /** Pasta da cor escolhida: casa o hex com manifest.cores (se não casar, a primeira cor). */
 export function pastaDaCor(hex: string) {
@@ -112,23 +115,37 @@ function PecaGirando({
   const pastaRef = useRef(pasta);
   const total = modelo.coresQuadros;
 
+  // Desenha o giro com fusão entre dois quadros vizinhos: com 26 quadros em 0,7 s, trocar
+  // quadro a quadro dava "degraus" (cada quadro ficava ~2 frames de tela). A fusão deixa o
+  // giro contínuo a 60 fps.
   const desenhar = useCallback(() => {
     pedido.current = 0;
     const atual = pastaRef.current;
-    const i = Math.round(progresso.current * (total - 1));
-    const quadro = bancos.current.get(atual)?.quadros[i];
+    const f = progresso.current * (total - 1);
+    const i = Math.floor(f);
+    const t = Math.round((f - i) * 8) / 8; // 8 passos de fusão bastam e evitam redesenho à toa
+    const quadros = bancos.current.get(atual)?.quadros;
+    const a = quadros?.[i];
+    const b = t > 0 ? quadros?.[i + 1] : undefined;
     const ctx = canvasRef.current?.getContext("2d");
+    const chave = `${atual}#${i}#${b ? t : 0}`;
     // Só desenha quadro já decodificado; até lá fica o que está na tela (inclusive o da cor anterior).
-    if (!quadro || !ctx || desenhado.current === `${atual}#${i}`) return;
+    if (!a || !ctx || desenhado.current === chave) return;
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-    ctx.drawImage(quadro, 0, 0, ctx.canvas.width, ctx.canvas.height);
-    ctx.canvas.dataset.quadro = String(i + 1);
+    ctx.globalAlpha = 1;
+    ctx.drawImage(a, 0, 0, ctx.canvas.width, ctx.canvas.height);
+    if (b) {
+      ctx.globalAlpha = t;
+      ctx.drawImage(b, 0, 0, ctx.canvas.width, ctx.canvas.height);
+      ctx.globalAlpha = 1;
+    }
+    ctx.canvas.dataset.quadro = String(Math.round(f) + 1);
     ctx.canvas.dataset.cor = atual;
-    desenhado.current = `${atual}#${i}`;
+    desenhado.current = chave;
     // A cor anterior saiu da tela: libera os quadros dela.
-    for (const [k, b] of bancos.current) {
+    for (const [k, bk] of bancos.current) {
       if (k === atual) continue;
-      liberar(b);
+      liberar(bk);
       bancos.current.delete(k);
     }
   }, [total]);
@@ -225,7 +242,14 @@ function PecaGirando({
   return (
     // A curva do gancho fica a 42/640 da altura do quadro (manifest.gancho): sobe a peça
     // para ela cair no eixo do cano (metade do cano + 42/640 × 4/3 da largura).
-    <span className="pointer-events-none relative -mt-[calc(var(--cano)/2+var(--w)*0.0875)] aspect-[3/4] w-(--w) max-w-none shrink-0">
+    <span
+      className={cn(
+        "pointer-events-none relative -mt-[calc(var(--cano)/2+var(--w)*0.0875)] aspect-[3/4] w-(--w) max-w-none shrink-0",
+        // As fotos da camiseta giram para o lado contrário das outras peças: espelha para a
+        // arara ficar toda virada para o mesmo lado (pedido do Gabriel, 18/11).
+        ESPELHADAS.has(modelo.id) && "-scale-x-100"
+      )}
+    >
       <canvas ref={canvasRef} aria-hidden className="peer absolute inset-0 size-full" />
       {/* Quadro parado, no HTML: a peça aparece sem esperar o JS; some quando o canvas desenha.
           Prioridade alta nas cinco: todas aparecem juntas na primeira tela (~45 KB no total). */}
