@@ -23,6 +23,7 @@ export const CONTATO = {
   email: "vendas@whimconfeccao.com.br",
   instagram: "@whimconfeccao",
   instagramUrl: "https://www.instagram.com/whimconfeccao/",
+  facebookUrl: "https://www.facebook.com/whimconfeccoes/",
 };
 
 /** Dados da empresa (rodapé e política de privacidade). */

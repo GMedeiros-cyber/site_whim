@@ -6,6 +6,7 @@ import { ArrowUpRightIcon } from "lucide-react";
 import { Container } from "@/components/blocos";
 import { LinkNav } from "@/components/link-nav";
 import { PreferenciasCookies } from "@/components/medicao";
+import { RedesSociais } from "@/components/redes-sociais";
 import { ACAO, NAVEGACAO } from "@/lib/navegacao";
 import { cn } from "@/lib/utils";
 import { CONTATO, EMPRESA, WHATSAPP } from "@/lib/whim";
@@ -71,15 +72,8 @@ export function SiteFooter() {
                 </a>
               </li>
               <li className="flex min-h-11 items-center lg:min-h-0 lg:py-1">{CONTATO.horario}</li>
-              <li>
-                <a href={CONTATO.instagramUrl} {...novaAba} className={link}>
-                  <span className="sr-only">Instagram: </span>
-                  {CONTATO.instagram}
-                  <ArrowUpRightIcon aria-hidden className="size-3.5 text-accent" />
-                  <span className="sr-only"> (abre em nova aba)</span>
-                </a>
-              </li>
             </ul>
+            <RedesSociais className="mt-3" />
           </Coluna>
 
           <Coluna id="endereco" titulo="Endereço">

@@ -30,6 +30,7 @@ ${DUVIDAS.map((d) => `- ${d.pergunta} ${d.resposta}`).join("\n")}
 - WhatsApp (orçamentos): ${CONTATO.whatsapp}
 - E-mail: ${CONTATO.email}
 - Instagram: ${CONTATO.instagramUrl}
+- Facebook: ${CONTATO.facebookUrl}
 - Endereço: ${CONTATO.logradouro.replace(" · ", ", ")}, ${CONTATO.bairro}, ${CONTATO.cidade}, CEP ${CONTATO.cep}
 - Horário: ${CONTATO.horario.toLowerCase()}
 - ${EMPRESA.razaoSocial}, CNPJ ${EMPRESA.cnpj}

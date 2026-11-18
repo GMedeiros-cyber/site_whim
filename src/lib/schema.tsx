@@ -54,7 +54,7 @@ export const NEGOCIO = {
     { "@type": "City", name: "Guarulhos" },
     { "@type": "AdministrativeArea", name: "Grande São Paulo" },
   ],
-  sameAs: [CONTATO.instagramUrl],
+  sameAs: [CONTATO.instagramUrl, CONTATO.facebookUrl],
   hasOfferCatalog: {
     "@type": "OfferCatalog",
     name: "Serviços da Whim",
