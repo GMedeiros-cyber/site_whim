@@ -377,3 +377,7 @@ Uma entrada por tarefa, sempre acrescentada no fim (nunca reescrever as anterior
 - Correção: leitura da fonte e do logo dentro da função (um arquivo que falte só afeta a imagem) e `outputFileTracingIncludes` no `next.config.mjs` (a fonte entra no pacote do servidor).
 - Comandos: lint, tsc, build (webpack, ok), `next start` com as 5 rotas em 200.
 - Pendente: rodar o PageSpeed de novo depois do deploy.
+
+### 2026-11-18 18:45 · Claude · PageSpeed no celular depois da correção
+- Home no celular: Desempenho 94, Acessibilidade 100, Práticas recomendadas 100, SEO 100 (LCP 2,7 s, CLS 0). Logs da Hostinger sem erro depois do deploy `708258c`.
+- Pendente: legenda (track) no vídeo, imagens mais leves (~77 KiB) e cache de arquivos estáticos (~400 KiB).
