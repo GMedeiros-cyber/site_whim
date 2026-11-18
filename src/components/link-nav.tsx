@@ -3,10 +3,12 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import { rolarPara } from "@/lib/rolagem";
+
 /**
- * Link da navegação global. Na home, "Início" (/) volta ao topo com a rolagem
- * suave do site (o Link sozinho mantém a posição); "/#secao" rola até a seção.
- * Fora da home, os mesmos hrefs levam para a home na seção certa.
+ * Link da navegação global. Na home, "Início" (/) e "/#secao" rolam até a seção por
+ * src/lib/rolagem.ts (o Link do Next não rola quando o endereço já é o mesmo). Fora da home,
+ * os mesmos hrefs levam para a home na seção certa.
  */
 export function LinkNav({
   href,
@@ -20,11 +22,9 @@ export function LinkNav({
       href={href}
       onClick={(e) => {
         onClick?.(e);
-        if (href === "/" && pathname === "/" && !e.defaultPrevented) {
-          e.preventDefault();
-          window.history.replaceState(window.history.state, "", "/");
-          window.scrollTo({ top: 0 });
-        }
+        if (e.defaultPrevented || pathname !== "/") return;
+        if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return; // nova aba
+        if ((href === "/" || href.startsWith("/#")) && rolarPara(href)) e.preventDefault();
       }}
       {...props}
     />

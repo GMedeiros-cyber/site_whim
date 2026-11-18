@@ -7,6 +7,7 @@ import { MenuIcon, XIcon } from "lucide-react";
 
 import { LinkNav, useAtivo } from "@/components/link-nav";
 import { faseIntro, pedirIntro } from "@/lib/abertura";
+import { destinoTravado, idDaSecao, soltarTrava } from "@/lib/rolagem";
 import { ACAO, NAVEGACAO, type ItemNav } from "@/lib/navegacao";
 import { cn } from "@/lib/utils";
 
@@ -34,9 +35,6 @@ export function SiteHeader({
   // Seção da home em que a pessoa está (ou a que ela acabou de clicar): marca o link na barra.
   const [secao, setSecao] = useState<string | null>(null);
   const listaRef = useRef<HTMLUListElement>(null);
-  // Depois de um clique, a pílula fica no link clicado até a rolagem suave terminar (sem
-  // passar pelas seções do meio).
-  const travaRef = useRef(0);
   const [pilula, setPilula] = useState<{ left: number; width: number } | null>(null);
   const naHome = pathname === "/";
   const hrefAtivo = naHome ? (secao ?? "/") : null;
@@ -71,38 +69,53 @@ export function SiteHeader({
     };
   }, []);
 
-  // Na home, a seção que cruza a linha de 55% da tela define o link marcado.
+  // Na home, a seção que cruza a linha de 55% da tela define o link marcado. Depois de um
+  // clique, fica no link clicado até a rolagem chegar lá (src/lib/rolagem.ts).
   useEffect(() => {
     if (!naHome) return;
-    const ids = links.map((l) => (l.href === "/" ? "topo" : l.href.split("#")[1])).filter(Boolean);
+    const ids = links.map((l) => idDaSecao(l.href)).filter((id): id is string => !!id);
     let raf = 0;
     const ler = () => {
       raf = 0;
-      if (performance.now() < travaRef.current) return;
+      const travado = destinoTravado();
+      if (travado) {
+        setSecao(travado);
+        return;
+      }
       const linha = window.innerHeight * 0.55;
+      const noFim = window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 4;
       let atual = ids[0];
       for (const id of ids) {
         const el = document.getElementById(id);
         if (el && el.getBoundingClientRect().top <= linha) atual = id;
       }
+      // No pé da página, a última seção da barra (mesmo que não chegue à linha).
+      if (noFim) atual = ids[ids.length - 1];
       setSecao(atual === "topo" ? "/" : `/#${atual}`);
     };
     const aoRolar = () => {
       raf ||= requestAnimationFrame(ler);
     };
-    // Fim da rolagem suave: solta a trava e lê a seção de novo.
-    const aoParar = () => {
-      travaRef.current = 0;
+    // A pessoa mexeu na rolagem: a barra volta a seguir a página na hora.
+    const mexeu = (e: Event) => {
+      if (e instanceof KeyboardEvent && !["ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End", " "].includes(e.key)) return;
+      soltarTrava();
       aoRolar();
     };
     ler();
     window.addEventListener("scroll", aoRolar, { passive: true });
-    window.addEventListener("scrollend", aoParar);
+    window.addEventListener("scrollend", aoRolar);
     window.addEventListener("resize", aoRolar);
+    window.addEventListener("wheel", mexeu, { passive: true });
+    window.addEventListener("touchstart", mexeu, { passive: true });
+    window.addEventListener("keydown", mexeu);
     return () => {
       window.removeEventListener("scroll", aoRolar);
-      window.removeEventListener("scrollend", aoParar);
+      window.removeEventListener("scrollend", aoRolar);
       window.removeEventListener("resize", aoRolar);
+      window.removeEventListener("wheel", mexeu);
+      window.removeEventListener("touchstart", mexeu);
+      window.removeEventListener("keydown", mexeu);
       cancelAnimationFrame(raf);
     };
   }, [naHome, links]);
@@ -182,11 +195,7 @@ export function SiteHeader({
                   href={l.href}
                   data-href={l.href}
                   aria-current={marcado ? "location" : undefined}
-                  onClick={() => {
-                    if (!naHome) return;
-                    travaRef.current = performance.now() + 1200; // sem scrollend (Safari antigo)
-                    setSecao(l.href);
-                  }}
+                  onClick={() => naHome && setSecao(l.href)}
                   className={cn(
                     "block rounded-full px-4 py-3 text-[15px] font-medium whitespace-nowrap text-muted-foreground transition-colors hover:text-foreground",
                     marcado && "font-semibold text-foreground"
