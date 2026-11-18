@@ -4,6 +4,10 @@ const nextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
   poweredByHeader: false,
+  // A imagem de compartilhamento lê a fonte e o logo do disco: entram no pacote do servidor.
+  outputFileTracingIncludes: {
+    "/**": ["./src/assets/poppins-semibold.ttf", "./public/brand/whim-logo-branco.svg"],
+  },
   // Uma URL só: o www vai para o endereço sem www (o mesmo do canonical e do sitemap).
   async redirects() {
     return [

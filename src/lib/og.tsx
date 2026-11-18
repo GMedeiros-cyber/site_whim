@@ -4,11 +4,20 @@ import { join } from "node:path";
 import { ImageResponse } from "next/og";
 
 // next/og não lê woff2; a Poppins vai em TTF. Leitura síncrona: com Cache Components,
-// ler arquivo de forma assíncrona tira a imagem do build estático.
-const poppins = readFileSync(join(process.cwd(), "src/assets/poppins-semibold.ttf"));
-const logo = readFileSync(join(process.cwd(), "public/brand/whim-logo-branco.svg"), "base64");
+// ler arquivo de forma assíncrona tira a imagem do build estático. A leitura fica dentro da
+// função (e não no topo do módulo): as páginas importam o alt e o tamanho daqui, e um arquivo
+// que falte no servidor derrubava a página inteira com erro 500 (PageSpeed, 18/11).
+let arquivos: { poppins: Buffer; logo: string } | null = null;
+function lerArquivos() {
+  arquivos ??= {
+    poppins: readFileSync(join(process.cwd(), "src/assets/poppins-semibold.ttf")),
+    logo: readFileSync(join(process.cwd(), "public/brand/whim-logo-branco.svg"), "base64"),
+  };
+  return arquivos;
+}
 
 export function imagemOg(titulo: string, linha: string) {
+  const { poppins, logo } = lerArquivos();
   return new ImageResponse(
     (
       <div

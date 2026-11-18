@@ -371,3 +371,9 @@ Uma entrada por tarefa, sempre acrescentada no fim (nunca reescrever as anterior
 - Comandos: `npm run lint`, `npx tsc --noEmit`, `npm run build` (webpack, ok), Playwright a 360/390/430 (menu nas 4 seções, barra no pé, flutuante no Resumo, sem rolagem lateral) e 1280/1920 (14 cliques na barra), verificador de links (internos ok).
 - Commit: ver o `git log` do main deste push.
 - Pendente: PageSpeed no celular; baixos do agente 3 (itens 4 e 2); IDs de medição; sitemap no Search Console; lead de teste.
+
+### 2026-11-18 18:50 · Claude · Erro 500 visto pelo PageSpeed
+- O PageSpeed recebia erro 500 na home e no Monte sua peça (sem título e sem descrição para o robô). Nos logs da Hostinger: `ENOENT src/assets/poppins-semibold.ttf`, lida no topo do `src/lib/og.tsx`, que as páginas importam pela imagem de compartilhamento.
+- Correção: leitura da fonte e do logo dentro da função (um arquivo que falte só afeta a imagem) e `outputFileTracingIncludes` no `next.config.mjs` (a fonte entra no pacote do servidor).
+- Comandos: lint, tsc, build (webpack, ok), `next start` com as 5 rotas em 200.
+- Pendente: rodar o PageSpeed de novo depois do deploy.
