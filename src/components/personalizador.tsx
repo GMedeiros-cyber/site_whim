@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import Image from "next/image";
 import { ArrowLeftIcon, CheckIcon, DownloadIcon, InfoIcon, MinusIcon, PlusIcon, Share2Icon } from "lucide-react";
 
@@ -99,6 +99,12 @@ const campo =
 type Ficha = { chave: string; url: string; arquivo: File; compartilhavel: boolean };
 
 export function Personalizador() {
+  // iOS antes do 16.4 não tem OffscreenCanvas: sem prévia da arte e sem ficha (teste do agente 3, 18/11).
+  const semCanvas = useSyncExternalStore(
+    nadaMuda,
+    () => typeof OffscreenCanvas === "undefined",
+    () => false
+  );
   const [pedido, setPedido] = useState(INICIAL);
   const [passo, setPasso] = useState(0);
   const [alcancado, setAlcancado] = useState(0); // passo mais longe já atingido
@@ -489,7 +495,12 @@ export function Personalizador() {
             <p className="rounded-2xl bg-muted p-[18px] text-sm wrap-anywhere whitespace-pre-wrap">{resumo}</p>
             <div className="mt-3.5 rounded-2xl border border-primary/12 p-3">
               <p className="text-[13px] font-medium">Ficha da estampa para a equipe da Whim</p>
-              {fichaPronta ? (
+              {semCanvas ? (
+                <p className="mt-2 rounded-lg bg-muted p-3 text-sm text-muted-foreground">
+                  Este navegador não consegue montar a prévia nem a ficha. Peça o orçamento pelo WhatsApp e mande as
+                  artes por lá: a equipe da Whim monta a prévia para você.
+                </p>
+              ) : fichaPronta ? (
                 <Image
                   src={ficha.url}
                   alt={`Ficha da estampa: ${peca}, ${nomeCor}, ${tecido}, ${tecnica}, ${posicoes.length} ${posicoes.length === 1 ? "posição" : "posições"}`}
@@ -501,7 +512,7 @@ export function Personalizador() {
               ) : (
                 <Skeleton className="mt-2 aspect-[16/10] w-full rounded-lg" />
               )}
-              <div className="mt-3 flex flex-wrap gap-2">
+              <div className={cn("mt-3 flex flex-wrap gap-2", semCanvas && "hidden")}>
                 <Button variant="outline" size="xl" disabled={!fichaPronta} onClick={baixarFicha} className="flex-1">
                   <DownloadIcon data-icon="inline-start" /> Baixar ficha
                 </Button>
@@ -702,10 +713,10 @@ export function Personalizador() {
                           <span className="hidden max-[600px]:inline">{p.pergunta}</span>
                         </p>
                         {/* Celular: sem o cartão; a altura mínima deixa a barra de ações no pé da tela. */}
-                        <div className="mt-3 rounded-[18px] border border-primary/12 bg-background p-4 shadow-sm max-[600px]:mt-1 max-[600px]:flex max-[600px]:min-h-[calc(100svh-env(safe-area-inset-top)-var(--vitrine)-200px)] max-[600px]:flex-col max-[600px]:rounded-none max-[600px]:border-0 max-[600px]:p-0 max-[600px]:shadow-none min-[601px]:p-5">
+                        <div className="mt-3 rounded-[18px] border border-primary/12 bg-background p-4 shadow-sm max-[600px]:mt-1 max-[600px]:flex max-[600px]:min-h-[calc(100svh-env(safe-area-inset-top)-var(--vitrine)-188px)] max-[600px]:flex-col max-[600px]:rounded-none max-[600px]:border-0 max-[600px]:p-0 max-[600px]:shadow-none min-[601px]:p-5">
                           {conteudo(i)}
                           {/* Celular: Voltar e Continuar presos no pé da tela, dizendo o próximo passo. */}
-                          <div data-barra-acoes className={cn("mt-5 flex gap-2.5", BARRA)}>
+                          <div data-barra-acoes data-ultimo={i === ultimo && !editando ? "" : undefined} className={cn("mt-5 flex gap-2.5", BARRA)}>
                             {editando ? (
                               <>
                                 <Button variant="outline" size="xl" onClick={cancelar} className="flex-1 min-[601px]:flex-none">
@@ -783,6 +794,8 @@ const BARRA = cn(
   "max-[600px]:sticky max-[600px]:bottom-0 max-[600px]:z-20 max-[600px]:-mx-4 max-[600px]:mt-auto max-[600px]:bg-background max-[600px]:px-4 max-[600px]:pt-3",
   "max-[600px]:pb-[calc(env(safe-area-inset-bottom)+0.75rem)] max-[600px]:shadow-[0_-12px_22px_-18px] max-[600px]:shadow-primary/55"
 );
+
+const nadaMuda = () => () => {};
 
 const QTD_DIGITOS = 5;
 

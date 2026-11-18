@@ -4,12 +4,28 @@ const nextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
   poweredByHeader: false,
+  // Uma URL só: o www vai para o endereço sem www (o mesmo do canonical e do sitemap).
+  async redirects() {
+    return [
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "www.whimconfeccao.com.br" }],
+        destination: "https://whimconfeccao.com.br/:path*",
+        permanent: true,
+      },
+    ];
+  },
   async headers() {
     return [
       {
         source: "/:path*",
         headers: [
           { key: "X-Content-Type-Options", value: "nosniff" },
+          // Sempre HTTPS (1 ano). Sem includeSubDomains: os subdomínios de e-mail e do painel não são deste site.
+          { key: "Strict-Transport-Security", value: "max-age=31536000" },
+          // O site não pode ser embutido em páginas de terceiros.
+          { key: "X-Frame-Options", value: "SAMEORIGIN" },
+          { key: "Content-Security-Policy", value: "frame-ancestors 'self'" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
           // Nada usa câmera, microfone, localização ou pagamento (o mapa do Google também não).
           {

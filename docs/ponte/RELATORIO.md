@@ -364,3 +364,10 @@ Uma entrada por tarefa, sempre acrescentada no fim (nunca reescrever as anterior
 - Comandos: `git checkout main && git pull && git checkout -b agente-3/teste-celular-18-11 && git merge --no-edit origin/agente-1/celular-18-11 origin/agente-2/celular-18-11`, `npx playwright-core install chromium webkit`, `npm run build` (webpack, ok) + `next start` (3417 e 3418), o script, `npm run lint` (ok).
 - Commit: `1baf7c0`.
 - Pendente: teclado de verdade num iPhone; prévia e ficha no iOS abaixo do 16.4 (sem `OffscreenCanvas`).
+
+### 2026-11-18 18:40 · Claude · Revisão e publicação do celular de 18/11
+- Juntei `agente-3/teste-celular-18-11` (que já traz os agentes 1 e 2 e a referência) e corrigi na revisão: menu marcando a seção clicada (Processo marcava Clientes), botão flutuante escondido no Resumo do celular, barra encostando no pé nos passos curtos e aviso sem `OffscreenCanvas`.
+- Checklist de lançamento: www → sem www (308) e cabeçalhos HSTS, X-Frame-Options e frame-ancestors.
+- Comandos: `npm run lint`, `npx tsc --noEmit`, `npm run build` (webpack, ok), Playwright a 360/390/430 (menu nas 4 seções, barra no pé, flutuante no Resumo, sem rolagem lateral) e 1280/1920 (14 cliques na barra), verificador de links (internos ok).
+- Commit: ver o `git log` do main deste push.
+- Pendente: PageSpeed no celular; baixos do agente 3 (itens 4 e 2); IDs de medição; sitemap no Search Console; lead de teste.

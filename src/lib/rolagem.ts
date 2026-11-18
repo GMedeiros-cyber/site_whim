@@ -3,17 +3,25 @@
 // em "Sobre" de novo) e a barra precisa saber para onde a página está indo.
 //
 // Enquanto a rolagem suave vai até a seção clicada, a barra fica "travada" nela (não passa
-// pelas seções do meio). A trava sai quando a página chega, quando a pessoa mexe na rolagem
-// (roda do mouse, toque, teclado) ou, no máximo, depois de 1,5 s.
+// pelas seções do meio). Depois de chegar, a barra continua no link clicado (uma seção curta,
+// como o Processo no celular, não deixa a próxima "roubar" a marcação). A trava sai quando a
+// pessoa mexe na rolagem (roda do mouse, toque, teclado), quando a página sai do lugar em que
+// chegou ou se a rolagem não chegar em 1,5 s.
 
-type Trava = { href: string; el: HTMLElement | null; ate: number };
+type Trava = { href: string; el: HTMLElement | null; ate: number; chegouEm?: number };
 
 let trava: Trava | null = null;
 
 /** href da seção para onde a página está rolando por clique, ou null. */
 export function destinoTravado(): string | null {
   if (!trava) return null;
-  if (performance.now() > trava.ate || chegou(trava)) trava = null;
+  if (trava.chegouEm === undefined) {
+    if (chegou(trava)) trava.chegouEm = window.scrollY;
+    else if (performance.now() > trava.ate) trava = null;
+  } else if (Math.abs(window.scrollY - trava.chegouEm) > 48) {
+    // Rolou sem roda, toque ou teclado (barra de rolagem arrastada, por exemplo).
+    trava = null;
+  }
   return trava?.href ?? null;
 }
 
