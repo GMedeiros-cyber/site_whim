@@ -1,15 +1,17 @@
 import type { Metadata } from "next";
 import Image, { getImageProps } from "next/image";
 import Link from "next/link";
+import { ArrowDownIcon } from "lucide-react";
 
 import { Container, Destaque, Seta, Titulo, secao } from "@/components/blocos";
 import { Abertura } from "@/components/home/abertura";
 import { Carrossel } from "@/components/home/carrossel";
 import { DUVIDAS } from "@/components/home/duvidas";
 import { DuvidasAcordeao } from "@/components/home/duvidas-acordeao";
-import { Etapas } from "@/components/home/etapas";
+import { Etapas, EtapasCelular } from "@/components/home/etapas";
 import { TambemCartoes } from "@/components/home/tambem-cartoes";
 import { TecnicaFotos } from "@/components/home/tecnica-fotos";
+import { TambemLinhas, TecnicasAbas } from "@/components/home/tecnicas-celular";
 import { VideoOficina } from "@/components/home/video-oficina";
 import { PalavraTinta } from "@/components/home/palavra-tinta";
 import "@/components/home/transicoes.css";
@@ -116,11 +118,13 @@ const TECNICAS = [
   },
 ];
 
+// `resumo`: a linha curta do celular (referencia/celular-18-11).
 const TAMBEM = [
-  { nome: "Confecção", texto: "Camiseta, polo, regata, moletom e baby look, do tecido ao acabamento, do infantil 2 ao adulto G3." },
-  { nome: "Uniformes", texto: "Para empresas e escolas, com padrão de cor, logo bordado ou estampado e reposição fácil." },
-  { nome: "Não sabe qual?", texto: "Mande a arte: a equipe indica a técnica que fica melhor." },
+  { nome: "Confecção", resumo: "Do tecido ao acabamento", texto: "Camiseta, polo, regata, moletom e baby look, do tecido ao acabamento, do infantil 2 ao adulto G3." },
+  { nome: "Uniformes", resumo: "Empresas e escolas", texto: "Para empresas e escolas, com padrão de cor, logo bordado ou estampado e reposição fácil." },
+  { nome: "Não sabe qual?", resumo: "A equipe indica a técnica", texto: "Mande a arte: a equipe indica a técnica que fica melhor." },
 ];
+const WHATSAPP_TECNICA = linkWhatsApp("Olá, Whim! Não sei qual técnica escolher para a minha arte.");
 
 // Clientes que a Whim autorizou citar (briefing de 16/11). Logos oficiais já em
 // cinza, 120 px de altura (fontes em referencia/logos-clientes.md).
@@ -166,6 +170,8 @@ function Topo() {
       <div
         className={cn(
           "relative isolate flex min-h-[calc(100svh-1rem)] flex-col items-center justify-center overflow-hidden rounded-[24px] bg-primary px-5 pt-28 pb-24 text-center text-primary-foreground md:min-h-[min(880px,calc(100svh-1.5rem))] md:rounded-[32px] min-[1800px]:min-h-[calc(100svh/var(--zoom)-1.5rem)]! md:px-10 md:pt-32 md:pb-28",
+          // Celular (referencia/celular-18-11): texto embaixo, alinhado à esquerda.
+          "cel:items-start cel:justify-end cel:px-[22px] cel:pb-8 cel:text-left",
           "home-recua"
         )}
       >
@@ -177,10 +183,11 @@ function Topo() {
             className="absolute inset-0 -z-20 size-full object-cover object-[50%_50%] [@media(min-aspect-ratio:1/1)]:object-[50%_55%]"
           />
         </picture>
-        {/* Véu azul: forte atrás do texto, mais leve nas bordas e embaixo, onde a estampa aparece. */}
+        {/* Véu azul: forte atrás do texto, mais leve nas bordas e embaixo, onde a estampa aparece.
+            No celular o texto fica embaixo, então o véu escurece de cima para baixo. */}
         <div
           aria-hidden
-          className="absolute inset-0 -z-10 bg-radial-[90%_62%_at_50%_44%] from-primary/88 via-primary/74 via-55% to-primary/38"
+          className="absolute inset-0 -z-10 bg-radial-[90%_62%_at_50%_44%] from-primary/88 via-primary/74 via-55% to-primary/38 cel:bg-linear-to-b cel:from-primary/35 cel:via-primary/55 cel:via-40% cel:to-primary/94"
         />
 
         {/* Logo no canto superior esquerdo do cartão da hero, na altura da barra (pedido do
@@ -193,19 +200,27 @@ function Topo() {
         />
         <h1>
           <PalavraTinta>Vista</PalavraTinta>{" "}
-          <span className="home-grande mt-1.5 block text-[28px] leading-[1.1] font-semibold tracking-[-0.025em] text-balance md:text-[40px]">
+          <span className="home-grande mt-1.5 block text-[28px] leading-[1.1] font-semibold tracking-[-0.025em] text-balance md:text-[40px] cel:mt-2 cel:text-[22px] cel:leading-[1.15]">
             a sua marca, peça por peça.
           </span>
         </h1>
-        <p className="home-grande mt-4 max-w-[52ch] text-[15px] leading-relaxed text-pretty text-primary-foreground/80 md:text-base">
-          Uniformes, camisetas e peças com a sua marca. Silk, DTF e bordado.
+        <p className="home-grande mt-4 max-w-[52ch] text-[15px] leading-relaxed text-pretty text-primary-foreground/80 md:text-base cel:mt-2.5 cel:leading-normal">
+          <span className="cel:hidden">Uniformes, camisetas e peças com a sua marca. Silk, DTF e bordado.</span>
+          <span className="min-[601px]:hidden">Silk, DTF e bordado para empresas, escolas e eventos.</span>
         </p>
-        <div className="home-grande mt-7 flex w-full flex-col gap-2.5 sm:w-auto sm:flex-row">
+        <div className="home-grande mt-7 flex w-full flex-col gap-2.5 sm:w-auto sm:flex-row cel:mt-[22px]">
           <a href={WHATSAPP_ORCAMENTO} className={botaoClaro}>
             Pedir orçamento no WhatsApp <Seta />
           </a>
-          <a href="#servicos" className={botaoContorno}>
+          <a href="#servicos" className={cn(botaoContorno, "cel:hidden")}>
             Ver o que fazemos
+          </a>
+          {/* No celular, um botão só; o segundo vira link de texto. */}
+          <a
+            href="#servicos"
+            className="inline-flex min-h-11 items-center gap-1.5 self-start rounded-sm text-sm font-medium underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-foreground min-[601px]:hidden"
+          >
+            Ver o que fazemos <ArrowDownIcon aria-hidden className="size-4" />
           </a>
         </div>
 
@@ -213,7 +228,7 @@ function Topo() {
         <a
           href="#sobre"
           aria-label="Ir para Quem somos"
-          className="home-rolar home-grande absolute bottom-3 left-1/2 flex size-11 -translate-x-1/2 items-center justify-center rounded-full text-primary-foreground/75 transition-colors hover:text-primary-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-foreground md:bottom-5"
+          className="home-rolar home-grande absolute bottom-3 left-1/2 flex size-11 -translate-x-1/2 items-center justify-center rounded-full text-primary-foreground/75 transition-colors hover:text-primary-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-foreground md:bottom-5 cel:hidden"
         >
           <span aria-hidden className="home-rolar-mouse relative h-[34px] w-[22px] rounded-full border-2 border-current">
             <span className="absolute top-1.5 left-1/2 h-[7px] w-[3px] -translate-x-1/2 rounded-full bg-current" />
@@ -232,15 +247,26 @@ function QuemSomos() {
           <Titulo className={cn("max-w-[13ch]", sobe)}>
             Uma oficina, <Destaque>do fio à estampa.</Destaque>
           </Titulo>
-          <p className={cn(apoio, sobe)}>
-            A Whim nasceu em 2021, quando o Wallan juntou 15 anos de experiência numa oficina
-            própria em Guarulhos. Hoje a gente faz peças para empresas, escolas e eventos com todas
-            as etapas no mesmo lugar.
+          <p className={cn(apoio, sobe, "cel:mt-3 cel:text-[15px]")}>
+            <span className="cel:hidden">
+              A Whim nasceu em 2021, quando o Wallan juntou 15 anos de experiência numa oficina
+              própria em Guarulhos. Hoje a gente faz peças para empresas, escolas e eventos com todas
+              as etapas no mesmo lugar.
+            </span>
+            <span className="min-[601px]:hidden">Desde 2021, em Guarulhos, com todas as etapas no mesmo lugar.</span>
           </p>
         </div>
 
-        {/* Mosaico no PC e no tablet; carrossel no celular. */}
-        <div className="relative lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:self-center">
+        {/* Celular: só o vídeo, em 16:10 (as duas fotos do mosaico não aparecem nem baixam). */}
+        <figure className="relative -mt-2.5 aspect-[16/10] overflow-hidden rounded-[22px] bg-muted min-[601px]:hidden">
+          <VideoOficina src={FOTOS[0].video!} poster={FOTOS[0].src} rotulo={FOTOS[0].alt} />
+          <figcaption className="absolute bottom-3 left-3 rounded-full bg-background/90 px-2.5 py-1.5 text-xs text-foreground">
+            {FOTOS[0].legenda}
+          </figcaption>
+        </figure>
+
+        {/* Mosaico no PC e no tablet; carrossel de 601 a 767 px. */}
+        <div className="relative lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:self-center cel:hidden">
           <Carrossel
             rotulo="Fotos da oficina"
             className="gap-3 md:grid md:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] md:grid-rows-[260px_260px] md:gap-4"
@@ -272,11 +298,18 @@ function QuemSomos() {
           </Carrossel>
         </div>
 
-        <ul className="grid grid-cols-2 gap-x-[18px] gap-y-4 sm:gap-x-7 sm:gap-y-[22px] lg:col-start-1 lg:self-start">
-          {OFICINA.map((etapa) => (
-            <li key={etapa.nome} className="flex flex-col gap-1 border-t pt-3.5">
-              <span className="text-base font-semibold">{etapa.nome}</span>
-              <span className="text-sm leading-normal text-muted-foreground">{etapa.texto}</span>
+        {/* No celular: blocos 2 × 2 numerados, só com o nome. */}
+        <ul className="grid grid-cols-2 gap-x-[18px] gap-y-4 sm:gap-x-7 sm:gap-y-[22px] lg:col-start-1 lg:self-start cel:-mt-3.5 cel:gap-2">
+          {OFICINA.map((etapa, i) => (
+            <li
+              key={etapa.nome}
+              className="flex flex-col gap-1 border-t pt-3.5 cel:min-h-12 cel:flex-row cel:items-center cel:gap-2.5 cel:rounded-[14px] cel:border-t-0 cel:bg-muted cel:px-3 cel:py-2.5"
+            >
+              <span aria-hidden className="grid size-6 shrink-0 place-items-center rounded-full bg-accent text-xs font-bold text-primary min-[601px]:hidden">
+                {i + 1}
+              </span>
+              <span className="text-base font-semibold cel:text-[13px] cel:leading-tight">{etapa.nome}</span>
+              <span className="text-sm leading-normal text-muted-foreground cel:hidden">{etapa.texto}</span>
             </li>
           ))}
         </ul>
@@ -292,11 +325,15 @@ function OQueFazemos() {
         <Titulo className={sobe}>
           Três jeitos de <Destaque>estampar sua marca.</Destaque>
         </Titulo>
-        <p className={cn(apoio, sobe)}>
+        <p className={cn(apoio, sobe, "cel:hidden")}>
           Cada técnica deixa a arte de um jeito. Veja como fica cada uma e para o que ela é melhor.
         </p>
 
-        <div className="mt-9 md:mt-14">
+        {/* Celular: abas e um cartão só; linhas curtas no lugar dos três cartões de baixo. */}
+        <TecnicasAbas tecnicas={TECNICAS} className="mt-[22px] min-[601px]:hidden" />
+        <TambemLinhas itens={TAMBEM} whatsapp={WHATSAPP_TECNICA} className="mt-3 min-[601px]:hidden" />
+
+        <div className="mt-9 md:mt-14 cel:hidden">
           <Carrossel rotulo="Técnicas de estampa" className="gap-3 md:grid md:grid-cols-3 md:gap-5">
             {TECNICAS.map((t) => (
               <article
@@ -316,7 +353,7 @@ function OQueFazemos() {
           </Carrossel>
         </div>
 
-        <TambemCartoes itens={TAMBEM} />
+        <TambemCartoes itens={TAMBEM} className="cel:hidden" />
       </Container>
     </section>
   );
@@ -329,9 +366,10 @@ function ComoFunciona() {
         <Titulo className={sobe}>
           Do pedido <Destaque>à entrega.</Destaque>
         </Titulo>
-        <div className="mt-10 lg:mt-16">
+        <div className="mt-10 lg:mt-16 cel:hidden">
           <Etapas />
         </div>
+        <EtapasCelular className="mt-[26px] min-[601px]:hidden" />
       </Container>
     </section>
   );
@@ -409,7 +447,7 @@ function Duvidas() {
           (cresce junto quando uma resposta abre). No celular a foto vem em cima, menor.
           Imagem gerada com IA; o logo é o arquivo oficial aplicado por cima, sem redesenho. */}
       <Container className="grid gap-8 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:items-stretch lg:gap-16">
-        <div className="relative aspect-[16/10] overflow-hidden rounded-[24px] bg-muted sm:aspect-[2/1] lg:aspect-auto lg:min-h-[560px]">
+        <div className="relative aspect-[16/10] overflow-hidden rounded-[24px] bg-muted sm:aspect-[2/1] lg:aspect-auto lg:min-h-[560px] cel:hidden">
           <Image
             src="/images/camiseta-whim-mesa.webp"
             alt="Camiseta azul-marinho dobrada com o logo da Whim estampado, na mesa de silk ao lado do rodo e da tinta turquesa"
@@ -422,8 +460,8 @@ function Duvidas() {
           <Titulo className={sobe}>
             Antes de <Destaque>pedir o orçamento.</Destaque>
           </Titulo>
-          <p className={cn(apoio, sobe)}>As perguntas que mais chegam no WhatsApp, respondidas aqui.</p>
-          <div className="mt-8 md:mt-10">
+          <p className={cn(apoio, sobe, "cel:hidden")}>As perguntas que mais chegam no WhatsApp, respondidas aqui.</p>
+          <div className="mt-8 md:mt-10 cel:mt-3.5">
             <DuvidasAcordeao />
           </div>
         </div>

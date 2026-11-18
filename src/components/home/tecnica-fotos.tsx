@@ -15,7 +15,7 @@ const INTERVALO = 4500;
  * tela e o mouse não está em cima; com movimento reduzido, só troca pelos pontos ou ao
  * tocar na foto. A primeira foto vem no HTML; as outras carregam quando o cartão aparece.
  */
-export function TecnicaFotos({ nome, fotos }: { nome: string; fotos: Foto[] }) {
+export function TecnicaFotos({ nome, fotos, className }: { nome: string; fotos: Foto[]; className?: string }) {
   const [atual, setAtual] = useState(0);
   const [visivel, setVisivel] = useState(false);
   const [parado, setParado] = useState(false);
@@ -39,7 +39,7 @@ export function TecnicaFotos({ nome, fotos }: { nome: string; fotos: Foto[] }) {
   return (
     <div
       ref={ref}
-      className="relative aspect-[3/4]"
+      className={cn("relative aspect-[3/4]", className)}
       onPointerEnter={(e) => e.pointerType === "mouse" && setParado(true)}
       onPointerLeave={() => setParado(false)}
     >
@@ -76,7 +76,7 @@ export function TecnicaFotos({ nome, fotos }: { nome: string; fotos: Foto[] }) {
             onClick={() => setAtual(i)}
             aria-label={`${nome}: foto ${i + 1} de ${fotos.length}`}
             aria-current={i === atual}
-            className="grid size-8 cursor-pointer place-items-center rounded-full outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+            className="grid size-8 cursor-pointer place-items-center rounded-full outline-none focus-visible:ring-3 focus-visible:ring-ring/50 cel:size-11"
           >
             <span
               className={cn(

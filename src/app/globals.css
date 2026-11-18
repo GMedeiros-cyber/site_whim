@@ -3,6 +3,9 @@
 @import "shadcn/tailwind.css";
 
 @custom-variant dark (&:is(.dark *));
+/* Celular (o layout de até 600 px, o mesmo da barra): `cel:` só vale abaixo de 601 px;
+   o par para "de 601 px para cima" é `min-[601px]:`. */
+@custom-variant cel (@media (width < 601px));
 
 @theme inline {
   --color-background: var(--background);

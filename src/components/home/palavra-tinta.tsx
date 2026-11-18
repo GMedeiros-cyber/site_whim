@@ -180,7 +180,7 @@ export function PalavraTinta({ children }: { children: string }) {
   }, [children, vez]);
 
   return (
-    <span className="relative mx-auto block w-fit text-primary-foreground">
+    <span className="relative mx-auto block w-fit text-primary-foreground cel:mx-0">
       <span
         ref={textoRef}
         // O padding (desfeito pela margem) deixa o pingo do "i" e o fim do "a"

@@ -9,13 +9,13 @@ import { cn } from "@/lib/utils";
  * ("Não sabe qual?"); passar o mouse mostra o azul no cartão de baixo do mouse e clicar
  * (ou tocar) leva o azul para ele.
  */
-export function TambemCartoes({ itens }: { itens: { nome: string; texto: string }[] }) {
+export function TambemCartoes({ itens, className }: { itens: { nome: string; texto: string }[]; className?: string }) {
   const [escolhido, setEscolhido] = useState(itens.length - 1);
   const [sobre, setSobre] = useState<number | null>(null);
   const ativo = sobre ?? escolhido;
 
   return (
-    <div className="mt-3 grid gap-3 md:mt-5 md:grid-cols-3 md:gap-5" onPointerLeave={() => setSobre(null)}>
+    <div className={cn("mt-3 grid gap-3 md:mt-5 md:grid-cols-3 md:gap-5", className)} onPointerLeave={() => setSobre(null)}>
       {itens.map((item, i) => {
         const destaque = i === ativo;
         return (
