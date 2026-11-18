@@ -1,6 +1,8 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useId, useRef, useState } from "react";
+
+import { cn } from "@/lib/utils";
 
 const PASSOS = [
   { nome: "Monte a peça", texto: "Escolha peça, cor e estampa aqui no site." },
@@ -31,7 +33,8 @@ export function Etapas() {
     )
       return;
     const olhar = () => {
-      if (parseFloat(getComputedStyle(lista).getPropertyValue("--home-p")) < ULTIMO) return;
+      // Escondida (celular, que usa EtapasCelular): a animação não roda e o valor fica no máximo.
+      if (!lista.checkVisibility() || parseFloat(getComputedStyle(lista).getPropertyValue("--home-p")) < ULTIMO) return;
       window.removeEventListener("scroll", olhar);
       estourar(fogosRef.current);
     };
@@ -81,6 +84,86 @@ export function Etapas() {
         </li>
       ))}
     </ol>
+  );
+}
+
+/**
+ * Celular (referencia/celular-18-11): os 5 passos numa linha (círculos ligados por uma
+ * linha que fica turquesa até o passo escolhido) e, embaixo, só a frase do passo tocado.
+ * Começa no 1; setas, Home e End trocam de passo.
+ */
+export function EtapasCelular({ className }: { className?: string }) {
+  const [atual, setAtual] = useState(0);
+  const id = useId();
+  const passos = useRef<(HTMLButtonElement | null)[]>([]);
+  const ir = (i: number) => {
+    const n = Math.max(0, Math.min(ULTIMO, i));
+    setAtual(n);
+    passos.current[n]?.focus();
+  };
+
+  return (
+    <div className={className}>
+      <div
+        role="tablist"
+        aria-label="Etapas do pedido"
+        onKeyDown={(e) => {
+          if (e.key === "ArrowRight") ir(atual + 1);
+          else if (e.key === "ArrowLeft") ir(atual - 1);
+          else if (e.key === "Home") ir(0);
+          else if (e.key === "End") ir(ULTIMO);
+          else return;
+          e.preventDefault();
+        }}
+        className="relative flex justify-between"
+      >
+        {/* Linha do centro do 1º ao centro do 5º (botões de 64 px, círculos de 36 px). */}
+        <span aria-hidden className="absolute top-[17px] right-8 left-8 h-0.5 bg-primary/12">
+          <span
+            style={{ transform: `scaleX(${atual / ULTIMO})` }}
+            className="block h-full origin-left bg-accent transition-transform duration-300 ease-out motion-reduce:transition-none"
+          />
+        </span>
+        {PASSOS.map((passo, i) => (
+          <button
+            key={passo.nome}
+            ref={(el) => {
+              passos.current[i] = el;
+            }}
+            type="button"
+            role="tab"
+            id={`${id}-passo${i}`}
+            aria-selected={i === atual}
+            aria-controls={`${id}-frase`}
+            tabIndex={i === atual ? 0 : -1}
+            onClick={() => setAtual(i)}
+            className="relative flex w-16 cursor-pointer flex-col items-center gap-2 rounded-xl pb-1 text-center text-[11px] leading-[1.2] font-semibold outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+          >
+            <span
+              aria-hidden
+              className={cn(
+                "grid size-9 place-items-center rounded-full border-2 text-[13px] font-bold tabular-nums transition-colors duration-300 motion-reduce:transition-none",
+                i <= atual ? "border-accent bg-accent text-primary" : "border-primary/14 bg-background"
+              )}
+            >
+              {i + 1}
+            </span>
+            {passo.nome}
+          </button>
+        ))}
+      </div>
+      <div
+        id={`${id}-frase`}
+        role="tabpanel"
+        aria-labelledby={`${id}-passo${atual}`}
+        className="mt-[18px] rounded-[18px] bg-muted px-[18px] py-4 text-sm leading-normal text-muted-foreground"
+      >
+        <b className="block text-[15px] font-semibold text-foreground">
+          {atual + 1} · {PASSOS[atual].nome}
+        </b>
+        {PASSOS[atual].texto}
+      </div>
+    </div>
   );
 }
 

@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { cacheLife } from "next/cache";
-import { ArrowUpRightIcon } from "lucide-react";
+import { ArrowUpRightIcon, ChevronDownIcon } from "lucide-react";
 
 import { Container } from "@/components/blocos";
 import { LinkNav } from "@/components/link-nav";
@@ -45,16 +45,8 @@ export function SiteFooter() {
             </p>
           </div>
 
-          <Coluna id="navegacao" titulo="Navegação">
-            <ul className="grid grid-cols-2 gap-x-6 sm:flex sm:flex-col lg:gap-1">
-              {[...NAVEGACAO, ACAO].map((l) => (
-                <li key={l.href}>
-                  <LinkNav href={l.href} className={link}>
-                    {l.label}
-                  </LinkNav>
-                </li>
-              ))}
-            </ul>
+          <Coluna id="navegacao" titulo="Navegação" className="cel:hidden">
+            <Navegacao />
           </Coluna>
 
           <Coluna id="atendimento" titulo="Atendimento">
@@ -82,19 +74,33 @@ export function SiteFooter() {
               <Linha partes={[CONTATO.bairro, CONTATO.cidade]} />
               <span>CEP {CONTATO.cep}</span>
             </address>
+            {/* No celular o mapa embutido não aparece nem baixa (iframe preguiçoso escondido
+                não carrega): fica só o link. */}
             <iframe
               src={MAPA_EMBED}
               title="Mapa com a localização da Whim"
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
-              className="mt-1 h-[190px] w-full rounded-[18px] border border-primary-foreground/15 bg-primary-foreground/10"
+              className="mt-1 h-[190px] w-full rounded-[18px] border border-primary-foreground/15 bg-primary-foreground/10 cel:hidden"
             />
             <a href={CONTATO.mapa} {...novaAba} className={cn(link, "w-fit")}>
-              Abrir no Google Maps
+              <span className="cel:hidden">Abrir no Google Maps</span>
+              <span className="min-[601px]:hidden">Ver no mapa</span>
               <ArrowUpRightIcon aria-hidden className="size-3.5 text-accent" />
               <span className="sr-only"> (abre em nova aba)</span>
             </a>
           </Coluna>
+
+          {/* Celular: a navegação fica fechada num acordeão, depois dos contatos. */}
+          <details className="group min-[601px]:hidden">
+            <summary className="flex min-h-13 cursor-pointer list-none items-center justify-between rounded-sm border-y border-primary-foreground/12 text-sm font-semibold text-primary-foreground outline-none focus-visible:ring-3 focus-visible:ring-ring/50 [&::-webkit-details-marker]:hidden">
+              Navegação
+              <ChevronDownIcon aria-hidden className="size-[18px] transition-transform duration-300 group-open:rotate-180 motion-reduce:transition-none" />
+            </summary>
+            <div className="pt-2">
+              <Navegacao />
+            </div>
+          </details>
         </div>
 
         <div className="mt-12 flex flex-col gap-3 border-t border-primary-foreground/15 pt-6 text-xs leading-relaxed text-primary-foreground/60 md:flex-row md:items-center md:justify-between md:gap-8">
@@ -124,6 +130,20 @@ export function SiteFooter() {
   );
 }
 
+function Navegacao() {
+  return (
+    <ul className="grid grid-cols-2 gap-x-6 sm:flex sm:flex-col lg:gap-1">
+      {[...NAVEGACAO, ACAO].map((l) => (
+        <li key={l.href}>
+          <LinkNav href={l.href} className={link}>
+            {l.label}
+          </LinkNav>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 /** Linha de endereço que só quebra nos " · ". */
 function Linha({ partes }: { partes: string[] }) {
   return (
@@ -138,9 +158,19 @@ function Linha({ partes }: { partes: string[] }) {
   );
 }
 
-function Coluna({ id, titulo, children }: { id: string; titulo: string; children: React.ReactNode }) {
+function Coluna({
+  id,
+  titulo,
+  className,
+  children,
+}: {
+  id: string;
+  titulo: string;
+  className?: string;
+  children: React.ReactNode;
+}) {
   return (
-    <section aria-labelledby={`rodape-${id}`} className="flex flex-col gap-3">
+    <section aria-labelledby={`rodape-${id}`} className={cn("flex flex-col gap-3", className)}>
       <h2
         id={`rodape-${id}`}
         className="flex items-center gap-2.5 text-[11.5px] font-medium tracking-[0.22em] text-primary-foreground uppercase before:h-px before:w-[22px] before:bg-accent"

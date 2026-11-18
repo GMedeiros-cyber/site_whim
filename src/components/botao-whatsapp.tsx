@@ -11,7 +11,8 @@ const LINK = linkWhatsApp("Olá, Whim! Quero um orçamento.");
 /**
  * Botão flutuante do WhatsApp, em todas as páginas (layout.tsx).
  * Só o ícone do WhatsApp, 56 px (PC e celular), sem texto e parado (sem balanço).
- * Balão uma vez por sessão, 3 s depois de carregar; some em 8 s, no × ou no clique.
+ * Balão uma vez por sessão, 3 s depois de carregar (na home do celular, 3 s depois de rolar
+ * para além da hero); some em 8 s, no × ou no clique.
  */
 export function BotaoWhatsApp() {
   const [dica, setDica] = useState(false);
@@ -20,15 +21,29 @@ export function BotaoWhatsApp() {
     try {
       if (sessionStorage.getItem(CHAVE)) return;
     } catch {}
+    let abre = 0;
     let fecha = 0;
-    const abre = window.setTimeout(() => {
-      try {
-        sessionStorage.setItem(CHAVE, "1");
-      } catch {}
-      setDica(true);
-      fecha = window.setTimeout(() => setDica(false), 8000);
-    }, 3000);
+    const comecar = () => {
+      abre = window.setTimeout(() => {
+        try {
+          sessionStorage.setItem(CHAVE, "1");
+        } catch {}
+        setDica(true);
+        fecha = window.setTimeout(() => setDica(false), 8000);
+      }, 3000);
+    };
+    // Home no celular (18/11): o botão de orçamento fica no pé da hero, onde o balão abre;
+    // o balão espera a pessoa rolar para além dele.
+    const aoRolar = () => {
+      if (window.scrollY < window.innerHeight * 0.6) return;
+      window.removeEventListener("scroll", aoRolar);
+      comecar();
+    };
+    if (matchMedia("(width < 601px)").matches && document.getElementById("topo")) {
+      window.addEventListener("scroll", aoRolar, { passive: true });
+    } else comecar();
     return () => {
+      window.removeEventListener("scroll", aoRolar);
       clearTimeout(abre);
       clearTimeout(fecha);
     };
