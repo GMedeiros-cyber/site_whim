@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Whim · Home nova no celular</title>
+
+</head>
+<body>
+<x-dc>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&amp;display=swap">
+<style>
+body{margin:0}
+.c{width:390px;font-family:Poppins,system-ui,sans-serif;color:#373857;background:#FFFFFF;box-sizing:border-box}
+.c *{box-sizing:border-box}
+.barra{position:absolute;top:12px;left:12px;right:12px;height:58px;border-radius:999px;background:rgba(255,255,255,.92);display:flex;align-items:center;justify-content:space-between;padding:0 7px 0 8px;box-shadow:0 10px 30px -14px rgba(55,56,87,.45);z-index:2}
+.barra img{height:38px;width:auto}
+.menu{height:44px;padding:0 18px 0 16px;border-radius:999px;background:#373857;color:#FFFFFF;border:0;font:600 14px Poppins;display:flex;align-items:center;gap:8px}
+.hero{position:relative;margin:8px;height:640px;border-radius:24px;overflow:hidden;color:#FFFFFF;display:flex;flex-direction:column;justify-content:flex-end;padding:0 22px 30px}
+.hero img.fundo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.veu{position:absolute;inset:0;background:linear-gradient(180deg,rgba(55,56,87,.35) 0%,rgba(55,56,87,.55) 40%,rgba(55,56,87,.94) 100%)}
+.hero .txt{position:relative}
+.vista{margin:0;font-size:88px;line-height:.9;font-weight:800;letter-spacing:-.04em}
+.vista b{color:#31C4EA}
+.sub{margin:8px 0 0;font-size:22px;font-weight:600;line-height:1.15}
+.apoio{margin:10px 0 0;font-size:15px;line-height:1.5;color:rgba(255,255,255,.82)}
+.cta{display:flex;align-items:center;justify-content:center;gap:8px;height:54px;border-radius:999px;background:#FFFFFF;color:#373857;font-weight:600;font-size:16px;text-decoration:none;margin-top:22px}
+.link-claro{display:inline-flex;align-items:center;gap:6px;margin-top:14px;color:#FFFFFF;font-size:14px;font-weight:500;text-decoration:underline;text-underline-offset:4px;min-height:44px}
+.sec{padding:52px 20px}
+.sec.cinza{background:#F5F7FA;border-radius:28px 28px 0 0}
+h2{margin:0;font-size:30px;line-height:1.08;font-weight:700;letter-spacing:-.02em}
+h2 i{font-style:normal;background:linear-gradient(transparent 60%,rgba(49,196,234,.45) 60%)}
+.lead{margin:12px 0 0;font-size:15px;line-height:1.55;color:#5D6178}
+.video{position:relative;margin-top:22px;border-radius:22px;overflow:hidden;height:230px}
+.video img{width:100%;height:100%;object-fit:cover}
+.play{position:absolute;left:14px;bottom:14px;display:flex;align-items:center;gap:8px;padding:7px 12px;border-radius:999px;background:rgba(255,255,255,.92);font-size:12px;font-weight:500}
+.etapas{margin:18px 0 0;padding:0;list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.etapas li{display:flex;align-items:center;gap:10px;min-height:48px;padding:10px 12px;border-radius:14px;background:#F5F7FA;font-size:13px;font-weight:600}
+.etapas li span{display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:#FFFFFF;color:#31C4EA;font-size:12px;font-weight:700;flex:none}
+.abas{display:flex;gap:4px;margin-top:22px;padding:4px;border-radius:999px;background:#FFFFFF;border:1px solid rgba(55,56,87,.08)}
+.abas button{flex:1;height:42px;border:0;border-radius:999px;background:transparent;font:500 14px Poppins;color:#5D6178}
+.abas button.on{background:rgba(49,196,234,.16);color:#373857;font-weight:600}
+.tec{margin-top:12px;border-radius:24px;background:#FFFFFF;overflow:hidden;border:1px solid rgba(55,56,87,.06)}
+.tec .foto{position:relative;height:250px}
+.tec .foto img{width:100%;height:100%;object-fit:cover}
+.selo{position:absolute;top:12px;left:12px;padding:4px 10px;border-radius:999px;background:rgba(255,255,255,.88);font-size:11px}
+.pontos{position:absolute;bottom:12px;left:0;right:0;display:flex;justify-content:center;gap:6px}
+.pontos i{width:6px;height:6px;border-radius:999px;background:rgba(255,255,255,.7)}
+.pontos i.on{width:18px;background:#FFFFFF}
+.tec .corpo{padding:18px 18px 20px}
+.tec h3{margin:0;font-size:20px;font-weight:700}
+.tec p{margin:6px 0 0;font-size:14px;line-height:1.5;color:#5D6178}
+.tec p.bom{color:#373857;font-size:13px}
+.linhas{margin-top:12px;display:flex;flex-direction:column;gap:8px}
+.linha{display:flex;align-items:center;justify-content:space-between;min-height:56px;padding:0 18px;border-radius:18px;background:#FFFFFF;border:1px solid rgba(55,56,87,.06);font-size:15px;font-weight:600}
+.linha.azul{background:#373857;color:#FFFFFF;border-color:transparent}
+.linha small{display:block;font-size:12px;font-weight:400;opacity:.75}
+.passos{margin-top:26px;position:relative;display:flex;justify-content:space-between}
+.passos:before{content:"";position:absolute;top:17px;left:18px;right:18px;height:2px;background:linear-gradient(90deg,#31C4EA 50%,rgba(55,56,87,.12) 50%)}
+.passo{position:relative;display:flex;flex-direction:column;align-items:center;gap:8px;width:64px;font-size:11px;font-weight:600;text-align:center;line-height:1.2}
+.passo span{display:grid;place-items:center;width:36px;height:36px;border-radius:50%;background:#31C4EA;color:#FFFFFF;font-size:13px;font-weight:700}
+.passo.depois span{background:#FFFFFF;color:#373857;border:2px solid rgba(55,56,87,.14)}
+.passo-atual{margin-top:18px;padding:16px 18px;border-radius:18px;background:#F5F7FA;font-size:14px;line-height:1.5;color:#5D6178}
+.passo-atual b{display:block;color:#373857;font-size:15px}
+.marcas{margin-top:22px;display:flex;align-items:center;gap:26px;overflow:hidden;opacity:.75}
+.marcas img{height:30px;width:auto;flex:none}
+.pergunta{display:flex;align-items:center;justify-content:space-between;min-height:58px;border-bottom:1px solid rgba(55,56,87,.1);font-size:15px;font-weight:600;gap:12px}
+.resposta{margin:-4px 0 0;padding:0 0 16px;border-bottom:1px solid rgba(55,56,87,.1);font-size:14px;color:#5D6178}
+.mais{display:inline-flex;align-items:center;gap:6px;margin-top:16px;min-height:44px;font-size:14px;font-weight:600;color:#373857}
+.fim{background:#373857;color:#FFFFFF;padding:52px 20px 28px}
+.fim h2{color:#FFFFFF}
+.fim .lead{color:rgba(255,255,255,.78)}
+.btn-tq{display:flex;align-items:center;justify-content:center;height:54px;border-radius:999px;background:#31C4EA;color:#373857;font-weight:600;font-size:16px;margin-top:22px}
+.btn-borda{display:flex;align-items:center;justify-content:center;height:54px;border-radius:999px;border:1px solid rgba(255,255,255,.35);color:#FFFFFF;font-weight:600;font-size:15px;margin-top:10px}
+.rodape{margin-top:40px;padding-top:26px;border-top:1px solid rgba(255,255,255,.15)}
+.redes{display:flex;gap:10px;margin-top:18px}
+.redes a{display:grid;place-items:center;width:44px;height:44px;border-radius:50%;border:1px solid rgba(255,255,255,.25);color:#FFFFFF}
+.info{margin-top:18px;font-size:14px;line-height:1.9;color:rgba(255,255,255,.8)}
+.acordeao{display:flex;justify-content:space-between;align-items:center;min-height:52px;border-top:1px solid rgba(255,255,255,.12);border-bottom:1px solid rgba(255,255,255,.12);margin-top:18px;font-size:14px;font-weight:600}
+.legal{margin-top:20px;font-size:11px;line-height:1.6;color:rgba(255,255,255,.55)}
+.nota{margin:0;padding:10px 20px;background:#FFF7D6;color:#5D6178;font-size:11px;line-height:1.45}
+</style>
+
+<div class="c">
+<div style="position: relative">
+<div class="barra">
+<img src="../../public/brand/whim-logo-horizontal.webp" alt="Whim Confecção e Estamparia">
+<button class="menu" type="button"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg>Menu</button>
+</div>
+<section class="hero">
+<img class="fundo" src="../../public/images/hero-oficina-celular-v2.webp" alt="">
+<div class="veu"></div>
+<div class="txt">
+<h1 class="vista"><b>V</b>ista</h1>
+<p class="sub">a sua marca, peça por peça.</p>
+<p class="apoio">Silk, DTF e bordado para empresas, escolas e eventos.</p>
+<a class="cta" href="#">Pedir orçamento no WhatsApp <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+<a class="link-claro" href="#">Ver o que fazemos <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6"></path></svg></a>
+</div>
+</section>
+</div>
+<p class="nota">Hero: texto embaixo, sobre a parte escura da foto; um botão só e o segundo vira link. O "Vista" fica alinhado à esquerda, sem a tinta animada ocupar o meio da foto.</p>
+
+<section class="sec">
+<h2>Uma oficina, <i>do fio à estampa.</i></h2>
+<p class="lead">Desde 2021, em Guarulhos, com todas as etapas no mesmo lugar.</p>
+<div class="video">
+<img src="../../public/images/oficina-silk-poster.webp" alt="Estampador passando tinta na tela de silk">
+<span class="play"><svg width="14" height="14" viewBox="0 0 24 24" fill="#373857" aria-hidden="true"><path d="M8 5v14l11-7z"></path></svg>Silk na mesa longa</span>
+</div>
+<ol class="etapas">
+<li><span>1</span>Gravação de telas</li>
+<li><span>2</span>Corte e costura</li>
+<li><span>3</span>Estampa</li>
+<li><span>4</span>Acabamento</li>
+</ol>
+</section>
+<p class="nota">Quem somos: só o vídeo (as duas fotos saem no celular) e as 4 etapas em blocos curtos, sem a frase de apoio de cada uma.</p>
+
+<section class="sec cinza">
+<h2>Três jeitos de <i>estampar sua marca.</i></h2>
+<div class="abas" role="tablist">
+<button class="on" type="button" role="tab" aria-selected="true">Silk</button>
+<button type="button" role="tab" aria-selected="false">DTF</button>
+<button type="button" role="tab" aria-selected="false">Bordado</button>
+</div>
+<article class="tec">
+<div class="foto">
+<img src="../../public/images/estilos/silk-close.webp" alt="Rodo passando tinta turquesa na tela de silk">
+<span class="selo">Imagem ilustrativa</span>
+<div class="pontos"><i class="on"></i><i></i><i></i></div>
+</div>
+<div class="corpo">
+<h3>Silk</h3>
+<p>Tinta grossa em cores chapadas, que dura muito.</p>
+<p class="bom"><b>Bom para:</b> logos de poucas cores e tiragens maiores.</p>
+</div>
+</article>
+<div class="linhas">
+<div class="linha"><span>Confecção<small>Do tecido ao acabamento</small></span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></div>
+<div class="linha"><span>Uniformes<small>Empresas e escolas</small></span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></div>
+<div class="linha azul"><span>Não sabe qual?<small>A equipe indica a técnica</small></span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></div>
+</div>
+</section>
+<p class="nota">Técnicas: uma de cada vez, trocando pelas abas (no lugar do carrossel de três cartões altos). Os três itens viram linhas curtas que abrem o detalhe.</p>
+
+<section class="sec">
+<h2>Do pedido <i>à entrega.</i></h2>
+<div class="passos">
+<div class="passo"><span>1</span>Monte a peça</div>
+<div class="passo"><span>2</span>Orçamento</div>
+<div class="passo"><span>3</span>Arte aprovada</div>
+<div class="passo depois"><span>4</span>Produção</div>
+<div class="passo depois"><span>5</span>Entrega</div>
+</div>
+<div class="passo-atual"><b>3 · Arte aprovada</b>Ajustamos a arte e enviamos para você aprovar.</div>
+</section>
+<p class="nota">Processo: os 5 passos numa linha; tocar num passo mostra a frase dele embaixo (uma frase por vez, não as cinco).</p>
+
+<section class="sec cinza" style="padding-bottom: 40px">
+<h2>Marcas que <i>confiam na Whim.</i></h2>
+<div class="marcas">
+<img src="../../public/clientes/santander.webp" alt="Santander">
+<img src="../../public/clientes/globo.webp" alt="Globo">
+<img src="../../public/clientes/lollapalooza.webp" alt="Lollapalooza">
+<img src="../../public/clientes/sbt.webp" alt="SBT">
+<img src="../../public/clientes/aurora.webp" alt="Aurora">
+</div>
+</section>
+
+<section class="sec">
+<h2>Antes de <i>pedir o orçamento.</i></h2>
+<div style="margin-top: 14px">
+<div class="pergunta" style="border-bottom: 0">Qual a quantidade mínima?<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 15l6-6 6 6"></path></svg></div>
+<p class="resposta">A partir de 50 peças por pedido.</p>
+<div class="pergunta">Quanto tempo leva?<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></div>
+<div class="pergunta">Qual técnica eu escolho?<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></div>
+<div class="pergunta">Vocês atendem a minha região?<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></div>
+</div>
+<a class="mais" href="#">Ver as 8 perguntas <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></a>
+</section>
+<p class="nota">Dúvidas: sem a foto grande no celular; as 4 primeiras perguntas e um link para mostrar as outras.</p>
+
+<section class="fim">
+<h2>Monte a sua <i>peça.</i></h2>
+<p class="lead">Peça, cor, estampa e quantidade em 5 passos. O orçamento chega pronto no WhatsApp.</p>
+<a class="btn-tq" href="#">Monte sua peça</a>
+<a class="btn-borda" href="#">Falar no WhatsApp</a>
+<div class="rodape">
+<img src="../../public/brand/whim-logo-horizontal.webp" alt="Whim Confecção e Estamparia" style="height: 40px; width: auto; filter: brightness(0) invert(1)">
+<div class="redes">
+<a href="#" aria-label="Instagram"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle></svg></a>
+<a href="#" aria-label="Facebook"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 3h-3a4 4 0 0 0-4 4v3H6v4h2v7h4v-7h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg></a>
+<a href="#" aria-label="WhatsApp"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 20l1.4-4A8 8 0 1 1 8 18.6z"></path></svg></a>
+</div>
+<div class="info">+55 11 94544-8802<br>vendas@whimconfeccao.com.br<br>Segunda a sexta, das 9h às 18h<br>Av. Brigadeiro Faria Lima, 110 · Cocaia</div>
+<div class="acordeao">Navegação<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></div>
+<div class="acordeao" style="margin-top: 0; border-top: 0">Ver no mapa<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8"></path></svg></div>
+<p class="legal">© 2026 Whim Confecção e Estamparia · Gallant Clothing Ltda · CNPJ 35.356.367/0001-27<br>Política de privacidade · Desenvolvido por Tribus Labs</p>
+</div>
+</section>
+<p class="nota">Rodapé: contatos e redes à vista; a navegação fica fechada num item e o mapa vira um link (sem o mapa embutido pesando a página).</p>
+</div>
+</x-dc>
+
+</body>
+</html>

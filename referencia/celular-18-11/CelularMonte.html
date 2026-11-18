@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Whim · Monte sua peça no celular</title>
+
+</head>
+<body>
+<x-dc>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0}
+.c{width:390px;font-family:Poppins,system-ui,sans-serif;color:#373857;background:#FFFFFF;box-sizing:border-box}
+.c *{box-sizing:border-box}
+.tela{position:relative;height:844px;overflow:hidden;border-bottom:1px dashed rgba(55,56,87,.25)}
+.barra{position:absolute;top:12px;left:12px;right:12px;height:58px;border-radius:999px;background:rgba(255,255,255,.95);display:flex;align-items:center;justify-content:space-between;padding:0 7px 0 8px;box-shadow:0 10px 30px -14px rgba(55,56,87,.45);z-index:3}
+.barra img{height:38px;width:auto}
+.menu{height:44px;padding:0 18px 0 16px;border-radius:999px;background:#373857;color:#FFFFFF;border:0;font:600 14px Poppins;display:flex;align-items:center;gap:8px}
+.fixo{position:absolute;top:82px;left:0;right:0;z-index:2;background:#FFFFFF;padding:0 12px 10px;box-shadow:0 14px 20px -18px rgba(55,56,87,.5)}
+.vitrine{position:relative;height:270px;border-radius:22px;background:#F5F7FA;overflow:hidden}
+.vitrine .cano{position:absolute;top:16px;left:18%;width:64%;height:14px}
+.vitrine .peca{position:absolute;left:50%;top:6px;transform:translateX(-50%);height:300px;width:auto}
+.lado{position:absolute;top:10px;left:10px;display:flex;padding:3px;border-radius:999px;background:#FFFFFF;border:1px solid rgba(55,56,87,.1);font-size:11px;font-weight:600}
+.lado span{padding:6px 12px;border-radius:999px}
+.lado .on{background:#373857;color:#FFFFFF}
+.arte{position:absolute;left:173px;top:112px;width:40px;height:26px;border:2px dashed #31C4EA;border-radius:6px;background:rgba(49,196,234,.15)}
+.resumo-curto{position:absolute;left:10px;right:10px;bottom:10px;display:flex;justify-content:space-between;align-items:center;padding:8px 12px;border-radius:14px;background:rgba(255,255,255,.92);font-size:12px}
+.resumo-curto b{font-weight:600}
+.trilho{display:flex;gap:6px;margin-top:10px;overflow:hidden}
+.chip{display:flex;align-items:center;gap:6px;flex:none;height:40px;padding:0 12px 0 6px;border-radius:999px;border:1px solid rgba(55,56,87,.12);font-size:13px;font-weight:500;color:#5D6178;background:#FFFFFF}
+.chip span{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:#F5F7FA;font-size:12px;font-weight:700;color:#373857}
+.chip.feito span{background:#373857;color:#FFFFFF}
+.chip.on{background:rgba(49,196,234,.16);border-color:transparent;color:#373857;font-weight:600}
+.chip.on span{background:#31C4EA;color:#FFFFFF}
+.conteudo{position:absolute;top:440px;left:0;right:0;padding:16px 16px 0}
+.conteudo h3{margin:0;font-size:18px;font-weight:700}
+.conteudo p{margin:4px 0 0;font-size:13px;color:#5D6178;line-height:1.5}
+.lados{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.lados b{display:block;font-size:12px;margin-bottom:6px}
+.opcao{display:flex;align-items:center;gap:10px;min-height:44px;font-size:13px}
+.opcao i{width:20px;height:20px;border-radius:6px;border:1.5px solid rgba(55,56,87,.35);flex:none}
+.opcao.on i{background:#373857;border-color:#373857}
+.acao{position:absolute;left:0;right:0;bottom:0;z-index:3;display:flex;align-items:center;gap:10px;padding:12px 16px 18px;background:#FFFFFF;box-shadow:0 -12px 22px -18px rgba(55,56,87,.55)}
+.voltar{height:50px;padding:0 18px;border-radius:999px;border:1px solid rgba(55,56,87,.18);background:#FFFFFF;font:600 15px Poppins;color:#373857}
+.continuar{flex:1;height:50px;border-radius:999px;border:0;background:#373857;color:#FFFFFF;font:600 15px Poppins;display:flex;align-items:center;justify-content:center;gap:8px}
+.zap{position:absolute;right:16px;bottom:86px;z-index:3;width:52px;height:52px;border-radius:50%;background:#31C4EA;display:grid;place-items:center;color:#373857}
+.rotulo{margin:0;padding:14px 16px;background:#F5F7FA;font-size:12px;font-weight:600;color:#5D6178}
+.nota{margin:0;padding:10px 16px;background:#FFF7D6;color:#5D6178;font-size:11px;line-height:1.5}
+.tela2 .conteudo{top:440px}
+.qtd{display:flex;align-items:center;justify-content:space-between;min-height:52px;border-bottom:1px solid rgba(55,56,87,.08);font-size:14px;font-weight:600}
+.qtd span.q{display:flex;align-items:center;gap:12px}
+.qtd i{display:grid;place-items:center;width:36px;height:36px;border-radius:50%;border:1px solid rgba(55,56,87,.18);font-style:normal;font-weight:600}
+.total{margin-top:10px;padding:10px 12px;border-radius:12px;background:#F5F7FA;font-size:13px}
+</style>
+
+<div class="c">
+<p class="rotulo">Tela 1 · passo Estampa (rolagem no topo do passo)</p>
+<div class="tela">
+<div class="barra">
+<img src="../../public/brand/whim-logo-horizontal.webp" alt="Whim Confecção e Estamparia">
+<button class="menu" type="button"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg>Menu</button>
+</div>
+<div class="fixo">
+<div class="vitrine">
+<img class="cano" src="../../public/arara/cano.webp" alt="">
+<img class="peca" src="../../public/arara/camiseta/cores/azul-marinho/026.webp" alt="Camiseta azul-marinho de frente">
+<div class="arte"></div>
+<div class="lado"><span class="on">Frente</span><span>Costas</span></div>
+<div class="resumo-curto"><span><b>Camiseta</b> · Azul-marinho · Silk</span><span>1 posição</span></div>
+</div>
+<div class="trilho" role="tablist" aria-label="Passos do pedido">
+<button class="chip feito" type="button"><span>✓</span>Peça</button>
+<button class="chip feito" type="button"><span>✓</span>Cor</button>
+<button class="chip on" type="button" aria-current="step"><span>3</span>Estampa</button>
+<button class="chip" type="button"><span>4</span>Quantidade</button>
+<button class="chip" type="button"><span>5</span>Resumo</button>
+</div>
+</div>
+<div class="conteudo">
+<h3>Onde vai a estampa?</h3>
+<p>Toque nas posições. Dá para marcar mais de uma.</p>
+<div class="lados">
+<div><b>Frente</b>
+<label class="opcao on"><i></i>Peito esquerdo</label>
+<label class="opcao"><i></i>Peito direito</label>
+<label class="opcao"><i></i>Centro do peito</label>
+<label class="opcao"><i></i>Frente inteira</label>
+</div>
+<div><b>Costas</b>
+<label class="opcao"><i></i>Nuca</label>
+<label class="opcao"><i></i>Costas em cima</label>
+<label class="opcao"><i></i>Costas inteira</label>
+<label class="opcao"><i></i>Mangas</label>
+</div>
+</div>
+</div>
+<a class="zap" href="#" aria-label="WhatsApp"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 20l1.4-4A8 8 0 1 1 8 18.6z"></path></svg></a>
+<div class="acao">
+<button class="voltar" type="button">Voltar</button>
+<button class="continuar" type="button">Continuar · Quantidade <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></button>
+</div>
+</div>
+<p class="nota">A vitrine fica presa embaixo da barra (270 px) com o resumo curto por cima; logo abaixo, os 5 passos numa linha, que rola de lado se precisar e mostra o passo atual com a mesma pílula turquesa da barra. Só o conteúdo do passo rola. Voltar e Continuar ficam sempre no pé da tela, dizendo qual é o próximo passo.</p>
+
+<p class="rotulo">Tela 2 · passo Quantidade</p>
+<div class="tela tela2">
+<div class="barra">
+<img src="../../public/brand/whim-logo-horizontal.webp" alt="Whim Confecção e Estamparia">
+<button class="menu" type="button"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg>Menu</button>
+</div>
+<div class="fixo">
+<div class="vitrine">
+<img class="cano" src="../../public/arara/cano.webp" alt="">
+<img class="peca" src="../../public/arara/camiseta/cores/azul-marinho/026.webp" alt="Camiseta azul-marinho de frente">
+<div class="arte" style="background: rgba(49,196,234,.55); border-style: solid"></div>
+<div class="lado"><span class="on">Frente</span><span>Costas</span></div>
+<div class="resumo-curto"><span><b>Camiseta</b> · Azul-marinho · Silk</span><span>60 peças</span></div>
+</div>
+<div class="trilho" role="tablist" aria-label="Passos do pedido" style="margin-left: -60px">
+<button class="chip feito" type="button"><span>✓</span>Peça</button>
+<button class="chip feito" type="button"><span>✓</span>Cor</button>
+<button class="chip feito" type="button"><span>✓</span>Estampa</button>
+<button class="chip on" type="button" aria-current="step"><span>4</span>Quantidade</button>
+<button class="chip" type="button"><span>5</span>Resumo</button>
+</div>
+</div>
+<div class="conteudo">
+<h3>Quantas peças?</h3>
+<p>Pedido mínimo de 50 peças, somando os tamanhos.</p>
+<div style="margin-top: 8px">
+<div class="qtd"><span>P</span><span class="q"><i>−</i>10<i>+</i></span></div>
+<div class="qtd"><span>M</span><span class="q"><i>−</i>20<i>+</i></span></div>
+<div class="qtd"><span>G</span><span class="q"><i>−</i>20<i>+</i></span></div>
+<div class="qtd"><span>GG</span><span class="q"><i>−</i>10<i>+</i></span></div>
+</div>
+<div class="total"><b>Total: 60 peças</b> · mínimo atingido</div>
+</div>
+<div class="acao">
+<button class="voltar" type="button">Voltar</button>
+<button class="continuar" type="button">Continuar · Resumo <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></button>
+</div>
+</div>
+<p class="nota">A linha de passos desliza sozinha para manter o passo atual à vista. A arara do topo da página vira o próprio passo 1 no celular (as peças na vitrine, trocando de lado), para a vitrine não ficar perdida lá em cima.</p>
+</div>
+</x-dc>
+
+</body>
+</html>
