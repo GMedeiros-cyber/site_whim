@@ -34,6 +34,9 @@ export function SiteHeader({
   // Seção da home em que a pessoa está (ou a que ela acabou de clicar): marca o link na barra.
   const [secao, setSecao] = useState<string | null>(null);
   const listaRef = useRef<HTMLUListElement>(null);
+  // Depois de um clique, a pílula fica no link clicado até a rolagem suave terminar (sem
+  // passar pelas seções do meio).
+  const travaRef = useRef(0);
   const [pilula, setPilula] = useState<{ left: number; width: number } | null>(null);
   const naHome = pathname === "/";
   const hrefAtivo = naHome ? (secao ?? "/") : null;
@@ -68,14 +71,15 @@ export function SiteHeader({
     };
   }, []);
 
-  // Na home, a seção que cruza a linha de 40% da tela define o link marcado.
+  // Na home, a seção que cruza a linha de 55% da tela define o link marcado.
   useEffect(() => {
     if (!naHome) return;
     const ids = links.map((l) => (l.href === "/" ? "topo" : l.href.split("#")[1])).filter(Boolean);
     let raf = 0;
     const ler = () => {
       raf = 0;
-      const linha = window.innerHeight * 0.4;
+      if (performance.now() < travaRef.current) return;
+      const linha = window.innerHeight * 0.55;
       let atual = ids[0];
       for (const id of ids) {
         const el = document.getElementById(id);
@@ -86,11 +90,18 @@ export function SiteHeader({
     const aoRolar = () => {
       raf ||= requestAnimationFrame(ler);
     };
+    // Fim da rolagem suave: solta a trava e lê a seção de novo.
+    const aoParar = () => {
+      travaRef.current = 0;
+      aoRolar();
+    };
     ler();
     window.addEventListener("scroll", aoRolar, { passive: true });
+    window.addEventListener("scrollend", aoParar);
     window.addEventListener("resize", aoRolar);
     return () => {
       window.removeEventListener("scroll", aoRolar);
+      window.removeEventListener("scrollend", aoParar);
       window.removeEventListener("resize", aoRolar);
       cancelAnimationFrame(raf);
     };
@@ -158,7 +169,7 @@ export function SiteHeader({
           <span
             aria-hidden
             className={cn(
-              "pointer-events-none absolute inset-y-0 rounded-full bg-accent/16 transition-[left,width,opacity] duration-350 ease-[cubic-bezier(.3,.7,.2,1)] motion-reduce:transition-none",
+              "pointer-events-none absolute inset-y-0 rounded-full bg-accent/16 transition-[left,width,opacity] duration-200 ease-out motion-reduce:transition-none",
               pilula ? "opacity-100" : "opacity-0"
             )}
             style={pilula ? { left: pilula.left, width: pilula.width } : undefined}
@@ -171,7 +182,11 @@ export function SiteHeader({
                   href={l.href}
                   data-href={l.href}
                   aria-current={marcado ? "location" : undefined}
-                  onClick={() => naHome && setSecao(l.href)}
+                  onClick={() => {
+                    if (!naHome) return;
+                    travaRef.current = performance.now() + 1200; // sem scrollend (Safari antigo)
+                    setSecao(l.href);
+                  }}
                   className={cn(
                     "block rounded-full px-4 py-3 text-[15px] font-medium whitespace-nowrap text-muted-foreground transition-colors hover:text-foreground",
                     marcado && "font-semibold text-foreground"
