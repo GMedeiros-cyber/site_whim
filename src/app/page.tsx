@@ -45,7 +45,12 @@ const sobrepoe =
 const cinza = "bg-muted/60";
 /** Título e linha de apoio que sobem ao entrar na tela. */
 const sobe = "home-sobe";
-const apoio = "mt-[18px] max-w-[56ch] text-base leading-relaxed text-pretty text-muted-foreground sm:text-[17px]";
+const apoio = "mt-[18px] max-w-[56ch] text-base leading-relaxed text-pretty text-muted-foreground sm:text-[17px] cel:mx-auto";
+/** Celular (pedido de 18/11 à noite): títulos, apoio e textos curtos no centro. */
+const centro = "cel:text-center";
+/** Celular: ~80 px em cima e embaixo de cada seção. Embaixo conta a seção seguinte, que sobe
+    28 px por cima desta (sobrepoe): 80 + 28. */
+const respiro = "cel:pt-20 cel:pb-[108px]";
 
 // Foto do topo com art direction: paisagem quando a tela é mais larga que alta, retrato
 // no resto (celular e tablet em pé). Mesma prioridade alta da foto anterior.
@@ -149,7 +154,8 @@ export default function Home() {
       <SiteHeader />
       <main className="flex-1">
         <Topo />
-        <div className="home-grande">
+        {/* Celular: "Marcas que confiam" sobe para logo depois da hero (order); no PC fica onde está. */}
+        <div className="home-grande cel:flex cel:flex-col">
           <QuemSomos />
           <OQueFazemos />
           <ComoFunciona />
@@ -170,8 +176,8 @@ function Topo() {
       <div
         className={cn(
           "relative isolate flex min-h-[calc(100svh-1rem)] flex-col items-center justify-center overflow-hidden rounded-[24px] bg-primary px-5 pt-28 pb-24 text-center text-primary-foreground md:min-h-[min(880px,calc(100svh-1.5rem))] md:rounded-[32px] min-[1800px]:min-h-[calc(100svh/var(--zoom)-1.5rem)]! md:px-10 md:pt-32 md:pb-28",
-          // Celular (referencia/celular-18-11): texto embaixo, alinhado à esquerda.
-          "cel:items-start cel:justify-end cel:px-[22px] cel:pb-8 cel:text-left",
+          // Celular: texto embaixo (referencia/celular-18-11), no centro (pedido de 18/11 à noite).
+          "cel:justify-end cel:px-[22px] cel:pb-8",
           "home-recua"
         )}
       >
@@ -218,7 +224,7 @@ function Topo() {
           {/* No celular, um botão só; o segundo vira link de texto. */}
           <a
             href="#servicos"
-            className="inline-flex min-h-11 items-center gap-1.5 self-start rounded-sm text-sm font-medium underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-foreground min-[601px]:hidden"
+            className="inline-flex min-h-11 items-center gap-1.5 self-center rounded-sm text-sm font-medium underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-foreground min-[601px]:hidden"
           >
             Ver o que fazemos <ArrowDownIcon aria-hidden className="size-4" />
           </a>
@@ -241,13 +247,13 @@ function Topo() {
 
 function QuemSomos() {
   return (
-    <section id="sobre" className={cn(secao, "relative isolate bg-background")}>
-      <Container className="grid gap-y-8 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-x-16 lg:gap-y-9">
+    <section id="sobre" className={cn(secao, respiro, "relative isolate bg-background")}>
+      <Container className="grid gap-y-8 cel:gap-y-0 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-x-16 lg:gap-y-9">
         <div className="lg:self-end">
-          <Titulo className={cn("max-w-[13ch]", sobe)}>
+          <Titulo className={cn("max-w-[13ch] cel:mx-auto", centro, sobe)}>
             Uma oficina, <Destaque>do fio à estampa.</Destaque>
           </Titulo>
-          <p className={cn(apoio, sobe, "cel:mt-3 cel:text-[15px]")}>
+          <p className={cn(apoio, centro, sobe, "cel:mt-3 cel:text-[15px]")}>
             <span className="cel:hidden">
               A Whim nasceu em 2021, quando o Wallan juntou 15 anos de experiência numa oficina
               própria em Guarulhos. Hoje a gente faz peças para empresas, escolas e eventos com todas
@@ -258,7 +264,7 @@ function QuemSomos() {
         </div>
 
         {/* Celular: só o vídeo, em 16:10 (as duas fotos do mosaico não aparecem nem baixam). */}
-        <figure className="relative -mt-2.5 aspect-[16/10] overflow-hidden rounded-[22px] bg-muted min-[601px]:hidden">
+        <figure className="relative mt-7 aspect-[16/10] overflow-hidden rounded-[22px] bg-muted min-[601px]:hidden">
           <VideoOficina src={FOTOS[0].video!} poster={FOTOS[0].src} rotulo={FOTOS[0].alt} />
           <figcaption className="absolute bottom-3 left-3 rounded-full bg-background/90 px-2.5 py-1.5 text-xs text-foreground">
             {FOTOS[0].legenda}
@@ -299,7 +305,7 @@ function QuemSomos() {
         </div>
 
         {/* No celular: blocos 2 × 2 numerados, só com o nome. */}
-        <ul className="grid grid-cols-2 gap-x-[18px] gap-y-4 sm:gap-x-7 sm:gap-y-[22px] lg:col-start-1 lg:self-start cel:-mt-3.5 cel:gap-2">
+        <ul className="grid grid-cols-2 gap-x-[18px] gap-y-4 sm:gap-x-7 sm:gap-y-[22px] lg:col-start-1 lg:self-start cel:mt-6 cel:gap-2">
           {OFICINA.map((etapa, i) => (
             <li
               key={etapa.nome}
@@ -320,9 +326,9 @@ function QuemSomos() {
 
 function OQueFazemos() {
   return (
-    <section id="servicos" className={cn(secao, sobrepoe, cinza)}>
+    <section id="servicos" className={cn(secao, respiro, sobrepoe, cinza)}>
       <Container>
-        <Titulo className={sobe}>
+        <Titulo className={cn(centro, sobe)}>
           Três jeitos de <Destaque>estampar sua marca.</Destaque>
         </Titulo>
         <p className={cn(apoio, sobe, "cel:hidden")}>
@@ -330,8 +336,8 @@ function OQueFazemos() {
         </p>
 
         {/* Celular: abas e um cartão só; linhas curtas no lugar dos três cartões de baixo. */}
-        <TecnicasAbas tecnicas={TECNICAS} className="mt-[22px] min-[601px]:hidden" />
-        <TambemLinhas itens={TAMBEM} whatsapp={WHATSAPP_TECNICA} className="mt-3 min-[601px]:hidden" />
+        <TecnicasAbas tecnicas={TECNICAS} className="mt-7 min-[601px]:hidden" />
+        <TambemLinhas itens={TAMBEM} whatsapp={WHATSAPP_TECNICA} className="mt-6 min-[601px]:hidden" />
 
         <div className="mt-9 md:mt-14 cel:hidden">
           <Carrossel rotulo="Técnicas de estampa" className="gap-3 md:grid md:grid-cols-3 md:gap-5">
@@ -361,15 +367,15 @@ function OQueFazemos() {
 
 function ComoFunciona() {
   return (
-    <section id="processo" className={cn(secao, sobrepoe, "bg-background")}>
+    <section id="processo" className={cn(secao, respiro, sobrepoe, "bg-background")}>
       <Container>
-        <Titulo className={sobe}>
+        <Titulo className={cn(centro, sobe)}>
           Do pedido <Destaque>à entrega.</Destaque>
         </Titulo>
         <div className="mt-10 lg:mt-16 cel:hidden">
           <Etapas />
         </div>
-        <EtapasCelular className="mt-[26px] min-[601px]:hidden" />
+        <EtapasCelular className="mt-7 min-[601px]:hidden" />
       </Container>
     </section>
   );
@@ -409,10 +415,17 @@ function ListaMarcas({ copia = false }: { copia?: boolean }) {
 
 function Clientes() {
   return (
-    <section id="clientes" className={cn(secao, sobrepoe, cinza)}>
+    // Celular: logo depois da hero (order-first), sem subir por cima dela; Quem somos não sobe
+    // por cima desta, então embaixo bastam 80 px. Título curto.
+    <section id="clientes" className={cn(secao, sobrepoe, cinza, centro, "cel:order-first cel:mt-0 cel:pt-20 cel:pb-20")}>
       <Container>
         <Titulo className={sobe}>
-          Marcas que <Destaque>confiam na Whim.</Destaque>
+          <span className="cel:hidden">
+            Marcas que <Destaque>confiam na Whim.</Destaque>
+          </span>
+          <span className="min-[601px]:hidden">
+            Marcas que <Destaque>confiam.</Destaque>
+          </span>
         </Titulo>
       </Container>
 
@@ -422,7 +435,7 @@ function Clientes() {
         tabIndex={0}
         role="region"
         aria-label="Clientes da Whim (o carrossel pausa com o foco)"
-        className="group mt-10 py-2 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset sm:mt-[52px]"
+        className="group mt-10 py-2 outline-none cel:mt-5 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset sm:mt-[52px]"
       >
         <div className="overflow-hidden [mask-image:linear-gradient(90deg,transparent,black_10%,black_90%,transparent)] motion-reduce:[mask-image:none]">
           <div
@@ -442,7 +455,8 @@ function Clientes() {
 
 function Duvidas() {
   return (
-    <section id="duvidas" className={cn(secao, sobrepoe, "bg-background")}>
+    // Celular: embaixo, a onda da chamada final sobe 38 px por cima (80 + 38).
+    <section id="duvidas" className={cn(secao, respiro, sobrepoe, "bg-background cel:pb-[118px]")}>
       {/* Foto à esquerda e perguntas à direita; no PC a foto acompanha a altura das perguntas
           (cresce junto quando uma resposta abre). No celular a foto vem em cima, menor.
           Imagem gerada com IA; o logo é o arquivo oficial aplicado por cima, sem redesenho. */}
@@ -457,11 +471,11 @@ function Duvidas() {
           />
         </div>
         <div>
-          <Titulo className={sobe}>
+          <Titulo className={cn(centro, sobe)}>
             Antes de <Destaque>pedir o orçamento.</Destaque>
           </Titulo>
           <p className={cn(apoio, sobe, "cel:hidden")}>As perguntas que mais chegam no WhatsApp, respondidas aqui.</p>
-          <div className="mt-8 md:mt-10 cel:mt-3.5">
+          <div className="mt-8 md:mt-10 cel:mt-7">
             <DuvidasAcordeao />
           </div>
         </div>
@@ -497,7 +511,7 @@ function Convite() {
         ))}
       </div>
       <Container>
-        <div className="flex flex-col items-center border-b border-primary-foreground/15 pt-20 pb-14 text-center md:pt-30 md:pb-24">
+        <div className="flex flex-col items-center border-b border-primary-foreground/15 pt-20 pb-14 text-center md:pt-30 md:pb-24 cel:pb-20">
           <h2 className={cn("text-5xl leading-none font-bold tracking-[-0.045em] md:text-[80px]", sobe)}>
             Monte a sua <em className="text-accent not-italic">peça.</em>
           </h2>

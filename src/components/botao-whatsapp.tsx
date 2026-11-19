@@ -51,10 +51,13 @@ export function BotaoWhatsApp() {
 
   return (
     // Celular no Monte sua peça: sobe acima da barra de Voltar/Continuar presa no pé da tela.
-    <div className="pointer-events-none fixed right-4 bottom-[calc(env(safe-area-inset-bottom)+1rem)] z-40 flex flex-col items-end gap-2.5 max-[600px]:[body:has([data-barra-acoes])_&]:bottom-[calc(env(safe-area-inset-bottom)+5.5rem)] max-[600px]:[body:has([data-barra-acoes][data-ultimo])_&]:hidden md:right-6 md:bottom-[calc(env(safe-area-inset-bottom)+1.5rem)]">
+    // Celular na home: some enquanto a linha Confecção | Uniformes | Não sabe qual? passa pelo pé
+    // da tela (html[data-sem-flutuante], tecnicas-celular.tsx), para não cobri-la.
+    <div className="pointer-events-none fixed right-4 bottom-[calc(env(safe-area-inset-bottom)+1rem)] z-40 flex flex-col items-end gap-2.5 max-[600px]:[body:has([data-barra-acoes])_&]:bottom-[calc(env(safe-area-inset-bottom)+5.5rem)] max-[600px]:[body:has([data-barra-acoes][data-ultimo])_&]:hidden max-[600px]:[html[data-sem-flutuante]_&]:invisible md:right-6 md:bottom-[calc(env(safe-area-inset-bottom)+1.5rem)]">
       {dica && (
         // Por cima do botão (absolute): se entrasse no fluxo, o bloco fixo cresceria e contaria como CLS.
-        <div className="pointer-events-auto absolute right-0 bottom-[calc(100%+0.625rem)] flex w-max max-w-[210px] items-start rounded-[16px_16px_4px_16px] border border-primary/8 bg-background py-0.5 pr-0.5 pl-3.5 text-[13px] leading-snug text-foreground shadow-[0_14px_30px_-18px] shadow-primary/55 duration-500 ease-[cubic-bezier(.2,.9,.3,1.3)] animate-in fade-in zoom-in-90 slide-in-from-bottom-2 motion-reduce:animate-none md:max-w-[250px]">
+        // No Monte sua peça do celular não aparece: abriria por cima das caixas dos passos (teste do agente 3).
+        <div className="pointer-events-auto absolute max-[600px]:[body:has([data-barra-acoes])_&]:hidden right-0 bottom-[calc(100%+0.625rem)] flex w-max max-w-[210px] items-start rounded-[16px_16px_4px_16px] border border-primary/8 bg-background py-0.5 pr-0.5 pl-3.5 text-[13px] leading-snug text-foreground shadow-[0_14px_30px_-18px] shadow-primary/55 duration-500 ease-[cubic-bezier(.2,.9,.3,1.3)] animate-in fade-in zoom-in-90 slide-in-from-bottom-2 motion-reduce:animate-none md:max-w-[250px]">
           <p className="py-2">Oi! Quer um orçamento? A nossa equipe responde no WhatsApp.</p>
           <button
             type="button"

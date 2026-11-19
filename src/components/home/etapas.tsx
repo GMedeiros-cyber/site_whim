@@ -156,7 +156,7 @@ export function EtapasCelular({ className }: { className?: string }) {
         id={`${id}-frase`}
         role="tabpanel"
         aria-labelledby={`${id}-passo${atual}`}
-        className="mt-[18px] rounded-[18px] bg-muted px-[18px] py-4 text-sm leading-normal text-muted-foreground"
+        className="mt-7 rounded-[18px] bg-muted px-[18px] py-4 text-center text-sm leading-normal text-muted-foreground"
       >
         <b className="block text-[15px] font-semibold text-foreground">
           {atual + 1} · {PASSOS[atual].nome}

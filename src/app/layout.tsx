@@ -20,6 +20,10 @@ export const metadata: Metadata = {
   title: "Whim Confecção e Estamparia",
   description: "Silk, DTF, bordado e confecção para empresas, escolas e confecções em Guarulhos/SP.",
   verification: { google: process.env.GOOGLE_SITE_VERIFICATION },
+  // O Safari do iPhone transforma telefone, CEP, CNPJ e endereço em links mexendo no HTML antes do
+  // React hidratar: o React não reconhece o DOM (erro #418), recria a página (a abertura recomeça) e
+  // depois pode falhar ao mexer nesses nós ("not a child of this node"). Os contatos já são links.
+  formatDetection: { telephone: false, address: false, email: false, date: false },
 };
 
 export const viewport: Viewport = {

@@ -5,7 +5,6 @@ import { useLayoutEffect, useRef, useSyncExternalStore } from "react";
 import "./abertura.css";
 import {
   EVENTO_FIM,
-  EVENTO_REINICIO,
   SCRIPT_CARGA,
   aberturaNaTela,
   avisarFimDaAbertura,
@@ -14,11 +13,7 @@ import {
 
 const assinar = (avisar: () => void) => {
   window.addEventListener(EVENTO_FIM, avisar);
-  window.addEventListener(EVENTO_REINICIO, avisar);
-  return () => {
-    window.removeEventListener(EVENTO_FIM, avisar);
-    window.removeEventListener(EVENTO_REINICIO, avisar);
-  };
+  return () => window.removeEventListener(EVENTO_FIM, avisar);
 };
 
 /**

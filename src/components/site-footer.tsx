@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { cacheLife } from "next/cache";
-import { ArrowUpRightIcon, ChevronDownIcon } from "lucide-react";
+import { ArrowUpRightIcon } from "lucide-react";
 
 import { Container } from "@/components/blocos";
 import { LinkNav } from "@/components/link-nav";
@@ -28,7 +28,8 @@ export function SiteFooter() {
     <footer className="bg-primary pt-14 pb-[calc(env(safe-area-inset-bottom)+6.5rem)] text-sm text-primary-foreground/75 sm:pt-16">
       {/* Telas grandes: 1520 px a partir de 1800 px, como a home e o Monte sua peça. */}
       <Container className="min-[112.5rem]:max-w-[1520px]">
-        <div className="grid gap-x-10 gap-y-10 sm:grid-cols-2 lg:grid-cols-[1.15fr_0.8fr_1.15fr_1.7fr]">
+        <RodapeCelular />
+        <div className="grid gap-x-10 gap-y-10 cel:hidden sm:grid-cols-2 lg:grid-cols-[1.15fr_0.8fr_1.15fr_1.7fr]">
           {/* Marca */}
           <div className="flex flex-col items-start gap-4">
             <Link href="/" aria-label="Whim Confecção e Estamparia, página inicial" className="rounded-sm">
@@ -45,7 +46,7 @@ export function SiteFooter() {
             </p>
           </div>
 
-          <Coluna id="navegacao" titulo="Navegação" className="cel:hidden">
+          <Coluna id="navegacao" titulo="Navegação">
             <Navegacao />
           </Coluna>
 
@@ -81,26 +82,14 @@ export function SiteFooter() {
               title="Mapa com a localização da Whim"
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
-              className="mt-1 h-[190px] w-full rounded-[18px] border border-primary-foreground/15 bg-primary-foreground/10 cel:hidden"
+              className="mt-1 h-[190px] w-full rounded-[18px] border border-primary-foreground/15 bg-primary-foreground/10"
             />
             <a href={CONTATO.mapa} {...novaAba} className={cn(link, "w-fit")}>
-              <span className="cel:hidden">Abrir no Google Maps</span>
-              <span className="min-[601px]:hidden">Ver no mapa</span>
+              Abrir no Google Maps
               <ArrowUpRightIcon aria-hidden className="size-3.5 text-accent" />
               <span className="sr-only"> (abre em nova aba)</span>
             </a>
           </Coluna>
-
-          {/* Celular: a navegação fica fechada num acordeão, depois dos contatos. */}
-          <details className="group min-[601px]:hidden">
-            <summary className="flex min-h-13 cursor-pointer list-none items-center justify-between rounded-sm border-y border-primary-foreground/12 text-sm font-semibold text-primary-foreground outline-none focus-visible:ring-3 focus-visible:ring-ring/50 [&::-webkit-details-marker]:hidden">
-              Navegação
-              <ChevronDownIcon aria-hidden className="size-[18px] transition-transform duration-300 group-open:rotate-180 motion-reduce:transition-none" />
-            </summary>
-            <div className="pt-2">
-              <Navegacao />
-            </div>
-          </details>
         </div>
 
         <div className="mt-12 flex flex-col gap-3 border-t border-primary-foreground/15 pt-6 text-xs leading-relaxed text-primary-foreground/60 md:flex-row md:items-center md:justify-between md:gap-8">
@@ -130,9 +119,58 @@ export function SiteFooter() {
   );
 }
 
-function Navegacao() {
+/**
+ * Rodapé do celular (abaixo de 601 px; as colunas do PC ficam escondidas e o mapa embutido não
+ * baixa): logo → redes → contatos → Navegação (sempre à vista, em duas colunas) → Ver no mapa
+ * (referencia/celular-18-11 e pedido de 18/11 à noite).
+ */
+function RodapeCelular() {
   return (
-    <ul className="grid grid-cols-2 gap-x-6 sm:flex sm:flex-col lg:gap-1">
+    <div className="flex flex-col items-start gap-6 min-[601px]:hidden">
+      <Link href="/" aria-label="Whim Confecção e Estamparia, página inicial" className="rounded-sm">
+        <Image src="/brand/whim-logo-branco.svg" alt="" width={444} height={138} className="h-11 w-auto" />
+      </Link>
+      <RedesSociais />
+      <ul aria-label="Contatos" className="flex flex-col">
+        <li>
+          <a href={`https://wa.me/${WHATSAPP}`} className={link}>
+            <span className="sr-only">WhatsApp: </span>
+            {CONTATO.whatsapp}
+          </a>
+        </li>
+        <li>
+          <a href={`mailto:${CONTATO.email}`} className={cn(link, "break-all")}>
+            <span className="sr-only">E-mail: </span>
+            {CONTATO.email}
+          </a>
+        </li>
+        <li className="flex min-h-11 items-center">{CONTATO.horario}</li>
+        <li className="py-2.5">
+          <address className="not-italic">
+            <Linha partes={CONTATO.logradouro.split(" · ")} />
+            <br />
+            <Linha partes={[CONTATO.bairro, CONTATO.cidade]} /> · CEP {CONTATO.cep}
+          </address>
+        </li>
+      </ul>
+      <section aria-labelledby="rodape-navegacao-celular" className="w-full">
+        <h2 id="rodape-navegacao-celular" className="text-sm font-semibold text-primary-foreground">
+          Navegação
+        </h2>
+        <Navegacao className="mt-2" />
+      </section>
+      <a href={CONTATO.mapa} {...novaAba} className={cn(link, "-mt-2 w-fit")}>
+        Ver no mapa
+        <ArrowUpRightIcon aria-hidden className="size-3.5 text-accent" />
+        <span className="sr-only"> (abre em nova aba)</span>
+      </a>
+    </div>
+  );
+}
+
+function Navegacao({ className }: { className?: string }) {
+  return (
+    <ul className={cn("grid grid-cols-2 gap-x-6 sm:flex sm:flex-col lg:gap-1", className)}>
       {[...NAVEGACAO, ACAO].map((l) => (
         <li key={l.href}>
           <LinkNav href={l.href} className={link}>

@@ -32,13 +32,13 @@ export function ContatoAvaliacoes() {
     <section id="contato" aria-labelledby="contato-titulo" className={cn(secao, "bg-muted")}>
       {/* Telas grandes: a mesma largura do personalizador (1520 px a partir de 1800 px). */}
       <Container className="min-[112.5rem]:max-w-[1520px]">
-        <Titulo id="contato-titulo">
+        <Titulo id="contato-titulo" className="cel:text-center">
           Fale com <Destaque>a Whim.</Destaque>
         </Titulo>
 
         {/* Celular (proposta de 18/11): o depoimento primeiro, depois o formulário e, no fim, os
             contatos como atalhos de toque. No PC fica como está. */}
-        <p className="mt-2 text-sm text-muted-foreground min-[601px]:hidden">A equipe responde pelo WhatsApp, de segunda a sexta.</p>
+        <p className="mt-2 text-sm text-muted-foreground min-[601px]:hidden cel:text-center">A equipe responde pelo WhatsApp, de segunda a sexta.</p>
         {MOSTRAR_AVALIACOES && (
           <DepoimentoCelular depoimentos={DEPOIMENTOS} emBreve={DEPOIMENTOS.length < 3} mapa={CONTATO.mapa} className="mt-6 min-[601px]:hidden" />
         )}
@@ -48,8 +48,8 @@ export function ContatoAvaliacoes() {
             MOSTRAR_AVALIACOES ? "lg:grid-cols-[minmax(0,600px)_minmax(0,1fr)]" : "max-w-[720px]"
           )}>
           <div className="px-4 pt-6 pb-8 sm:px-7 sm:pt-8 lg:px-9 lg:py-10">
-            <h3 className="text-xl font-semibold tracking-[-0.01em]">Mande sua mensagem</h3>
-            <p className="mt-2 text-sm text-muted-foreground">
+            <h3 className="text-xl font-semibold tracking-[-0.01em] cel:text-center">Mande sua mensagem</h3>
+            <p className="mt-2 text-sm text-muted-foreground cel:text-center">
               Abre o WhatsApp com tudo escrito. É só enviar.
             </p>
             <FormContato className="mt-6" />

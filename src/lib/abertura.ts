@@ -10,7 +10,6 @@
  * Na carga, quem marca "abertura" é SCRIPT_CARGA (script em linha: só roda na carga).
  */
 export const EVENTO_FIM = "whim:abertura-fim";
-export const EVENTO_REINICIO = "whim:abertura-reinicio";
 
 type Fase = "abertura" | "tinta";
 

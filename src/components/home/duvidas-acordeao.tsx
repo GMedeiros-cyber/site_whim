@@ -10,9 +10,11 @@ import { cn } from "@/lib/utils";
  * Acordeão das Dúvidas frequentes: uma pergunta aberta por vez (a primeira começa aberta),
  * seta que gira e abertura suave (linhas da grade de 0fr a 1fr). Cada pergunta é um
  * <button aria-expanded> dentro de um h3; a resposta fechada fica inerte (fora do leitor).
- * No celular aparecem as 4 primeiras e "Ver as 8 perguntas" mostra o resto.
+ * No celular aparecem 4 (a 4ª é "Vocês atendem a minha região?", pedido de 18/11 à noite) e
+ * "Ver as 8 perguntas" mostra o resto, na ordem de sempre.
  */
-const NO_CELULAR = 4;
+const NO_CELULAR = [0, 1, 2, 6];
+const PRIMEIRA_ESCONDIDA = DUVIDAS.findIndex((_, i) => !NO_CELULAR.includes(i));
 
 export function DuvidasAcordeao() {
   const [aberta, setAberta] = useState<number | null>(0);
@@ -25,7 +27,7 @@ export function DuvidasAcordeao() {
         {DUVIDAS.map((d, i) => {
           const ativa = aberta === i;
           return (
-            <div key={d.pergunta} className={cn("border-b", !todas && i >= NO_CELULAR && "cel:hidden")}>
+            <div key={d.pergunta} className={cn("border-b", !todas && !NO_CELULAR.includes(i) && "cel:hidden")}>
               <h3>
                 <button
                   type="button"
@@ -75,10 +77,10 @@ export function DuvidasAcordeao() {
           type="button"
           onClick={() => {
             setTodas(true);
-            // a 5ª pergunta recebe o foco (teclado e leitor de tela seguem dali)
-            requestAnimationFrame(() => document.getElementById(`${id}-p${NO_CELULAR}`)?.focus());
+            // a primeira pergunta que estava escondida recebe o foco (teclado e leitor de tela seguem dali)
+            requestAnimationFrame(() => document.getElementById(`${id}-p${PRIMEIRA_ESCONDIDA}`)?.focus());
           }}
-          className="mt-4 inline-flex min-h-11 cursor-pointer items-center gap-1.5 rounded-sm text-sm font-semibold underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring min-[601px]:hidden"
+          className="mx-auto mt-4 flex w-fit min-h-11 cursor-pointer items-center gap-1.5 rounded-sm text-sm font-semibold underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring min-[601px]:hidden"
         >
           Ver as {DUVIDAS.length} perguntas <ChevronDownIcon aria-hidden className="size-4" />
         </button>

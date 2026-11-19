@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import Image from "next/image";
 import { ArrowLeftIcon, CheckIcon, DownloadIcon, InfoIcon, MinusIcon, PlusIcon, Share2Icon } from "lucide-react";
 
-import { Arara, CORES, MODELOS, usePoucoMovimento, type Cor } from "@/components/arara";
+import { Arara, AraraGrade, CORES, MODELOS, usePoucoMovimento, type Cor } from "@/components/arara";
 import { Container, Destaque, Seta, Titulo } from "@/components/blocos";
 import {
   conflitos,
@@ -359,10 +359,9 @@ export function Personalizador() {
         return (
           <>
             <p className="text-sm text-muted-foreground max-[600px]:hidden">Também dá para escolher direto na arara.</p>
-            {/* Celular: a arara do topo vira este passo, para a vitrine ficar presa no alto (a
-                margem de 4 px faz o trilho da arara ir de ponta a ponta da tela). */}
-            <div className="mx-1 min-[601px]:hidden">
-              <Arara selecionada={peca} cor={cor.hex} onEscolher={trocarPeca} />
+            {/* Celular: este passo é só a arara, com todas as peças (a vitrine presa entra no passo Cor). */}
+            <div className="mt-2 min-[601px]:hidden">
+              <AraraGrade selecionada={peca} cor={cor.hex} onEscolher={trocarPeca} />
             </div>
             <ToggleGroup aria-label="Peça" value={[peca]} onValueChange={escolha(trocarPeca)} className="mt-3.5 flex-wrap max-[600px]:hidden">
               {PECAS.map((p) => (
@@ -382,7 +381,7 @@ export function Personalizador() {
       case 1:
         return (
           <>
-            <p className="text-sm text-muted-foreground">As cores da vitrine são exemplos. Toque numa das camisas para ver na prévia.</p>
+            <p className="text-sm text-muted-foreground max-[600px]:text-center">As cores da vitrine são exemplos. Toque numa das camisas para ver na prévia.</p>
             <CoresVitrine modelo={modelo} cor={cor} onCor={(c) => mudar({ cor: c, usaOutra: false })} className="mt-3.5 min-[601px]:hidden" />
             <ToggleGroup
               aria-label="Cor"
@@ -420,7 +419,7 @@ export function Personalizador() {
       case 2:
         return (
           <>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-muted-foreground max-[600px]:text-center">
               <span className="pointer-coarse:hidden">Clique onde vai a estampa.</span>
               <span className="hidden pointer-coarse:inline">Toque onde vai a estampa.</span> Dá para marcar mais de uma posição.
               Tamanho máximo da estampa: A3.
@@ -472,7 +471,7 @@ export function Personalizador() {
       case 3:
         return (
           <>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-muted-foreground max-[600px]:text-center">
               Pedido mínimo de {MINIMO} peças. Prazo de produção de 20 a 30 dias, conforme quantidade e modelo.
             </p>
             <Tamanhos tamanhos={tamanhos} onTamanhos={(t) => mudar({ tamanhos: t })} />
@@ -561,8 +560,12 @@ export function Personalizador() {
   return (
     <section
       id="personalizar"
-      // --vitrine: altura da vitrine presa do celular (270 px, menos em telas baixas).
-      className="scroll-mt-24 pt-[132px] [--vitrine:clamp(170px,32svh,270px)] max-[600px]:pt-[calc(env(safe-area-inset-top)+82px)] sm:pt-[168px]"
+      // --vitrine: altura da vitrine presa do celular (270 px, menos em telas baixas); no passo
+      // Peça ela não aparece (só a arara, pedido de 18/11 à noite).
+      className={cn(
+        "scroll-mt-24 pt-[132px] [--vitrine:clamp(170px,32svh,270px)] max-[600px]:pt-[calc(env(safe-area-inset-top)+82px)] sm:pt-[168px]",
+        passo === 0 && "max-[600px]:[--vitrine:0px]"
+      )}
     >
       <Container className={cn("pb-3 max-[600px]:p-0 sm:pb-8", LARGO)}>
         <Titulo as="h1" className="max-[600px]:sr-only">
@@ -605,7 +608,7 @@ export function Personalizador() {
         {/* Celular: vitrine e linha de passos presas embaixo da barra; quando a barra some (rolando
             para baixo), sobem junto com ela. A faixa branca de cima cobre o que rola por trás da barra. */}
         <div className={cn("min-w-0 @container lg:self-stretch", PRESA)}>
-          <div ref={previaRef} className={cn("lg:h-[min(100%,100svh-8rem)] lg:min-h-[max(30rem,min(125cqw,100svh-8rem))] max-[600px]:relative", FIXA)}>
+          <div ref={previaRef} className={cn("lg:h-[min(100%,100svh-8rem)] lg:min-h-[max(30rem,min(125cqw,100svh-8rem))] max-[600px]:relative", FIXA, passo === 0 && "max-[600px]:hidden")}>
             <PreviaPeca modelo={modelo} cor={cor} onCor={(c) => mudar({ cor: c, usaOutra: false })} estampa={estampa} />
             <p className="pointer-events-none absolute inset-x-2.5 bottom-2.5 flex items-center justify-between gap-3 rounded-[14px] bg-background/92 px-3 py-2 text-xs min-[601px]:hidden">
               <span className="min-w-0 truncate">
@@ -707,7 +710,7 @@ export function Personalizador() {
                         <p
                           ref={tituloRef}
                           tabIndex={-1}
-                          className="scroll-mt-28 pt-0.5 font-semibold outline-none max-[600px]:scroll-mt-[calc(env(safe-area-inset-top)+var(--vitrine)+158px)] max-[600px]:text-lg max-[600px]:font-bold min-[601px]:pt-1"
+                          className="scroll-mt-28 pt-0.5 font-semibold outline-none max-[600px]:scroll-mt-[calc(env(safe-area-inset-top)+var(--vitrine)+158px)] max-[600px]:text-center max-[600px]:text-lg max-[600px]:font-bold min-[601px]:pt-1"
                         >
                           <span className="max-[600px]:hidden">{p.nome}</span>
                           <span className="hidden max-[600px]:inline">{p.pergunta}</span>

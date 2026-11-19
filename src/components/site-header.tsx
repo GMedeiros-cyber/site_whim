@@ -83,13 +83,17 @@ export function SiteHeader({
       }
       const linha = window.innerHeight * 0.55;
       const noFim = window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 4;
+      // A seção mais de baixo que já passou da linha; no pé da página, a mais de baixo de todas
+      // (mesmo que não chegue à linha). Pela posição e não pela ordem da lista: no celular,
+      // Clientes vem logo depois do topo (pedido de 18/11 à noite).
       let atual = ids[0];
+      let maisBaixo = -Infinity;
       for (const id of ids) {
-        const el = document.getElementById(id);
-        if (el && el.getBoundingClientRect().top <= linha) atual = id;
+        const topo = document.getElementById(id)?.getBoundingClientRect().top;
+        if (topo === undefined || (!noFim && topo > linha) || topo <= maisBaixo) continue;
+        maisBaixo = topo;
+        atual = id;
       }
-      // No pé da página, a última seção da barra (mesmo que não chegue à linha).
-      if (noFim) atual = ids[ids.length - 1];
       setSecao(atual === "topo" ? "/" : `/#${atual}`);
     };
     const aoRolar = () => {

@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef } from "react";
 
-import { EVENTO_REINICIO, avisarVistaPronta, depoisDaAbertura, faseIntro } from "@/lib/abertura";
+import { avisarVistaPronta, depoisDaAbertura, faseIntro } from "@/lib/abertura";
 
 const ATRASO = 250; // ms antes de a tinta entrar
 const DURACAO = 2500; // ms da pintura inteira
@@ -71,21 +71,17 @@ const rgb = (cor: string) =>
  * palavra da esquerda para a direita (~60 quadros/s); um toque ou uma tecla pula.
  * No fim o texto em CSS (mesmo degradê) assume, o canvas some e a barra de navegação entra.
  * Sem a entrada (chegou por outro link), movimento reduzido ou sem WebGL: aparece pronta.
+ * O canvas é do React (vem no HTML, vazio): o efeito só desenha nele, nunca põe nem tira nós
+ * do DOM à mão (DOM mexido fora do React derruba a página com "not a child of this node").
  */
 export function PalavraTinta({ children }: { children: string }) {
   const textoRef = useRef<HTMLSpanElement>(null);
-  const [vez, setVez] = useState(0);
-
-  // Logo clicado na home: a entrada recomeça e a palavra é pintada de novo.
-  useEffect(() => {
-    const recomecar = () => setVez((v) => v + 1);
-    window.addEventListener(EVENTO_REINICIO, recomecar);
-    return () => window.removeEventListener(EVENTO_REINICIO, recomecar);
-  }, []);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useLayoutEffect(() => {
     const texto = textoRef.current;
-    if (!texto?.parentElement) return;
+    const canvas = canvasRef.current;
+    if (!texto?.parentElement || !canvas) return;
     const pronta = () => {
       texto.dataset.estado = "pronta";
       avisarVistaPronta();
@@ -99,11 +95,6 @@ export function PalavraTinta({ children }: { children: string }) {
     let timer = 0;
     let inicio = 0;
     let gl: WebGLRenderingContext | null = null;
-    // Canvas novo a cada pintura (o da anterior teve o WebGL liberado); sai no fim.
-    const canvas = document.createElement("canvas");
-    canvas.setAttribute("aria-hidden", "true");
-    canvas.className =
-      "pointer-events-none absolute text-accent opacity-0 transition-opacity duration-300 data-ativo:opacity-100";
     // Pular = o próximo quadro já é o último. Toque, tecla, resize, aba oculta
     // ou o topo saindo da tela.
     const pular = () => {
@@ -118,9 +109,12 @@ export function PalavraTinta({ children }: { children: string }) {
       if (liga) fora.observe(texto);
       else fora.disconnect();
     };
+    // Libera o WebGL e a memória do canvas (ele fica vazio, invisível, na árvore).
     const soltarGl = () => {
       gl?.getExtension("WEBGL_lose_context")?.loseContext();
-      canvas.remove();
+      gl = null;
+      delete canvas.dataset.ativo;
+      canvas.width = canvas.height = 0;
     };
 
     const comecar = () => {
@@ -128,7 +122,6 @@ export function PalavraTinta({ children }: { children: string }) {
       const r = texto.getBoundingClientRect();
       if (r.bottom < 0 || r.top > innerHeight) return pronta(); // já rolou para longe
       const cs = getComputedStyle(texto);
-      texto.after(canvas);
       document.fonts
         .load(`${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`, children)
         .catch(() => {})
@@ -173,14 +166,14 @@ export function PalavraTinta({ children }: { children: string }) {
       clearTimeout(timer);
       ouvir(false);
       soltarGl();
-      // Saiu da home no meio da entrada (a página fica escondida pelo Next, ainda no DOM):
-      // a barra das outras páginas não pode ficar escondida.
-      queueMicrotask(() => texto.checkVisibility() || avisarVistaPronta());
+      // Saiu da home no meio da entrada (a página fica escondida pelo Next, ainda no DOM): a
+      // entrada acaba. getClientRects e não checkVisibility (que falta no iOS anterior ao 17.4).
+      queueMicrotask(() => texto.getClientRects().length > 0 || avisarVistaPronta());
     };
-  }, [children, vez]);
+  }, [children]);
 
   return (
-    <span className="relative mx-auto block w-fit text-primary-foreground cel:mx-0">
+    <span className="relative mx-auto block w-fit text-primary-foreground">
       <span
         ref={textoRef}
         // O padding (desfeito pela margem) deixa o pingo do "i" e o fim do "a"
@@ -189,6 +182,13 @@ export function PalavraTinta({ children }: { children: string }) {
       >
         {children}
       </span>
+      <canvas
+        ref={canvasRef}
+        aria-hidden
+        width={0}
+        height={0}
+        className="pointer-events-none absolute text-accent opacity-0 transition-opacity duration-300 data-ativo:opacity-100"
+      />
     </span>
   );
 }

@@ -278,6 +278,58 @@ function liberar(b: Banco) {
 }
 
 /**
+ * Arara do passo Peça no celular (pedido de 18/11 à noite): todas as peças à vista, de frente e
+ * maiores, em fileiras de 3 (sem rolar de lado), cada fileira no seu cano. A escolhida fica com o
+ * fundo turquesa claro e o nome em negrito. Só o quadro parado de frente (sem canvas nem giro).
+ */
+export function AraraGrade({ selecionada, cor, onEscolher }: { selecionada: string; cor: string; onEscolher: (nome: string) => void }) {
+  const fileiras = [MODELOS.slice(0, 3), MODELOS.slice(3)];
+  return (
+    // --w: 1/3 da largura útil (16 px de cada lado e 8 px entre as peças); --cano como na arara.
+    <div role="group" aria-label="Arara de modelos" className="[--cano:calc(var(--w)*0.1067)] [--w:calc((100vw-3rem)/3)]">
+      {fileiras.map((fileira, f) => (
+        <div
+          key={f}
+          className={cn("mx-auto", f > 0 && "mt-4")}
+          style={{ width: `calc(var(--w) * ${fileira.length} + ${(fileira.length - 1) * 0.5}rem)` }}
+        >
+          <div aria-hidden className="h-(--cano) w-full bg-size-[100%_100%] mix-blend-multiply" style={{ backgroundImage: `url(${CANO.arquivo})` }} />
+          <ul className="flex gap-2">
+            {fileira.map((m) => {
+              const escolhida = m.nome === selecionada;
+              return (
+                <li key={m.id} className="w-(--w)">
+                  <button
+                    type="button"
+                    aria-pressed={escolhida}
+                    onClick={() => onEscolher(m.nome)}
+                    className={cn(
+                      "flex w-full cursor-pointer flex-col items-center gap-1 rounded-2xl px-1 pb-2 outline-none transition-colors focus-visible:ring-3 focus-visible:ring-ring/50 motion-reduce:transition-none",
+                      escolhida && "bg-accent/16"
+                    )}
+                  >
+                    {/* O gancho cai no eixo do cano, como na arara (manifest.gancho). */}
+                    <Image
+                      src={`${m.coresPasta}${pastaDaCor(escolhida ? cor : corPropria(m))}/${String(m.coresQuadros).padStart(3, "0")}.webp`}
+                      alt=""
+                      width={m.largura}
+                      height={m.altura}
+                      unoptimized
+                      className={cn("-mt-[calc(var(--cano)/2+var(--w)*0.0875)] aspect-[3/4] w-full max-w-none", ESPELHADAS.has(m.id) && "-scale-x-100")}
+                    />
+                    <span className={cn("text-[13px] leading-tight", escolhida ? "font-semibold" : "text-muted-foreground")}>{m.nome}</span>
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/**
  * Arara de modelos: hover (ou foco pelo teclado) gira a peça para a frente; um clique ou
  * toque já escolhe. Só a peça escolhida usa `cor` (hex da vitrine); as outras ficam na
  * cor própria do manifesto.
