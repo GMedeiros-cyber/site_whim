@@ -394,3 +394,8 @@ Uma entrada por tarefa, sempre acrescentada no fim (nunca reescrever as anterior
 - Revisei `agente-celular/ajustes-18-11` (`cf07120`, `3667ea7`, `98cc679`) e publiquei no main.
 - Comandos: lint, tsc, build (webpack, ok); Playwright no Chromium a 360/390/430 (menu nas 4 seções, barra no pé, flutuante no Resumo, sem rolagem lateral, console limpo) e 1280/1920 (14 cliques na barra, sem rastro).
 - Pendente: conferir num iPhone de verdade a tinta e as idas e voltas Monte → home.
+
+### 2026-11-19 01:05 · Claude · Transição nas abas das técnicas (celular)
+- Pílula turquesa desliza até a aba escolhida (380 ms, leve elástico) e o cartão novo entra com fade e deslize do lado da aba (420 ms); movimento reduzido sem animação. `src/components/home/tecnicas-celular.tsx`.
+- Comandos: lint, tsc, build (webpack, ok), quadros a 60/140/450 ms a 390 px.
+- Pendente: nada.

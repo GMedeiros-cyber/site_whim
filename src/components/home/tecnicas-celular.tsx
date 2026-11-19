@@ -13,14 +13,27 @@ type Tecnica = { nome: string; fotos: Foto[]; texto: string; bomPara: string };
  * o da aba, com as fotos que já trocam sozinhas. Setas, Home e End trocam de aba.
  * No PC continuam os três cartões (page.tsx).
  */
-export function TecnicasAbas({ tecnicas, className }: { tecnicas: Tecnica[]; className?: string }) {
+export function TecnicasAbas({
+  tecnicas,
+  className,
+}: {
+  tecnicas: Tecnica[];
+  className?: string;
+}) {
   const [atual, setAtual] = useState(0);
+  // Para que lado o cartão novo entra (da direita indo para a frente, da esquerda voltando).
+  const [frente, setFrente] = useState(true);
   const id = useId();
   const abas = useRef<(HTMLButtonElement | null)[]>([]);
   const t = tecnicas[atual];
+  const escolher = (n: number) => {
+    if (n === atual) return;
+    setFrente(n > atual);
+    setAtual(n);
+  };
   const ir = (i: number) => {
     const n = (i + tecnicas.length) % tecnicas.length;
-    setAtual(n);
+    escolher(n);
     abas.current[n]?.focus();
   };
 
@@ -37,8 +50,17 @@ export function TecnicasAbas({ tecnicas, className }: { tecnicas: Tecnica[]; cla
           else return;
           e.preventDefault();
         }}
-        className="flex gap-1 rounded-full border border-primary/8 bg-background p-1"
+        className="relative isolate flex gap-1 rounded-full border border-primary/8 bg-background p-1"
       >
+        {/* Pílula que desliza até a aba escolhida (a mesma ideia da barra do PC). */}
+        <span
+          aria-hidden
+          className="pointer-events-none absolute inset-y-1 left-1 -z-10 rounded-full bg-accent/16 transition-transform duration-[380ms] ease-[cubic-bezier(.3,1.25,.4,1)] motion-reduce:transition-none"
+          style={{
+            width: `calc((100% - 0.5rem - ${(tecnicas.length - 1) * 0.25}rem) / ${tecnicas.length})`,
+            transform: `translateX(calc(${atual} * (100% + 0.25rem)))`,
+          }}
+        />
         {tecnicas.map((x, i) => (
           <button
             key={x.nome}
@@ -51,10 +73,10 @@ export function TecnicasAbas({ tecnicas, className }: { tecnicas: Tecnica[]; cla
             aria-selected={i === atual}
             aria-controls={`${id}-painel`}
             tabIndex={i === atual ? 0 : -1}
-            onClick={() => setAtual(i)}
+            onClick={() => escolher(i)}
             className={cn(
-              "min-h-11 flex-1 cursor-pointer rounded-full text-sm font-medium text-muted-foreground transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/50 motion-reduce:transition-none",
-              i === atual && "bg-accent/16 font-semibold text-foreground"
+              "min-h-11 flex-1 cursor-pointer rounded-full text-sm font-medium text-muted-foreground transition-colors duration-300 outline-none focus-visible:ring-3 focus-visible:ring-ring/50 motion-reduce:transition-none",
+              i === atual && "text-foreground",
             )}
           >
             {x.nome}
@@ -67,13 +89,30 @@ export function TecnicasAbas({ tecnicas, className }: { tecnicas: Tecnica[]; cla
         aria-labelledby={`${id}-aba${atual}`}
         className="mt-3 overflow-hidden rounded-[24px] border border-primary/6 bg-background"
       >
-        <TecnicaFotos key={t.nome} nome={t.nome} fotos={t.fotos} className="aspect-[7/5]" />
-        <div className="flex flex-col gap-1.5 px-[18px] pt-[18px] pb-5 text-center">
-          <h3 className="text-xl font-semibold tracking-[-0.02em]">{t.nome}</h3>
-          <p className="text-sm leading-normal text-muted-foreground">{t.texto}</p>
-          <p className="text-[13px] leading-normal">
-            <strong className="font-semibold">Bom para:</strong> {t.bomPara}
-          </p>
+        {/* O cartão novo entra com um leve deslize do lado da aba escolhida. */}
+        <div
+          key={t.nome}
+          className={cn(
+            "animate-in duration-[420ms] ease-out fade-in motion-reduce:animate-none",
+            frente ? "slide-in-from-right-6" : "slide-in-from-left-6",
+          )}
+        >
+          <TecnicaFotos
+            nome={t.nome}
+            fotos={t.fotos}
+            className="aspect-[7/5]"
+          />
+          <div className="flex flex-col gap-1.5 px-[18px] pt-[18px] pb-5 text-center">
+            <h3 className="text-xl font-semibold tracking-[-0.02em]">
+              {t.nome}
+            </h3>
+            <p className="text-sm leading-normal text-muted-foreground">
+              {t.texto}
+            </p>
+            <p className="text-[13px] leading-normal">
+              <strong className="font-semibold">Bom para:</strong> {t.bomPara}
+            </p>
+          </div>
         </div>
       </article>
     </div>
@@ -110,7 +149,10 @@ export function TambemLinhas({
       raf = 0;
       const r = linha.getBoundingClientRect();
       // O botão ocupa os 88 px de baixo da tela (16 de margem + 56 + folga).
-      html.toggleAttribute("data-sem-flutuante", r.height > 0 && r.bottom > innerHeight - 88 && r.top < innerHeight);
+      html.toggleAttribute(
+        "data-sem-flutuante",
+        r.height > 0 && r.bottom > innerHeight - 88 && r.top < innerHeight,
+      );
     };
     const aoMudar = () => {
       raf ||= requestAnimationFrame(ler);
@@ -136,15 +178,26 @@ export function TambemLinhas({
         {itens.map((item, i) => {
           const nome = (
             <span className="flex flex-col gap-0.5">
-              <span className="text-sm leading-tight font-semibold">{item.nome}</span>
-              <span className="text-[11.5px] leading-snug opacity-75">{item.resumo}</span>
+              <span className="text-sm leading-tight font-semibold">
+                {item.nome}
+              </span>
+              <span className="text-[11.5px] leading-snug opacity-75">
+                {item.resumo}
+              </span>
             </span>
           );
           if (i === ultimo) {
             return (
-              <a key={item.nome} href={whatsapp} className={cn(caixa, "bg-primary text-primary-foreground")}>
+              <a
+                key={item.nome}
+                href={whatsapp}
+                className={cn(caixa, "bg-primary text-primary-foreground")}
+              >
                 {nome}
-                <ChevronRightIcon aria-hidden className="size-[18px] shrink-0" />
+                <ChevronRightIcon
+                  aria-hidden
+                  className="size-[18px] shrink-0"
+                />
               </a>
             );
           }
@@ -162,13 +215,16 @@ export function TambemLinhas({
               className={cn(
                 caixa,
                 "cursor-pointer border bg-background transition-colors motion-reduce:transition-none",
-                ativa ? "border-accent/60 bg-accent/16" : "border-primary/6"
+                ativa ? "border-accent/60 bg-accent/16" : "border-primary/6",
               )}
             >
               {nome}
               <ChevronDownIcon
                 aria-hidden
-                className={cn("size-[18px] shrink-0 transition-transform duration-300 motion-reduce:transition-none", ativa && "rotate-180")}
+                className={cn(
+                  "size-[18px] shrink-0 transition-transform duration-300 motion-reduce:transition-none",
+                  ativa && "rotate-180",
+                )}
               />
             </button>
           );
@@ -181,7 +237,7 @@ export function TambemLinhas({
         inert={aberta === null}
         className={cn(
           "grid transition-[grid-template-rows] duration-300 ease-out motion-reduce:transition-none",
-          aberta === null ? "grid-rows-[0fr]" : "grid-rows-[1fr]"
+          aberta === null ? "grid-rows-[0fr]" : "grid-rows-[1fr]",
         )}
       >
         <p className="overflow-hidden text-center text-sm leading-normal text-muted-foreground">
