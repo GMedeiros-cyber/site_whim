@@ -410,3 +410,9 @@ Uma entrada por tarefa, sempre acrescentada no fim (nunca reescrever as anterior
 - Arrastar para o lado (> 40 px, mais horizontal que vertical) passa ou volta a foto; o toque simples continua passando; a rolagem vertical não é afetada (`touch-pan-y`). `src/components/home/tecnica-fotos.tsx`.
 - Comandos: lint, tsc, build (webpack, ok), Playwright a 390 (esq, esq, dir, toque: 0→1→2→1→2).
 - Pendente: nada.
+
+### 2026-11-19 14:05 · Claude · Quem somos no celular em capítulos (ideia B do Figma)
+- `src/components/home/oficina-capitulos.tsx`: cartão como stories com 4 capítulos (Telas, Costura, Estampa, Acabamento), barrinhas que enchem (3,5 s), troca sozinha só com o cartão na tela, toque nos capítulos e arrasto pulam; mídias empilhadas trocando só a opacidade; o vídeo do silk só baixa ao aparecer e só toca no capítulo Estampa; selo "Imagem ilustrativa" nas 3 imagens de IA. No celular saem o vídeo 16:10 e os blocos 2 × 2; no PC nada muda.
+- Figma com as 3 ideias: https://www.figma.com/design/bB78sHIWMiVDVHsR0OnYtx
+- Comandos: lint, tsc, build (webpack, ok), Playwright a 390 (troca sozinha 1→3 em 7 s, toque no 3 toca o vídeo, sem rolagem lateral, console limpo).
+- Pendente: vídeos curtos reais de telas, costura e acabamento (pedir à Whim) para trocar as imagens ilustrativas.

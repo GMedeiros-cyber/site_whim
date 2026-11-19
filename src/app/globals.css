@@ -212,3 +212,16 @@
     animation: none;
   }
 }
+
+/* Quem somos no celular: a barrinha do capítulo atual enche no tempo dele (oficina-capitulos.tsx). */
+@keyframes oficina-barra {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+.oficina-barra {
+  animation: oficina-barra var(--dur, 3.5s) linear both;
+}

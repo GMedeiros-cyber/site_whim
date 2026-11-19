@@ -12,6 +12,7 @@ import { Etapas, EtapasCelular } from "@/components/home/etapas";
 import { TambemCartoes } from "@/components/home/tambem-cartoes";
 import { TecnicaFotos } from "@/components/home/tecnica-fotos";
 import { TambemLinhas, TecnicasAbas } from "@/components/home/tecnicas-celular";
+import { OficinaCapitulos, type Capitulo } from "@/components/home/oficina-capitulos";
 import { VideoOficina } from "@/components/home/video-oficina";
 import { PalavraTinta } from "@/components/home/palavra-tinta";
 import "@/components/home/transicoes.css";
@@ -87,6 +88,27 @@ const FOTOS: { src: string; alt: string; legenda: string; video?: string }[] = [
     legenda: "Tela pronta para a próxima peça",
   },
   { src: "/images/rodo-tela.webp", alt: "Mãos passando o rodo na tela de silk", legenda: "Rodo na tela de silk · ilustrativa" },
+];
+
+// Quem somos no celular (ideia B do Figma, 19/11): a oficina em 4 capítulos. Só o vídeo do
+// silk é da Whim; as outras são ilustrativas (IA) até chegarem vídeos curtos de cada etapa.
+const CAPITULOS: Capitulo[] = [
+  { ...OFICINA[0], curto: "Telas", src: "/images/rodo-tela.webp", alt: "Mãos passando o rodo na tela de silk", ilustrativa: true },
+  {
+    ...OFICINA[1],
+    curto: "Costura",
+    src: "/images/hero-oficina-celular-v2.webp",
+    alt: "Oficina de costura com máquinas, linhas coloridas e camisetas dobradas nas mesas",
+    ilustrativa: true,
+  },
+  { ...OFICINA[2], curto: "Estampa", src: FOTOS[0].src, video: FOTOS[0].video, alt: FOTOS[0].alt },
+  {
+    ...OFICINA[3],
+    curto: "Acabamento",
+    src: "/images/camiseta-whim-mesa.webp",
+    alt: "Camiseta azul-marinho dobrada com o logo da Whim estampado, na mesa de silk ao lado do rodo e da tinta turquesa",
+    ilustrativa: true,
+  },
 ];
 
 // Imagens geradas por IA: sempre com o selo "Imagem ilustrativa".
@@ -263,13 +285,8 @@ function QuemSomos() {
           </p>
         </div>
 
-        {/* Celular: só o vídeo, em 16:10 (as duas fotos do mosaico não aparecem nem baixam). */}
-        <figure className="relative mt-7 aspect-[16/10] overflow-hidden rounded-[22px] bg-muted min-[601px]:hidden">
-          <VideoOficina src={FOTOS[0].video!} poster={FOTOS[0].src} rotulo={FOTOS[0].alt} />
-          <figcaption className="absolute bottom-3 left-3 rounded-full bg-background/90 px-2.5 py-1.5 text-xs text-foreground">
-            {FOTOS[0].legenda}
-          </figcaption>
-        </figure>
+        {/* Celular: a oficina em capítulos, como stories (ideia B, 19/11). */}
+        <OficinaCapitulos capitulos={CAPITULOS} className="mt-7 min-[601px]:hidden" />
 
         {/* Mosaico no PC e no tablet; carrossel de 601 a 767 px. */}
         <div className="relative lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:self-center cel:hidden">
@@ -304,8 +321,8 @@ function QuemSomos() {
           </Carrossel>
         </div>
 
-        {/* No celular: blocos 2 × 2 numerados, só com o nome. */}
-        <ul className="grid grid-cols-2 gap-x-[18px] gap-y-4 sm:gap-x-7 sm:gap-y-[22px] lg:col-start-1 lg:self-start cel:mt-6 cel:gap-2">
+        {/* No celular as etapas já estão nos capítulos de cima. */}
+        <ul className="grid grid-cols-2 gap-x-[18px] gap-y-4 sm:gap-x-7 sm:gap-y-[22px] lg:col-start-1 lg:self-start cel:hidden">
           {OFICINA.map((etapa, i) => (
             <li
               key={etapa.nome}
