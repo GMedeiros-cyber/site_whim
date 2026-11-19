@@ -61,7 +61,7 @@ type Pedido = {
   usaOutra: boolean; // a cor do pedido é outra, escrita pelo cliente
   outraCor: string;
   posicoes: Posicao[]; // na ordem em que foram marcadas (= números do mapa)
-  tecnica: Tecnica;
+  tecnica: Tecnica | null; // null: o cliente ainda não escolheu (vai "a definir" na mensagem)
   tamanhos: Tamanho[];
 };
 
@@ -72,7 +72,7 @@ const INICIAL: Pedido = {
   usaOutra: false,
   outraCor: "",
   posicoes: [],
-  tecnica: TECNICAS[0],
+  tecnica: null,
   tamanhos: (Object.keys(GRADES) as Grupo[]).flatMap((grupo) => GRADES[grupo].map((nome) => ({ grupo, nome, qtd: 0 }))),
 };
 
@@ -88,7 +88,8 @@ function lerPedido(): { pedido: Pedido; passo: number; alcancado: number } | nul
     if (!cor || !PECAS.includes(p.peca) || !Array.isArray(p.posicoes) || !Array.isArray(p.tamanhos)) return null;
     const passo = Math.min(4, Math.max(0, Number(s.passo) || 0));
     const alcancado = Math.min(4, Math.max(passo, Number(s.alcancado) || 0));
-    return { pedido: { ...INICIAL, ...p, cor, posicoes: p.posicoes.map((x: Posicao) => ({ chave: x.chave, manterFundo: x.manterFundo })) }, passo, alcancado };
+    const tecnica = TECNICAS.includes(p.tecnica) ? p.tecnica : null;
+    return { pedido: { ...INICIAL, ...p, cor, tecnica, posicoes: p.posicoes.map((x: Posicao) => ({ chave: x.chave, manterFundo: x.manterFundo })) }, passo, alcancado };
   } catch {
     return null;
   }
@@ -129,6 +130,11 @@ export function Personalizador() {
   // "P 10, M 20, Infantil 4: 5" (os dois-pontos separam o tamanho infantil da quantidade).
   const listaTamanhos = comQtd.map((t) => (t.grupo === "Infantil" ? `${nomeTamanho(t)}: ${t.qtd}` : `${t.nome} ${t.qtd}`)).join(", ");
   const temArte = posicoes.some((p) => p.arte);
+  // Sem técnica escolhida, a prévia e a ficha simulam sem técnica (como "Não sei, me indiquem").
+  const tecnicaPrevia: Tecnica = tecnica ?? "Não sei, me indiquem";
+  // Abaixo do mínimo, a quantidade fica "a definir": o passo não ganha ✓ e a mensagem avisa (sem bloquear).
+  const abaixoDoMinimo = total < MINIMO;
+  const aDefinir = (i: number) => i === 3 && abaixoDoMinimo;
 
   // Libera as URLs das artes que saíram do pedido (trocar, remover) e do rascunho do "Cancelar";
   // ao sair da página, todas.
@@ -166,11 +172,13 @@ export function Personalizador() {
     "Olá, Whim! Montei minha peça no site:",
     `• Peça: ${peca} · Cor: ${nomeCor}`,
     `• Tecido: ${tecido}`,
-    `• Técnica: ${tecnica}`,
+    `• Técnica: ${tecnica ?? "a definir"}`,
     posicoes.length
       ? ["• Estampas:", ...posicoes.map((p, i) => `  ${i + 1}. ${NOME[p.chave]} (${medidaDe(p.chave)}): ${p.arte?.arquivo.name ?? "arte a enviar"}`)].join("\n")
       : "• Estampas: a definir",
-    `• Tamanhos: ${listaTamanhos || "a definir"} · Total: ${pecas(total)}`,
+    abaixoDoMinimo
+      ? `• Quantidade: a definir (mínimo ${MINIMO})${listaTamanhos ? ` · até agora: ${listaTamanhos}` : ""}`
+      : `• Tamanhos: ${listaTamanhos} · Total: ${pecas(total)}`,
     "Vou mandar a ficha e os arquivos aqui na conversa.",
     "Podem me passar o orçamento?",
   ].join("\n");
@@ -264,7 +272,8 @@ export function Personalizador() {
           cor: cor.pasta,
           // Outra cor: a ficha diz a do pedido e em que cor está a foto.
           nomeCor: usaOutra ? `${nomeCor} (prévia em ${cor.nome})` : cor.nome,
-          tecnica,
+          tecnica: tecnicaPrevia,
+          rotulo: tecnica ?? "a definir",
           t: listaTamanhos,
           total,
           p: posicoes.map((p) => [p.chave, p.arte?.url ?? "", p.arte?.arquivo.name ?? "", !!p.manterFundo]),
@@ -279,6 +288,7 @@ export function Personalizador() {
       cor: string;
       nomeCor: string;
       tecnica: Tecnica;
+      rotulo: string;
       t: string;
       total: number;
       p: [string, string, string, boolean][];
@@ -291,6 +301,7 @@ export function Personalizador() {
       cor: { nome: d.nomeCor, pasta: c.pasta },
       tecido: d.tecido,
       tecnica: d.tecnica,
+      rotuloTecnica: d.rotulo,
       tamanhos: d.t || "a definir",
       total: d.total,
       tinta: tintaPara(c.hex),
@@ -330,8 +341,8 @@ export function Personalizador() {
   const passos = [
     { nome: "Peça", pergunta: "Qual peça?", valor: `${peca} · ${tecido}`, depois: "Modelo e tecido" },
     { nome: "Cor", pergunta: "Qual cor?", valor: usaOutra ? `Outra: ${nomeCor}` : cor.nome, depois: "Na vitrine da prévia" },
-    { nome: "Estampa", pergunta: "Onde vai a estampa?", valor: `${posicoes.length ? posicoes.map((p) => NOME[p.chave]).join(", ") : "A definir"} · ${tecnica}`, depois: "Posições, artes e técnica" },
-    { nome: "Quantidade", pergunta: "Quantas peças?", valor: `${pecas(total)}${listaTamanhos ? ` · ${listaTamanhos}` : ""}`, depois: `A partir de ${MINIMO} peças` },
+    { nome: "Estampa", pergunta: "Onde vai a estampa?", valor: `${posicoes.length ? posicoes.map((p) => NOME[p.chave]).join(", ") : "A definir"} · ${tecnica ?? "técnica a definir"}`, depois: "Posições, artes e técnica" },
+    { nome: "Quantidade", pergunta: "Quantas peças?", valor: abaixoDoMinimo ? `A definir (mínimo ${MINIMO})${total ? ` · ${pecas(total)}` : ""}` : `${pecas(total)} · ${listaTamanhos}`, depois: `A partir de ${MINIMO} peças` },
     { nome: "Resumo", pergunta: "Confira o pedido", valor: "", depois: "Ficha e WhatsApp" },
   ];
   const ultimo = passos.length - 1;
@@ -347,7 +358,7 @@ export function Personalizador() {
           lado,
           onLado: setLado,
           posicoes: posicoes.map((p) => ({ chave: p.chave, url: p.arte?.url, manterFundo: p.manterFundo })),
-          tecnica,
+          tecnica: tecnicaPrevia,
           foco,
           final,
         }
@@ -381,7 +392,11 @@ export function Personalizador() {
       case 1:
         return (
           <>
-            <p className="text-sm text-muted-foreground max-[600px]:text-center">As cores da vitrine são exemplos. Toque numa das camisas para ver na prévia.</p>
+            {/* O texto diz onde a cor é escolhida: no celular, aqui no passo; no PC, embaixo da prévia. */}
+            <p className="text-sm text-muted-foreground max-[600px]:text-center">
+              <span className="min-[601px]:hidden">Toque numa camisa para ver a cor na prévia.</span>
+              <span className="max-[600px]:hidden">Escolha a cor nas camisas embaixo da prévia.</span>
+            </p>
             <CoresVitrine modelo={modelo} cor={cor} onCor={(c) => mudar({ cor: c, usaOutra: false })} className="mt-3.5 min-[601px]:hidden" />
             <ToggleGroup
               aria-label="Cor"
@@ -412,7 +427,7 @@ export function Personalizador() {
             )}
             <p className="mt-3.5 flex gap-2.5 rounded-[14px] bg-muted p-3.5 text-[13px]">
               <InfoIcon aria-hidden className="mt-px size-4 shrink-0 text-accent" />
-              A cor da peça é de acordo com o seu pedido.
+              As cores da vitrine são exemplos. A peça é feita na cor que você pedir: se não estiver aqui, escolha “Outra cor”.
             </p>
           </>
         );
@@ -422,7 +437,7 @@ export function Personalizador() {
             <p className="text-sm text-muted-foreground max-[600px]:text-center">
               <span className="pointer-coarse:hidden">Clique onde vai a estampa.</span>
               <span className="hidden pointer-coarse:inline">Toque onde vai a estampa.</span> Dá para marcar mais de uma posição.
-              Tamanho máximo da estampa: A3.
+              Tamanho máximo da estampa: A3 (29,7 × 42 cm).
             </p>
             {aviso && (
               <p role="status" className="mt-3 rounded-[14px] bg-muted px-3.5 py-2.5 text-[13px]">
@@ -442,7 +457,7 @@ export function Personalizador() {
                       posicao={p}
                       area={areaDe(modelo, "frente", p.chave) ?? areaDe(modelo, "costas", p.chave)}
                       info={p.arte && infos[p.arte.url]}
-                      tecnica={tecnica}
+                      tecnica={tecnicaPrevia}
                       outras={posicoes.flatMap((o, k) => (k !== j && o.arte ? [{ numero: k + 1, posicao: o }] : []))}
                       onArte={(arte, manterFundo) => anexar(p.chave, arte, manterFundo)}
                       onManterFundo={(manterFundo) => mudarPosicao(p.chave, { manterFundo })}
@@ -459,12 +474,12 @@ export function Personalizador() {
             )}
             <div className="mt-5 grid gap-2">
               <p className="text-[13px] font-medium">Técnica</p>
-              <ToggleGroup aria-label="Técnica" value={[tecnica]} onValueChange={escolha((v) => mudar({ tecnica: v as Tecnica }))} className="flex-wrap">
+              <ToggleGroup aria-label="Técnica" value={tecnica ? [tecnica] : []} onValueChange={escolha((v) => mudar({ tecnica: v as Tecnica }))} className="flex-wrap">
                 {TECNICAS.map((t) => (
                   <Opcao key={t} value={t}>{t}</Opcao>
                 ))}
               </ToggleGroup>
-              <p className="text-[13px] text-muted-foreground">{FRASE_TECNICA[tecnica]}</p>
+              {tecnica && <p className="text-[13px] text-muted-foreground">{FRASE_TECNICA[tecnica]}</p>}
             </div>
           </>
         );
@@ -502,7 +517,7 @@ export function Personalizador() {
               ) : fichaPronta ? (
                 <Image
                   src={ficha.url}
-                  alt={`Ficha da estampa: ${peca}, ${nomeCor}, ${tecido}, ${tecnica}, ${posicoes.length} ${posicoes.length === 1 ? "posição" : "posições"}`}
+                  alt={`Ficha da estampa: ${peca}, ${nomeCor}, ${tecido}, ${tecnica ?? "técnica a definir"}, ${posicoes.length} ${posicoes.length === 1 ? "posição" : "posições"}`}
                   width={1600}
                   height={1000}
                   unoptimized
@@ -613,7 +628,7 @@ export function Personalizador() {
             <p className="pointer-events-none absolute inset-x-2.5 bottom-2.5 flex items-center justify-between gap-3 rounded-[14px] bg-background/92 px-3 py-2 text-xs min-[601px]:hidden">
               <span className="min-w-0 truncate">
                 <span className="font-semibold">{peca}</span> · {nomeCor}
-                {alcancado >= 2 || passo >= 2 ? ` · ${tecnica}` : ""}
+                {(alcancado >= 2 || passo >= 2) && tecnica && tecnica !== "Não sei, me indiquem" ? ` · ${tecnica}` : ""}
               </span>
               {resumoDireita && <span className="shrink-0 tabular-nums">{resumoDireita}</span>}
             </p>
@@ -627,10 +642,10 @@ export function Personalizador() {
                     <span
                       className={cn(
                         "grid size-7 shrink-0 place-items-center rounded-full text-xs font-bold tabular-nums",
-                        estado === "feito" ? "bg-primary text-primary-foreground" : estado === "atual" ? "bg-accent text-primary" : "bg-muted text-foreground"
+                        estado === "feito" && !aDefinir(i) ? "bg-primary text-primary-foreground" : estado === "atual" ? "bg-accent text-primary" : "bg-muted text-foreground"
                       )}
                     >
-                      {estado === "feito" ? <CheckIcon aria-hidden className="size-3.5" strokeWidth={3} /> : i + 1}
+                      {estado === "feito" && !aDefinir(i) ? <CheckIcon aria-hidden className="size-3.5" strokeWidth={3} /> : i + 1}
                     </span>
                     {p.nome}
                   </>
@@ -643,7 +658,7 @@ export function Personalizador() {
                   <li key={p.nome} data-passo={i} aria-current={estado === "atual" ? "step" : undefined}>
                     {estado === "feito" ? (
                       // Tocar num passo feito volta para ele (como o "Alterar" do PC).
-                      <button type="button" onClick={() => abrir(i)} aria-label={`${p.nome}, feito: voltar para este passo`} className={cn(chip, "outline-none focus-visible:ring-3 focus-visible:ring-ring/50")}>
+                      <button type="button" onClick={() => abrir(i)} aria-label={`${p.nome}, ${aDefinir(i) ? "a definir" : "feito"}: voltar para este passo`} className={cn(chip, "outline-none focus-visible:ring-3 focus-visible:ring-ring/50")}>
                         {miolo}
                       </button>
                     ) : (
@@ -680,12 +695,13 @@ export function Personalizador() {
                     <span
                       className={cn(
                         "grid size-[26px] shrink-0 place-items-center rounded-full text-xs font-semibold tabular-nums min-[601px]:size-[30px] min-[601px]:text-[13px]",
-                        estado === "feito" && "bg-primary text-primary-foreground",
+                        estado === "feito" && !aDefinir(i) && "bg-primary text-primary-foreground",
+                        estado === "feito" && aDefinir(i) && "border-2 border-primary/35 bg-background",
                         estado === "atual" && "border-2 border-accent bg-background",
                         estado === "depois" && "border border-primary/18 text-muted-foreground"
                       )}
                     >
-                      {estado === "feito" ? <CheckIcon role="img" aria-label="feito" className="size-3.5" strokeWidth={3} /> : i + 1}
+                      {estado === "feito" && !aDefinir(i) ? <CheckIcon role="img" aria-label="feito" className="size-3.5" strokeWidth={3} /> : i + 1}
                     </span>
                     {i < ultimo && (
                       <span aria-hidden className={cn("min-h-4 w-0.5 flex-1", estado === "feito" ? "bg-primary" : "bg-primary/14")} />

@@ -13,6 +13,9 @@ import { cn } from "@/lib/utils";
 export type { ItemNav };
 
 const MENU_ID = "menu-principal";
+/** Foco do teclado na barra: contorno azul-marinho de 2 px (o padrão, turquesa a 50% e 1 px, quase não aparecia sobre a pílula branca). */
+// outline-solid é necessário: no Tailwind v4 o outline-none fixa --tw-outline-style: none, e o outline-2 sozinho herdaria isso.
+const FOCO = "outline-none focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-primary";
 
 /**
  * Header flutuante, o mesmo em todas as páginas (lista em src/lib/navegacao.ts).
@@ -123,20 +126,31 @@ export function SiteHeader({
     };
   }, [naHome, links]);
 
-  // Posição da pílula: medida no link marcado, dentro da lista (o zoom das telas grandes
-  // vale para os dois, então as medidas batem).
+  // Posição da pílula: o retângulo do link marcado menos o da lista, dividido pelo zoom das telas
+  // grandes (tela ÷ CSS). Com offsetLeft o Safari errava 38 px a 1920 e 70 px a 2560 (auditoria 19/11).
   useEffect(() => {
     const lista = listaRef.current;
     if (!lista) return;
+    let raf = 0;
     const medir = () => {
       const a = hrefAtivo ? lista.querySelector<HTMLElement>(`a[data-href="${hrefAtivo}"]`) : null;
       const li = a?.parentElement;
-      setPilula(li && li.offsetWidth ? { left: li.offsetLeft, width: li.offsetWidth } : null);
+      const rl = lista.getBoundingClientRect();
+      const r = li?.getBoundingClientRect();
+      const zoom = rl.width / lista.offsetWidth || 1;
+      setPilula(r && r.width ? { left: (r.left - rl.left) / zoom, width: r.width / zoom } : null);
     };
     medir();
-    const ro = new ResizeObserver(medir);
+    // No quadro seguinte: setState dentro do observer dispara o "ResizeObserver loop" do Safari.
+    const ro = new ResizeObserver(() => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(medir);
+    });
     ro.observe(lista);
-    return () => ro.disconnect();
+    return () => {
+      ro.disconnect();
+      cancelAnimationFrame(raf);
+    };
   }, [hrefAtivo]);
 
   return (
@@ -152,7 +166,7 @@ export function SiteHeader({
         <LinkNav
           href="/"
           aria-label="Whim Confecção e Estamparia, página inicial"
-          className="flex min-h-11 shrink-0 items-center gap-2 rounded-full"
+          className={cn("flex min-h-11 shrink-0 items-center gap-2 rounded-full", FOCO)}
         >
           <Image
             src="/brand/whim-simbolo.webp"
@@ -192,6 +206,7 @@ export function SiteHeader({
                   onClick={() => naHome && setSecao(l.href)}
                   className={cn(
                     "block rounded-full px-4 py-3 text-[15px] font-medium whitespace-nowrap text-muted-foreground transition-colors hover:text-foreground",
+                    FOCO,
                     marcado && "font-semibold text-foreground"
                   )}
                 >
@@ -206,6 +221,7 @@ export function SiteHeader({
           aria-current={ctaAtivo ? "page" : undefined}
           className={cn(
             "hidden rounded-full bg-primary px-[22px] py-[13px] text-[15px] font-semibold whitespace-nowrap text-primary-foreground transition-colors hover:bg-primary/85 min-[601px]:block",
+            FOCO,
             // Ativo: anel turquesa por dentro, discreto.
             ctaAtivo && "inset-ring-2 inset-ring-accent"
           )}
@@ -219,7 +235,7 @@ export function SiteHeader({
           popoverTarget={MENU_ID}
           aria-controls={MENU_ID}
           aria-expanded={aberto}
-          className="flex min-h-11 items-center gap-2.5 rounded-full bg-primary pr-[18px] pl-4 text-sm font-semibold text-primary-foreground min-[601px]:hidden"
+          className={cn("flex min-h-11 items-center gap-2.5 rounded-full bg-primary pr-[18px] pl-4 text-sm font-semibold text-primary-foreground min-[601px]:hidden", FOCO)}
         >
           {/* Ícone que gira de ☰ para ✕ (e volta); com movimento reduzido só troca. */}
           <span aria-hidden className="relative size-[18px]">
@@ -260,6 +276,7 @@ export function SiteHeader({
                     aria-current={ativo ? (l.href === cta.href ? "page" : "location") : undefined}
                     className={cn(
                       "flex min-h-12 items-center gap-2.5 rounded-2xl px-[18px] text-base font-medium transition-colors hover:bg-accent/15",
+                      FOCO,
                       ativo && "bg-accent/15 font-semibold"
                     )}
                   >

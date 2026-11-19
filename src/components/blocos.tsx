@@ -60,6 +60,10 @@ export function Container({
   );
 }
 
+/** Selo das imagens geradas por IA (regra de marca): posição fica com quem usa (top-3 left-3, …). */
+export const seloIlustrativa =
+  "pointer-events-none absolute rounded-full bg-background/85 px-2.5 py-[5px] text-[11px] text-foreground";
+
 /** Respiro vertical padrão das seções (âncoras param abaixo do header fixo). */
 export const secao = "scroll-mt-24 py-14 sm:py-[clamp(72px,10vw,128px)]";
 

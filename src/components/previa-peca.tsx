@@ -72,14 +72,21 @@ function criarMotor(painel: HTMLElement, canvas: HTMLCanvasElement, pendulo: HTM
   }
 
   // Canvas no tamanho da tela × DPR (até 2), medido fora do laço. Mudar o tamanho limpa o canvas:
-  // redesenha na hora (antes da pintura), sem piscar ao trocar de passo.
+  // redesenha junto. No quadro seguinte: a largura do canvas na tela vem da proporção dos atributos,
+  // e trocá-los dentro do observer (com o arredondamento do zoom das telas grandes) o fazia disparar
+  // de novo no mesmo quadro ("ResizeObserver loop" no Safari a 2560, auditoria de 19/11).
+  let medida = 0;
   const ro = new ResizeObserver(([e]) => {
-    const w = Math.round(e.contentRect.width * Math.min(2, devicePixelRatio || 1));
-    if (!w || w === canvas.width) return;
-    canvas.width = w;
-    canvas.height = Math.round((w * 4) / 3);
-    desenhado = "";
-    desenhar();
+    const largura = e.contentRect.width;
+    cancelAnimationFrame(medida);
+    medida = requestAnimationFrame(() => {
+      const w = Math.round(largura * Math.min(2, devicePixelRatio || 1));
+      if (!w || w === canvas.width) return;
+      canvas.width = w;
+      canvas.height = Math.round((w * 4) / 3);
+      desenhado = "";
+      desenhar();
+    });
   });
   ro.observe(canvas);
 
@@ -292,6 +299,7 @@ function criarMotor(painel: HTMLElement, canvas: HTMLCanvasElement, pendulo: HTM
       cancelAnimationFrame(avulso);
       io.disconnect();
       ro.disconnect();
+      cancelAnimationFrame(medida);
       document.removeEventListener("visibilitychange", aba);
       [...bancos.keys()].forEach(descartar);
     },
@@ -759,8 +767,8 @@ export function CoresVitrine({
               )}
             />
             <span className={cn("text-[11px] leading-none whitespace-nowrap lg:text-xs", ativa ? "font-semibold" : "text-muted-foreground")}>
-              <span className="min-[601px]:hidden">{c.curto ?? c.nome}</span>
-              <span className="hidden min-[601px]:inline">{c.nome}</span>
+              {/* O mesmo nome do botão do passo Cor ("Azul-marinho", não "Marinho"). */}
+              {c.nome}
             </span>
             <span aria-hidden className={cn("h-[3px] w-[22px] rounded-full", ativa ? "bg-accent" : "bg-transparent")} />
           </button>

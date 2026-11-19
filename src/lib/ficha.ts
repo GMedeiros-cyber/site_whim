@@ -23,6 +23,8 @@ export type DadosFicha = {
   cor: { nome: string; pasta: string }; // nome = a cor do pedido (pode ser "Outra cor"); pasta = a da prévia
   tecido: string;
   tecnica: Tecnica;
+  /** O que a ficha escreve como técnica ("a definir" quando o cliente não escolheu). */
+  rotuloTecnica?: string;
   tamanhos: string; // "P 10, M 20, Infantil 4: 5" ou "a definir"
   total: number;
   linhas: LinhaFicha[];
@@ -109,7 +111,7 @@ export async function gerarFicha(d: DadosFicha): Promise<Blob> {
   // Topo: logo, peça, cor, técnica e tecido.
   if (logo) ctx.drawImage(logo, 48, 40, (logo.naturalWidth / logo.naturalHeight) * 64, 64);
   texto(`Ficha da estampa · ${d.modelo.nome}`, 400, 66, 32, 600);
-  texto(`Cor: ${d.cor.nome}  ·  Técnica: ${tecnica}`, 400, 104, 22, 400, secundaria);
+  texto(`Cor: ${d.cor.nome}  ·  Técnica: ${d.rotuloTecnica ?? tecnica}`, 400, 104, 22, 400, secundaria);
   texto(`Tecido: ${d.tecido}`, 400, 136, 22, 400, secundaria);
   ctx.fillStyle = fundo;
   ctx.fillRect(48, 164, W - 96, 2);

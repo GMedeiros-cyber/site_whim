@@ -8,6 +8,12 @@
         "value": "cubic-bezier(.2, .9, .3, 1.3)",
         "createdAt": "2026-11-16T04:21:17.241Z",
         "reason": "spec: referencia/home/README.md (Botão do WhatsApp flutuante) pede 'entrada com mola curta'; protótipo .zap-dica usa cubic-bezier(.2,.9,.3,1.3)"
+      },
+      {
+        "rule": "bounce-easing",
+        "value": "cubic-bezier(.3, 1.25, .4, 1)",
+        "createdAt": "2026-11-19T19:02:32.978Z",
+        "reason": "decisão do Gabriel (19/11, auditoria B3): o leve elástico da pílula das abas das técnicas no celular fica (src/components/home/tecnicas-celular.tsx)"
       }
     ]
   }

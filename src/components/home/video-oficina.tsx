@@ -26,7 +26,9 @@ export function VideoOficina({ src, poster, rotulo }: { src: string; poster: str
           v.pause();
         }
       },
-      { rootMargin: "200px" }
+      // Só baixa quando aparece (auditoria de 19/11): com 200 px de folga, no PC o mosaico logo
+      // abaixo da hero baixava o vídeo na carga da página.
+      { threshold: 0.1 }
     );
     io.observe(v);
     return () => io.disconnect();

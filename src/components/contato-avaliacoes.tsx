@@ -3,17 +3,17 @@ import { MailIcon, MapPinIcon, MessageCircleIcon, QuoteIcon, StarIcon } from "lu
 import { Container, Destaque, Titulo, secao } from "@/components/blocos";
 import { DepoimentoCelular, type Depoimento } from "@/components/depoimento-celular";
 import { FormContato } from "@/components/form-contato";
-import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { CONTATO, WHATSAPP } from "@/lib/whim";
 
-/** Link dos dados de contato: alvo de 44px abaixo de 1024px e de 28px no PC (como o rodapé). */
+/** Link dos dados de contato: alvo de 44px abaixo de 1024px e de 32px no PC, que com o zoom das
+    telas grandes (0,85 e 0,75) ainda fica com 24px ou mais (WCAG 2.5.8, auditoria de 19/11). */
 const linkInfo =
-  "inline-flex min-h-11 w-fit items-center rounded-sm underline-offset-4 outline-none hover:underline focus-visible:ring-3 focus-visible:ring-ring/50 lg:min-h-0 lg:py-1";
+  "inline-flex min-h-11 w-fit items-center rounded-sm underline-offset-4 outline-none hover:underline focus-visible:ring-3 focus-visible:ring-ring/50 lg:min-h-8";
 
 // Nunca colocar depoimento inventado aqui: só os reais, com autorização de quem escreveu,
 // com o texto exatamente como a pessoa mandou. Sem estrelas: os depoimentos chegam pelo
-// WhatsApp, sem nota. Os cartões vazios completam 3 até chegarem os outros.
+// WhatsApp, sem nota. Com menos de 3, o aviso "Mais depoimentos em breve" (sem cartões vazios).
 const MOSTRAR_AVALIACOES = true;
 
 const DEPOIMENTOS: Depoimento[] = [
@@ -66,13 +66,6 @@ export function ContatoAvaliacoes() {
 }
 
 function Avaliacoes() {
-  // Cartões vazios só para completar 3 enquanto os outros depoimentos não chegam.
-  const vazios = [
-    ["w-[92%]", "w-[76%]", "w-[58%]"],
-    ["w-[88%]", "w-[64%]", "w-[70%]"],
-    ["w-[80%]", "w-[90%]", "w-[46%]"],
-  ].slice(0, Math.max(0, 3 - DEPOIMENTOS.length));
-
   const cartao =
     "w-[min(85%,320px)] shrink-0 snap-start rounded-[20px] border border-border/60 bg-background p-5 lg:w-auto lg:border-transparent";
 
@@ -82,7 +75,7 @@ function Avaliacoes() {
       className="scroll-mt-24 overflow-hidden rounded-[22px] bg-muted px-4 py-6 max-[600px]:hidden sm:px-7 sm:py-8 lg:rounded-[28px] lg:p-7"
     >
       <h3 className="text-xl font-semibold tracking-[-0.01em]">O que dizem de nós</h3>
-      {vazios.length > 0 && (
+      {DEPOIMENTOS.length < 3 && (
         <>
           <p className="mt-4 inline-flex items-center gap-2 rounded-full border border-accent bg-background px-3.5 py-1.5 text-xs font-medium">
             <StarIcon aria-hidden className="size-3.5 fill-accent text-accent" />
@@ -103,10 +96,14 @@ function Avaliacoes() {
         </>
       )}
 
-      <ul
+      {/* De 640 a 1023 px a faixa rola de lado: focável para quem usa o teclado (auditoria de 19/11). */}
+      <div
+        role="region"
         aria-label="Depoimentos de clientes"
-        className="-mx-4 mt-5 flex snap-x snap-mandatory scroll-px-4 gap-3 overflow-x-auto px-4 pb-1 sm:-mx-7 sm:scroll-px-7 sm:px-7 lg:mx-0 lg:grid lg:snap-none lg:gap-4 lg:overflow-visible lg:px-0 lg:pb-0"
+        tabIndex={0}
+        className="-mx-4 mt-5 snap-x snap-mandatory scroll-px-4 overflow-x-auto px-4 pb-1 outline-none focus-visible:ring-3 focus-visible:ring-ring/50 sm:-mx-7 sm:scroll-px-7 sm:px-7 lg:mx-0 lg:snap-none lg:overflow-visible lg:px-0 lg:pb-0"
       >
+      <ul className="flex gap-3 lg:grid lg:gap-4">
         {DEPOIMENTOS.map((d) => (
           <li key={d.nome + d.empresa} className={cartao}>
             <figure>
@@ -129,28 +126,8 @@ function Avaliacoes() {
             </figure>
           </li>
         ))}
-        {vazios.map((linhas, i) => (
-          <li key={i} aria-hidden className={cartao}>
-            <div className="flex gap-1">
-              {Array.from({ length: 5 }, (_, s) => (
-                <StarIcon key={s} className="size-3.5 fill-muted-foreground/15 text-muted-foreground/25" />
-              ))}
-            </div>
-            <div className="mt-4 grid gap-2.5">
-              {linhas.map((w) => (
-                <Skeleton key={w} className={cn("h-[9px] motion-reduce:animate-none", w)} />
-              ))}
-            </div>
-            <div className="mt-5 flex items-center gap-3">
-              <span className="size-9 shrink-0 rounded-full bg-muted" />
-              <div className="grid min-w-0 gap-1.5">
-                <Skeleton className="h-[7px] w-16 motion-reduce:animate-none" />
-                <Skeleton className="h-[7px] w-24 motion-reduce:animate-none" />
-              </div>
-            </div>
-          </li>
-        ))}
       </ul>
+      </div>
     </div>
   );
 }

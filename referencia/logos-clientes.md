@@ -10,7 +10,7 @@ Logos oficiais, convertidos para uma cor só (`#5D6178`, cinza-azulado da Whim) 
 | SBT | `sbt.webp` | Wikimedia Commons, versão monocromática do logo do SBT |
 | Bauducco | `bauducco.webp` | logo do cabeçalho de bauducco.com.br |
 | Aurora | `aurora.webp` | logo "Aurora" da marca de alimentos, de auroracoop.com.br (trocado em 17/11 a pedido do Gabriel; em tons de cinza para manter o sol e os arcos) |
-| Electrochemical | `electrochemical.webp` | logo do cabeçalho de electrochemical.com.br (Guarulhos) |
+| Electrochemical | `electrochemical.webp` | logo do cabeçalho de electrochemical.com.br (Guarulhos); refeito em 19/11 a partir do original (`electrochemical_logo_header_novo.png`), com a transparência pela luminosidade: na versão anterior a bateria amarela e verde tinha virado cinza-escuro e engolia o "L" |
 | Lopes Kalil Engenharia | `lopes-kalil.webp` | logo de lopeskalil.com.br (original pequeno, 130 px) |
 | Indovinya | `indovinya.webp` | logo de indovinya.indoramaventures.com |
 | Colégio Progresso | `colegio-progresso.webp` | logo de colegioprogresso.g12.br (Guarulhos, Vila Galvão) (unidade de Guarulhos; confirmado pelo Gabriel em 16/11) |

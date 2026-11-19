@@ -40,12 +40,13 @@ Comandos: `npm run dev` · `npm run build` · `npm run lint`.
   - branco `#FFFFFF`
   - fundo claro `#F5F7FA`
   - cinza-azulado `#5D6178` (texto secundário)
+- Exceção (decisão do Gabriel, 19/11): o vermelho de erro (`--destructive`, `text-destructive`) só nas mensagens de erro; em nenhum outro lugar.
 - As cores já estão mapeadas nas variáveis do tema em `src/app/globals.css` (primary = azul-marinho, accent = turquesa, background = branco, muted = fundo claro; o tema dark usa o azul-marinho como fundo). Use as classes do tema (`bg-primary`, `text-muted-foreground`, …), não hex soltos.
 - O logo **nunca** é redesenhado nem tem a tipografia trocada. Arquivos oficiais em `public/brand/`.
 
 ## Abertura do site
 
-Entrou em 16/11 (pedido do Gabriel para a reunião com a Whim): `src/components/home/abertura.tsx`, a mesma do protótipo aprovado (símbolo pintado pela tinta e a escrita entrando), toca em toda carga da home; o logo da barra só leva à home, sem repetir a abertura (pedido de 18/11), toque pula, sem movimento reduzido. A tinta da palavra "Vista" só começa quando ela acaba (`src/lib/abertura.ts`).
+Entrou em 16/11 (pedido do Gabriel para a reunião com a Whim): `src/components/home/abertura.tsx`, a mesma do protótipo aprovado (símbolo pintado pela tinta e a escrita entrando), toca só na 1ª carga da home na sessão (`sessionStorage`, decisão do Gabriel em 19/11); nas cargas seguintes a home vem pronta e só a tinta do "Vista" toca. O logo da barra só leva à home, sem repetir a abertura (pedido de 18/11), toque pula, sem movimento reduzido. A tinta da palavra "Vista" só começa quando a abertura acaba (`src/lib/abertura.ts`).
 
 ## SEO
 

@@ -63,7 +63,7 @@ export default function Privacidade() {
   return (
     <>
       <SiteHeader />
-      <main className="flex-1 bg-background">
+      <main id="conteudo" tabIndex={-1} className="outline-none flex-1 bg-background">
         <Container className="pt-32 pb-20 sm:pt-40 sm:pb-28">
           <article className="mx-auto max-w-[72ch]">
             <header className="border-b pb-8">

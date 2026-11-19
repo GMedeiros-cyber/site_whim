@@ -81,6 +81,8 @@ export function SiteFooter() {
               src={MAPA_EMBED}
               title="Mapa com a localização da Whim"
               loading="lazy"
+              // O mapa testa a tela cheia: sem a permissão, o Safari acusa erro no console.
+              allowFullScreen
               referrerPolicy="no-referrer-when-downgrade"
               className="mt-1 h-[190px] w-full rounded-[18px] border border-primary-foreground/15 bg-primary-foreground/10"
             />
@@ -211,7 +213,7 @@ function Coluna({
     <section aria-labelledby={`rodape-${id}`} className={cn("flex flex-col gap-3", className)}>
       <h2
         id={`rodape-${id}`}
-        className="flex items-center gap-2.5 text-[11.5px] font-medium tracking-[0.22em] text-primary-foreground uppercase before:h-px before:w-[22px] before:bg-accent"
+        className="text-sm font-semibold text-primary-foreground"
       >
         {titulo}
       </h2>

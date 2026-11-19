@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
+import { seloIlustrativa } from "@/components/blocos";
 import { cn } from "@/lib/utils";
 
 export type Foto = {
@@ -153,9 +154,7 @@ export function TecnicaFotos({
         )}
       </button>
       {!fotos[atual]?.real && (
-        <span className="pointer-events-none absolute top-3 left-3 rounded-full bg-background/85 px-2.5 py-[5px] text-[11px] text-foreground">
-          Imagem ilustrativa
-        </span>
+        <span className={cn(seloIlustrativa, "top-3 left-3")}>Imagem ilustrativa</span>
       )}
       <div className="absolute inset-x-0 bottom-1.5 flex justify-center">
         {fotos.map((f, i) => (
@@ -165,7 +164,7 @@ export function TecnicaFotos({
             onClick={() => setAtual(i)}
             aria-label={`${nome}: foto ${i + 1} de ${fotos.length}`}
             aria-current={i === atual}
-            className="grid size-8 cursor-pointer place-items-center rounded-full outline-none focus-visible:ring-3 focus-visible:ring-ring/50 cel:size-11"
+            className="grid size-8 cursor-pointer place-items-center rounded-full outline-none focus-visible:ring-3 focus-visible:ring-ring/50 max-lg:size-11"
           >
             <span
               className={cn(

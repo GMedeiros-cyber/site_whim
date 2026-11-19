@@ -33,7 +33,7 @@ export function TelaErro({ error }: { error: unknown }) {
   }, [error]);
 
   return (
-    <main className="flex flex-1 items-center bg-muted">
+    <main id="conteudo" tabIndex={-1} className="outline-none flex flex-1 items-center bg-muted">
       <Container className="py-24 sm:py-32">
         {/* <a> e não <Link> (aqui e no botão): depois de um erro, a navegação completa é a mais segura. */}
         {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}

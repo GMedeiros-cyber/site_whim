@@ -1,7 +1,8 @@
 /**
  * Entrada da home, em sequência: abertura (logo pintado) → tinta da palavra "Vista".
- * Toca em toda carga da home. Chegando à home por um link (inclusive o logo da barra,
- * pedido de 18/11), tudo já aparece pronto.
+ * A abertura toca só na 1ª carga da home na sessão (decisão do Gabriel, 19/11); nas cargas
+ * seguintes a home vem pronta e só a tinta do "Vista" toca. Chegando à home por um link
+ * (inclusive o logo da barra, pedido de 18/11), tudo já aparece pronto.
  *
  * A fase fica em <html data-intro>:
  *   "abertura" abertura tocando (começa no 1º desenho; a rolagem fica travada)
@@ -23,10 +24,11 @@ export const faseIntro = () => html().dataset.intro as Fase | undefined;
 export const aberturaNaTela = () => faseIntro() === "abertura";
 
 /**
- * Antes da 1ª pintura: marca a abertura e trava a rolagem (o gutter fica, para a página
- * não mudar de largura ao destravar). Com movimento reduzido, nada disso.
+ * Antes da 1ª pintura: na 1ª carga da sessão marca a abertura e trava a rolagem (o gutter fica,
+ * para a página não mudar de largura ao destravar); nas seguintes, marca direto a tinta. Sem
+ * sessionStorage (navegação privada antiga), a abertura toca como antes. Com movimento reduzido, nada.
  */
-export const SCRIPT_CARGA = `(function(){try{if(!matchMedia("(prefers-reduced-motion: reduce)").matches){var h=document.documentElement;h.dataset.intro="abertura";h.style.overflow="hidden";h.style.scrollbarGutter="stable"}}catch(e){}})()`;
+export const SCRIPT_CARGA = `(function(){try{if(!matchMedia("(prefers-reduced-motion: reduce)").matches){var h=document.documentElement,k="whim-abertura",v=null;try{v=sessionStorage.getItem(k);sessionStorage.setItem(k,"1")}catch(e){}if(v){h.dataset.intro="tinta"}else{h.dataset.intro="abertura";h.style.overflow="hidden";h.style.scrollbarGutter="stable"}}}catch(e){}})()`;
 
 export function travarRolagem(trava: boolean) {
   html().style.overflow = trava ? "hidden" : "";

@@ -41,6 +41,14 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${poppins.variable} h-full antialiased motion-safe:scroll-smooth`}
     >
       <body className="min-h-full flex flex-col">
+        {/* Primeira parada do Tab: pula a barra (aparece só com o foco). Cada página tem <main id="conteudo">. */}
+        <a
+          href="#conteudo"
+          // O not-sr-only zera o padding: o padding vem junto, no foco (pílula de 44 px de altura).
+          className="sr-only rounded-full bg-primary text-sm font-semibold text-primary-foreground focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[110] focus:px-5 focus:py-3 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+        >
+          Pular para o conteúdo
+        </a>
         {children}
         <BotaoWhatsApp />
         <TransicaoPinta />

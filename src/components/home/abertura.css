@@ -33,3 +33,5 @@
 @keyframes abertura-sai{to{transform:translateY(-100%)}}
 @keyframes abertura-pula{to{transform:translateY(-100%)}}
 @media (prefers-reduced-motion:reduce){.abertura{display:none}}
+/* Cargas seguintes da sessão (SCRIPT_CARGA marca "tinta"): o HTML da abertura não aparece até a hidratação tirá-lo. */
+html:not([data-intro="abertura"]) .abertura{display:none}

@@ -3,7 +3,7 @@ import Image, { getImageProps } from "next/image";
 import Link from "next/link";
 import { ArrowDownIcon } from "lucide-react";
 
-import { Container, Destaque, Seta, Titulo, secao } from "@/components/blocos";
+import { Container, Destaque, Seta, Titulo, secao, seloIlustrativa } from "@/components/blocos";
 import { Abertura } from "@/components/home/abertura";
 import { Carrossel } from "@/components/home/carrossel";
 import { DUVIDAS } from "@/components/home/duvidas";
@@ -137,7 +137,7 @@ const TECNICAS = [
       { src: "/images/estilos/dtf-2.webp", alt: "Mão tirando o filme transparente de uma estampa DTF colorida de flores numa camiseta branca, ao lado da prensa" },
       { src: "/images/estilos/dtf-3.webp", alt: "Rolo de filme DTF impresso com várias artes coloridas, ao lado de uma camiseta preta dobrada" },
     ],
-    texto: "Todas as cores, degradês e fotos, com acabamento fotográfico.",
+    texto: "Impressa num filme e aplicada com calor: todas as cores, degradês e fotos, com acabamento fotográfico.",
     bomPara: "artes coloridas e pedidos menores.",
   },
   {
@@ -183,7 +183,7 @@ export default function Home() {
     <>
       <Abertura />
       <SiteHeader />
-      <main className="flex-1">
+      <main id="conteudo" tabIndex={-1} className="outline-none flex-1">
         <Topo />
         {/* Celular: "Marcas que confiam" sobe para logo depois da hero (order); no PC fica onde está. */}
         <div className="home-grande cel:flex cel:flex-col">
@@ -220,6 +220,11 @@ function Topo() {
             className="absolute inset-0 -z-20 size-full object-cover object-[50%_50%] [@media(min-aspect-ratio:1/1)]:object-[50%_55%]"
           />
         </picture>
+        {/* Hero provisória gerada com IA: o selo da regra de marca (auditoria de 19/11). O alt já
+            diz "imagem ilustrativa", então o selo fica fora do leitor de tela. */}
+        <span aria-hidden className={cn(seloIlustrativa, "bottom-3 left-3 z-10 md:bottom-5 md:left-5")}>
+          Imagem ilustrativa
+        </span>
         {/* Véu azul: forte atrás do texto, mais leve nas bordas e embaixo, onde a estampa aparece.
             No celular o texto fica embaixo, então o véu escurece de cima para baixo. */}
         <div
@@ -286,7 +291,7 @@ function QuemSomos() {
           </Titulo>
           <p className={cn(apoio, centro, sobe, "cel:mt-3 cel:text-[15px]")}>
             <span className="cel:hidden">
-              A Whim nasceu em 2021, quando o Wallan juntou 15 anos de experiência numa oficina
+              A Whim nasceu em 2021, quando o fundador juntou 15 anos de experiência numa oficina
               própria em Guarulhos. Hoje a gente faz peças para empresas, escolas e eventos com todas
               as etapas no mesmo lugar.
             </span>
@@ -495,6 +500,7 @@ function Duvidas() {
             sizes="(min-width: 1024px) 440px, 100vw"
             className="object-cover object-[50%_42%]"
           />
+          <span className={cn(seloIlustrativa, "bottom-3 left-3")}>Imagem ilustrativa</span>
         </div>
         <div>
           <Titulo className={cn(centro, sobe)}>

@@ -7,13 +7,13 @@
 export type Lado = "frente" | "costas";
 /** [x, y, largura, altura] de 0 a 1 no quadro 900x1200; nas mangas, + ângulo em graus (horário na tela). */
 export type Area = [number, number, number, number] | [number, number, number, number, number];
-export const TECNICAS = ["Silk", "DTF", "Bordado", "Ainda não sei"] as const;
+export const TECNICAS = ["Silk", "DTF", "Bordado", "Não sei, me indiquem"] as const;
 export type Tecnica = (typeof TECNICAS)[number];
 export const FRASE_TECNICA: Record<Tecnica, string> = {
   Silk: "Cores chapadas, toque macio. Cada cor é uma tela.",
-  DTF: "Todas as cores e degradês, com um leve brilho.",
+  DTF: "Impressa num filme e aplicada com calor: todas as cores e degradês, com um leve brilho.",
   Bordado: "Linha costurada em relevo. Bom para logos simples.",
-  "Ainda não sei": "A Whim indica a melhor técnica para a sua arte.",
+  "Não sei, me indiquem": "A equipe da Whim indica a melhor técnica para a sua arte.",
 };
 
 const QUADRO = 900; // largura do quadro das fotos (1×)
@@ -27,7 +27,7 @@ const TINTA: Record<Tecnica, { trama: number; brilho: number; clareia: boolean; 
   Silk: { trama: 0.9, brilho: 0, clareia: false, opacidade: 0.95 },
   DTF: { trama: 0.35, brilho: 0.6, clareia: true, opacidade: 0.95 },
   Bordado: { trama: 0.2, brilho: 0, clareia: true, opacidade: 1 },
-  "Ainda não sei": { trama: 0.35, brilho: 0, clareia: true, opacidade: 0.95 },
+  "Não sei, me indiquem": { trama: 0.35, brilho: 0, clareia: true, opacidade: 0.95 },
 };
 
 export function areaDe(modelo: { areas: object }, lado: Lado, chave: string) {
@@ -349,7 +349,7 @@ export function comporEstampa(ctx: OffscreenCanvasRenderingContext2D, peca: Imag
     const M = Math.ceil(K + 2 * r + 4);
     const x0 = Math.max(0, Math.floor(cx - bw / 2) - M), y0 = Math.max(0, Math.floor(cy - bh / 2) - M);
     const rw = Math.min(W, Math.ceil(cx + bw / 2) + M) - x0, rh = Math.min(H, Math.ceil(cy + bh / 2) + M) - y0;
-    const t = arte.simula ? tecnica : "Ainda não sei";
+    const t = arte.simula ? tecnica : "Não sei, me indiquem";
     const estilo = TINTA[t];
 
     // 1. Arte sem distorcer: contain, centrada, alinhada em cima; manga girada e mais estreita.

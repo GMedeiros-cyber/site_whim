@@ -26,7 +26,7 @@ export const DUVIDAS = [
   },
   {
     pergunta: "Onde dá para estampar e qual o tamanho máximo?",
-    resposta: "Frente, costas e manga, com estampa de até A3.",
+    resposta: "Frente, costas e manga, com estampa de até A3 (29,7 × 42 cm).",
   },
   {
     pergunta: "Vocês atendem a minha região?",

@@ -18,7 +18,7 @@ const assinar = (avisar: () => void) => {
 
 /**
  * Abertura da home: o símbolo da Whim é pintado pela tinta e a escrita entra (~3,5 s).
- * Toca em toda carga da home; o logo da barra não a repete (pedido de 18/11).
+ * Toca na 1ª carga da home na sessão (19/11); o logo da barra não a repete (pedido de 18/11).
  * Vem no HTML do servidor e anima já no 1º desenho, só com transform e opacity (no
  * compositor, a hidratação não engasga). O React decide se ela fica na árvore; o nó
  * nunca é tirado à mão. Um toque (ou tecla) pula. No fim, a tinta do "Vista" começa.
@@ -69,6 +69,9 @@ export function Abertura() {
   if (!tocando) return null;
   return (
     <>
+      {/* O script vem antes: marca a fase antes de o navegador ver a abertura (o CSS a esconde
+          quando a fase não é "abertura", como nas cargas seguintes da sessão). */}
+      <script dangerouslySetInnerHTML={{ __html: SCRIPT_CARGA }} />
       <div ref={ref} id="abertura" className="abertura" aria-hidden="true" title="Toque para pular">
         <div className="abertura-palco">
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -86,7 +89,6 @@ export function Abertura() {
         </div>
         <span className="abertura-pular">Toque para pular</span>
       </div>
-      <script dangerouslySetInnerHTML={{ __html: SCRIPT_CARGA }} />
     </>
   );
 }

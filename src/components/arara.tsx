@@ -161,6 +161,7 @@ function PecaGirando({
   // Tamanho do canvas = tamanho na tela × DPR (até 2), medido uma vez (e se a tela mudar de largura).
   useEffect(() => {
     const canvas = canvasRef.current!;
+    let raf = 0;
     const ro = new ResizeObserver(([e]) => {
       const dpr = Math.min(2, devicePixelRatio || 1);
       const w = Math.round(e.contentRect.width * dpr);
@@ -171,10 +172,15 @@ function PecaGirando({
         desenhado.current = "";
         agendar();
       }
-      setTamanho((t) => t ?? [canvas.width, canvas.height]);
+      // O estado muda no quadro seguinte: dentro do observer, o Safari acusa "ResizeObserver loop".
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => setTamanho((t) => t ?? [canvas.width, canvas.height]));
     });
     ro.observe(canvas);
-    return () => ro.disconnect();
+    return () => {
+      ro.disconnect();
+      cancelAnimationFrame(raf);
+    };
   }, [modelo, agendar]);
 
   // Os quadros da cor atual (e a cada troca de cor) vêm num pacote só, baixado no load da página
@@ -284,6 +290,7 @@ function liberar(b: Banco) {
  */
 export function AraraGrade({ selecionada, cor, onEscolher }: { selecionada: string; cor: string; onEscolher: (nome: string) => void }) {
   const fileiras = [MODELOS.slice(0, 3), MODELOS.slice(3)];
+  // A 1ª fileira é o maior elemento da 1ª tela do celular (o LCP): carrega já, com prioridade.
   return (
     // --w: 1/3 da largura útil (16 px de cada lado e 8 px entre as peças); --cano como na arara.
     <div role="group" aria-label="Arara de modelos" className="[--cano:calc(var(--w)*0.1067)] [--w:calc((100vw-3rem)/3)]">
@@ -315,6 +322,8 @@ export function AraraGrade({ selecionada, cor, onEscolher }: { selecionada: stri
                       width={m.largura}
                       height={m.altura}
                       unoptimized
+                      loading={f === 0 ? "eager" : "lazy"}
+                      fetchPriority={f === 0 ? "high" : "auto"}
                       className={cn("-mt-[calc(var(--cano)/2+var(--w)*0.0875)] aspect-[3/4] w-full max-w-none", ESPELHADAS.has(m.id) && "-scale-x-100")}
                     />
                     <span className={cn("text-[13px] leading-tight", escolhida ? "font-semibold" : "text-muted-foreground")}>{m.nome}</span>
@@ -351,10 +360,17 @@ export function Arara({ selecionada, cor, onEscolher }: { selecionada: string; c
     const el = trilhoRef.current;
     if (!el) return;
     medirTrilho();
-    const ro = new ResizeObserver(medirTrilho);
+    let raf = 0;
+    const ro = new ResizeObserver(() => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(medirTrilho);
+    });
     ro.observe(el);
     if (el.firstElementChild) ro.observe(el.firstElementChild);
-    return () => ro.disconnect();
+    return () => {
+      ro.disconnect();
+      cancelAnimationFrame(raf);
+    };
   }, [medirTrilho]);
 
   const corDe = (m: Modelo) => (m.nome === selecionada ? cor : corPropria(m));
