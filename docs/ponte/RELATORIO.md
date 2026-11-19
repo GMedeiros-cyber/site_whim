@@ -405,3 +405,8 @@ Uma entrada por tarefa, sempre acrescentada no fim (nunca reescrever as anterior
 - Processo: o passo anda de 1 a 5 enquanto o bloco sobe de 85% a 25% da tela (sem prender a página), volta ao rolar para cima; tocar num número continua valendo; frase com esmaecimento curto e número atual um pouco maior.
 - Comandos: lint, tsc, build (webpack, ok), Playwright a 390 (rolagem 1→5, toque no 5, quadros da troca de aba, console limpo).
 - Pendente: conferir no iPhone.
+
+### 2026-11-19 12:45 · Claude · Arrastar as fotos das técnicas
+- Arrastar para o lado (> 40 px, mais horizontal que vertical) passa ou volta a foto; o toque simples continua passando; a rolagem vertical não é afetada (`touch-pan-y`). `src/components/home/tecnica-fotos.tsx`.
+- Comandos: lint, tsc, build (webpack, ok), Playwright a 390 (esq, esq, dir, toque: 0→1→2→1→2).
+- Pendente: nada.

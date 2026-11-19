@@ -31,6 +31,10 @@ export function TecnicaFotos({
   const [visivel, setVisivel] = useState(false);
   const [parado, setParado] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  // Arrastar para o lado troca a foto (pedido de 19/11); o toque simples continua passando.
+  const arrasto = useRef<{ x: number; y: number } | null>(null);
+  const arrastou = useRef(false);
+  const passar = (d: number) => setAtual((a) => (a + d + fotos.length) % fotos.length);
 
   useEffect(() => {
     const el = ref.current;
@@ -58,9 +62,27 @@ export function TecnicaFotos({
     >
       <button
         type="button"
-        onClick={() => setAtual((a) => (a + 1) % fotos.length)}
+        onPointerDown={(e) => {
+          arrasto.current = { x: e.clientX, y: e.clientY };
+          arrastou.current = false;
+        }}
+        onPointerUp={(e) => {
+          const a = arrasto.current;
+          arrasto.current = null;
+          if (!a) return;
+          const dx = e.clientX - a.x;
+          if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(e.clientY - a.y)) {
+            arrastou.current = true;
+            passar(dx < 0 ? 1 : -1);
+          }
+        }}
+        onPointerCancel={() => (arrasto.current = null)}
+        onClick={() => {
+          if (arrastou.current) arrastou.current = false;
+          else passar(1);
+        }}
         aria-label={`${nome}: próxima foto`}
-        className="absolute inset-0 cursor-pointer outline-none focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:ring-inset"
+        className="absolute inset-0 cursor-pointer touch-pan-y outline-none select-none focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:ring-inset"
       >
         {fotos.map((f, i) => (
           <Image
@@ -69,6 +91,7 @@ export function TecnicaFotos({
             alt={i === atual ? f.alt : ""}
             aria-hidden={i !== atual}
             fill
+            draggable={false}
             loading={i === 0 ? undefined : visivel || atual === i ? "eager" : "lazy"}
             sizes="(min-width: 1024px) 380px, (min-width: 768px) 33vw, 76vw"
             className={cn(
