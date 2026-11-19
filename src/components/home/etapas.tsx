@@ -26,11 +26,7 @@ export function Etapas() {
 
   useEffect(() => {
     const lista = listaRef.current;
-    if (
-      !lista ||
-      !CSS.supports("animation-timeline: view()") ||
-      matchMedia("(prefers-reduced-motion: reduce)").matches
-    )
+    if (!lista || !CSS.supports("animation-timeline: view()") || matchMedia("(prefers-reduced-motion: reduce)").matches)
       return;
     const olhar = () => {
       // Escondida (celular, que usa EtapasCelular): a animação não roda e o valor fica no máximo.
@@ -89,13 +85,49 @@ export function Etapas() {
 
 /**
  * Celular (referencia/celular-18-11): os 5 passos numa linha (círculos ligados por uma
- * linha que fica turquesa até o passo escolhido) e, embaixo, só a frase do passo tocado.
- * Começa no 1; setas, Home e End trocam de passo.
+ * linha que fica turquesa até o passo atual) e, embaixo, só a frase do passo atual.
+ * O passo anda sozinho com a rolagem (pedido de 19/11): enquanto o bloco sobe de 85% a 25%
+ * da altura da tela, vai do 1 ao 5, sem prender a página. Tocar num número ou usar as
+ * setas, Home e End também troca; a rolagem volta a mandar quando cruza o próximo trecho.
  */
 export function EtapasCelular({ className }: { className?: string }) {
   const [atual, setAtual] = useState(0);
   const id = useId();
   const passos = useRef<(HTMLButtonElement | null)[]>([]);
+  const caixaRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const caixa = caixaRef.current;
+    if (!caixa) return;
+    let raf = 0;
+    let ultimo = -1;
+    const ler = () => {
+      raf = 0;
+      const r = caixa.getBoundingClientRect();
+      if (!r.height) return; // escondido (PC)
+      const meio = r.top + r.height / 2;
+      const inicio = innerHeight * 0.85;
+      const fim = innerHeight * 0.25;
+      const p = Math.min(1, Math.max(0, (inicio - meio) / (inicio - fim)));
+      const n = Math.min(ULTIMO, Math.floor(p * (ULTIMO + 1)));
+      // Só troca quando a rolagem muda de trecho: um toque num número fica até lá.
+      if (n !== ultimo) {
+        ultimo = n;
+        setAtual(n);
+      }
+    };
+    const aoRolar = () => {
+      raf ||= requestAnimationFrame(ler);
+    };
+    ler();
+    addEventListener("scroll", aoRolar, { passive: true });
+    addEventListener("resize", aoRolar);
+    return () => {
+      removeEventListener("scroll", aoRolar);
+      removeEventListener("resize", aoRolar);
+      cancelAnimationFrame(raf);
+    };
+  }, []);
   const ir = (i: number) => {
     const n = Math.max(0, Math.min(ULTIMO, i));
     setAtual(n);
@@ -103,7 +135,7 @@ export function EtapasCelular({ className }: { className?: string }) {
   };
 
   return (
-    <div className={className}>
+    <div ref={caixaRef} className={className}>
       <div
         role="tablist"
         aria-label="Etapas do pedido"
@@ -142,8 +174,9 @@ export function EtapasCelular({ className }: { className?: string }) {
             <span
               aria-hidden
               className={cn(
-                "grid size-9 place-items-center rounded-full border-2 text-[13px] font-bold tabular-nums transition-colors duration-300 motion-reduce:transition-none",
-                i <= atual ? "border-accent bg-accent text-primary" : "border-primary/14 bg-background"
+                "grid size-9 place-items-center rounded-full border-2 text-[13px] font-bold tabular-nums transition-[color,background-color,border-color,scale] duration-300 motion-reduce:transition-none",
+                i <= atual ? "border-accent bg-accent text-primary" : "border-primary/14 bg-background",
+                i === atual && "scale-110"
               )}
             >
               {i + 1}
@@ -158,10 +191,16 @@ export function EtapasCelular({ className }: { className?: string }) {
         aria-labelledby={`${id}-passo${atual}`}
         className="mt-7 rounded-[18px] bg-muted px-[18px] py-4 text-center text-sm leading-normal text-muted-foreground"
       >
-        <b className="block text-[15px] font-semibold text-foreground">
-          {atual + 1} · {PASSOS[atual].nome}
-        </b>
-        {PASSOS[atual].texto}
+        {/* A frase nova entra com um esmaecimento curto (só opacity e transform). */}
+        <div
+          key={atual}
+          className="animate-in duration-300 ease-out fade-in slide-in-from-bottom-1 motion-reduce:animate-none"
+        >
+          <b className="block text-[15px] font-semibold text-foreground">
+            {atual + 1} · {PASSOS[atual].nome}
+          </b>
+          {PASSOS[atual].texto}
+        </div>
       </div>
     </div>
   );

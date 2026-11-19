@@ -13,22 +13,11 @@ type Tecnica = { nome: string; fotos: Foto[]; texto: string; bomPara: string };
  * o da aba, com as fotos que já trocam sozinhas. Setas, Home e End trocam de aba.
  * No PC continuam os três cartões (page.tsx).
  */
-export function TecnicasAbas({
-  tecnicas,
-  className,
-}: {
-  tecnicas: Tecnica[];
-  className?: string;
-}) {
+export function TecnicasAbas({ tecnicas, className }: { tecnicas: Tecnica[]; className?: string }) {
   const [atual, setAtual] = useState(0);
-  // Para que lado o cartão novo entra (da direita indo para a frente, da esquerda voltando).
-  const [frente, setFrente] = useState(true);
   const id = useId();
   const abas = useRef<(HTMLButtonElement | null)[]>([]);
-  const t = tecnicas[atual];
   const escolher = (n: number) => {
-    if (n === atual) return;
-    setFrente(n > atual);
     setAtual(n);
   };
   const ir = (i: number) => {
@@ -76,7 +65,7 @@ export function TecnicasAbas({
             onClick={() => escolher(i)}
             className={cn(
               "min-h-11 flex-1 cursor-pointer rounded-full text-sm font-medium text-muted-foreground transition-colors duration-300 outline-none focus-visible:ring-3 focus-visible:ring-ring/50 motion-reduce:transition-none",
-              i === atual && "text-foreground",
+              i === atual && "text-foreground"
             )}
           >
             {x.nome}
@@ -89,30 +78,35 @@ export function TecnicasAbas({
         aria-labelledby={`${id}-aba${atual}`}
         className="mt-3 overflow-hidden rounded-[24px] border border-primary/6 bg-background"
       >
-        {/* O cartão novo entra com um leve deslize do lado da aba escolhida. */}
-        <div
-          key={t.nome}
-          className={cn(
-            "animate-in duration-[420ms] ease-out fade-in motion-reduce:animate-none",
-            frente ? "slide-in-from-right-6" : "slide-in-from-left-6",
-          )}
-        >
-          <TecnicaFotos
-            nome={t.nome}
-            fotos={t.fotos}
-            className="aspect-[7/5]"
-          />
-          <div className="flex flex-col gap-1.5 px-[18px] pt-[18px] pb-5 text-center">
-            <h3 className="text-xl font-semibold tracking-[-0.02em]">
-              {t.nome}
-            </h3>
-            <p className="text-sm leading-normal text-muted-foreground">
-              {t.texto}
-            </p>
-            <p className="text-[13px] leading-normal">
-              <strong className="font-semibold">Bom para:</strong> {t.bomPara}
-            </p>
-          </div>
+        {/* Os três cartões ficam montados, um sobre o outro (fotos já carregadas): trocar de aba
+            só mexe em opacity e transform, no compositor, sem baixar foto nem recriar nada.
+            O novo entra do lado da aba escolhida; o antigo sai para o outro lado. */}
+        <div className="grid">
+          {tecnicas.map((x, i) => {
+            const ativo = i === atual;
+            return (
+              <div
+                key={x.nome}
+                inert={!ativo}
+                aria-hidden={!ativo || undefined}
+                className={cn(
+                  "col-start-1 row-start-1 transition-[opacity,transform] duration-300 ease-out will-change-transform motion-reduce:transition-none",
+                  ativo
+                    ? "translate-x-0 opacity-100"
+                    : cn("pointer-events-none opacity-0", i > atual ? "translate-x-6" : "-translate-x-6")
+                )}
+              >
+                <TecnicaFotos nome={x.nome} fotos={x.fotos} pausado={!ativo} className="aspect-[7/5]" />
+                <div className="flex flex-col gap-1.5 px-[18px] pt-[18px] pb-5 text-center">
+                  <h3 className="text-xl font-semibold tracking-[-0.02em]">{x.nome}</h3>
+                  <p className="text-sm leading-normal text-muted-foreground">{x.texto}</p>
+                  <p className="text-[13px] leading-normal">
+                    <strong className="font-semibold">Bom para:</strong> {x.bomPara}
+                  </p>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </article>
     </div>
@@ -149,10 +143,7 @@ export function TambemLinhas({
       raf = 0;
       const r = linha.getBoundingClientRect();
       // O botão ocupa os 88 px de baixo da tela (16 de margem + 56 + folga).
-      html.toggleAttribute(
-        "data-sem-flutuante",
-        r.height > 0 && r.bottom > innerHeight - 88 && r.top < innerHeight,
-      );
+      html.toggleAttribute("data-sem-flutuante", r.height > 0 && r.bottom > innerHeight - 88 && r.top < innerHeight);
     };
     const aoMudar = () => {
       raf ||= requestAnimationFrame(ler);
@@ -178,26 +169,15 @@ export function TambemLinhas({
         {itens.map((item, i) => {
           const nome = (
             <span className="flex flex-col gap-0.5">
-              <span className="text-sm leading-tight font-semibold">
-                {item.nome}
-              </span>
-              <span className="text-[11.5px] leading-snug opacity-75">
-                {item.resumo}
-              </span>
+              <span className="text-sm leading-tight font-semibold">{item.nome}</span>
+              <span className="text-[11.5px] leading-snug opacity-75">{item.resumo}</span>
             </span>
           );
           if (i === ultimo) {
             return (
-              <a
-                key={item.nome}
-                href={whatsapp}
-                className={cn(caixa, "bg-primary text-primary-foreground")}
-              >
+              <a key={item.nome} href={whatsapp} className={cn(caixa, "bg-primary text-primary-foreground")}>
                 {nome}
-                <ChevronRightIcon
-                  aria-hidden
-                  className="size-[18px] shrink-0"
-                />
+                <ChevronRightIcon aria-hidden className="size-[18px] shrink-0" />
               </a>
             );
           }
@@ -215,7 +195,7 @@ export function TambemLinhas({
               className={cn(
                 caixa,
                 "cursor-pointer border bg-background transition-colors motion-reduce:transition-none",
-                ativa ? "border-accent/60 bg-accent/16" : "border-primary/6",
+                ativa ? "border-accent/60 bg-accent/16" : "border-primary/6"
               )}
             >
               {nome}
@@ -223,7 +203,7 @@ export function TambemLinhas({
                 aria-hidden
                 className={cn(
                   "size-[18px] shrink-0 transition-transform duration-300 motion-reduce:transition-none",
-                  ativa && "rotate-180",
+                  ativa && "rotate-180"
                 )}
               />
             </button>
@@ -237,7 +217,7 @@ export function TambemLinhas({
         inert={aberta === null}
         className={cn(
           "grid transition-[grid-template-rows] duration-300 ease-out motion-reduce:transition-none",
-          aberta === null ? "grid-rows-[0fr]" : "grid-rows-[1fr]",
+          aberta === null ? "grid-rows-[0fr]" : "grid-rows-[1fr]"
         )}
       >
         <p className="overflow-hidden text-center text-sm leading-normal text-muted-foreground">

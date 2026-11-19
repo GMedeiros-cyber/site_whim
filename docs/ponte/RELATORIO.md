@@ -399,3 +399,9 @@ Uma entrada por tarefa, sempre acrescentada no fim (nunca reescrever as anterior
 - Pílula turquesa desliza até a aba escolhida (380 ms, leve elástico) e o cartão novo entra com fade e deslize do lado da aba (420 ms); movimento reduzido sem animação. `src/components/home/tecnicas-celular.tsx`.
 - Comandos: lint, tsc, build (webpack, ok), quadros a 60/140/450 ms a 390 px.
 - Pendente: nada.
+
+### 2026-11-19 12:35 · Claude · Abas sem travar e Processo andando com a rolagem (celular)
+- Técnicas: os 3 cartões ficam montados um sobre o outro (fotos já carregadas, as escondidas não trocam sozinhas); trocar de aba só mexe em opacity/transform (30 quadros em 500 ms, maior intervalo 18 ms). Antes, cada troca recriava o cartão e baixava a foto.
+- Processo: o passo anda de 1 a 5 enquanto o bloco sobe de 85% a 25% da tela (sem prender a página), volta ao rolar para cima; tocar num número continua valendo; frase com esmaecimento curto e número atual um pouco maior.
+- Comandos: lint, tsc, build (webpack, ok), Playwright a 390 (rolagem 1→5, toque no 5, quadros da troca de aba, console limpo).
+- Pendente: conferir no iPhone.

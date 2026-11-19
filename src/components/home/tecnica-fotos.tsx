@@ -15,7 +15,18 @@ const INTERVALO = 4500;
  * tela e o mouse não está em cima; com movimento reduzido, só troca pelos pontos ou ao
  * tocar na foto. A primeira foto vem no HTML; as outras carregam quando o cartão aparece.
  */
-export function TecnicaFotos({ nome, fotos, className }: { nome: string; fotos: Foto[]; className?: string }) {
+export function TecnicaFotos({
+  nome,
+  fotos,
+  className,
+  pausado = false,
+}: {
+  nome: string;
+  fotos: Foto[];
+  className?: string;
+  /** Cartão escondido (abas do celular): não troca de foto sozinho. */
+  pausado?: boolean;
+}) {
   const [atual, setAtual] = useState(0);
   const [visivel, setVisivel] = useState(false);
   const [parado, setParado] = useState(false);
@@ -24,17 +35,19 @@ export function TecnicaFotos({ nome, fotos, className }: { nome: string; fotos: 
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    const io = new IntersectionObserver(([e]) => setVisivel(e.isIntersecting), { threshold: 0.4 });
+    const io = new IntersectionObserver(([e]) => setVisivel(e.isIntersecting), {
+      threshold: 0.4,
+    });
     io.observe(el);
     return () => io.disconnect();
   }, []);
 
   useEffect(() => {
-    if (!visivel || parado || fotos.length < 2) return;
+    if (!visivel || parado || pausado || fotos.length < 2) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const t = window.setInterval(() => setAtual((a) => (a + 1) % fotos.length), INTERVALO);
     return () => window.clearInterval(t);
-  }, [visivel, parado, fotos.length]);
+  }, [visivel, parado, pausado, fotos.length]);
 
   return (
     <div
