@@ -416,3 +416,9 @@ Uma entrada por tarefa, sempre acrescentada no fim (nunca reescrever as anterior
 - Figma com as 3 ideias: https://www.figma.com/design/bB78sHIWMiVDVHsR0OnYtx
 - Comandos: lint, tsc, build (webpack, ok), Playwright a 390 (troca sozinha 1→3 em 7 s, toque no 3 toca o vídeo, sem rolagem lateral, console limpo).
 - Pendente: vídeos curtos reais de telas, costura e acabamento (pedir à Whim) para trocar as imagens ilustrativas.
+
+### 2026-11-19 14:45 · Claude · Vídeo da Yamaha na aba Silk + logo nas marcas
+- Logo oficial da Yamaha (site da Yamaha Motor, sem o slogan, no cinza #5D6178) na faixa de marcas e no llms.txt (`ae8883d`).
+- Vídeo real da Whim (camisetas Yamaha em silk): 8 s em loop com fusão de 0,6 s, 576 × 1024, sem som, 1,4 MB (`public/videos/yamaha-silk-loop.mp4`, pôster webp). Entra como 1ª mídia do Silk (celular e PC), no lugar da foto silk-3; sem o selo "Imagem ilustrativa"; só baixa quando o cartão aparece e só toca na vez dele (fica 8 s antes de passar). `tecnica-fotos.tsx` aceita vídeo.
+- Comandos: lint, tsc, build (webpack, ok), Playwright a 390 e 1280 (vídeo tocando, sem selo, console limpo).
+- Pendente: confirmar com a Whim a autorização da Yamaha para mostrar a marca.

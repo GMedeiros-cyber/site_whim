@@ -116,9 +116,16 @@ const TECNICAS = [
   {
     nome: "Silk",
     fotos: [
+      // Vídeo real da Whim (19/11): camisetas da Yamaha em silk, tirando a tela e a mesa cheia.
+      {
+        src: "/images/yamaha-silk-poster.webp",
+        video: "/videos/yamaha-silk-loop.mp4",
+        alt: "Tela de silk sendo levantada e revelando o logo da Yamaha em branco numa camiseta preta, na mesa longa da oficina",
+        real: true,
+        foco: "50% 32%",
+      },
       { src: "/images/estilos/silk-close.webp", alt: "Rodo passando tinta turquesa na tela de silk sobre uma camiseta azul-marinho" },
       { src: "/images/estilos/silk-2.webp", alt: "Camiseta azul-marinho recém-estampada em silk, com arte geométrica em branco e turquesa e a tinta em relevo" },
-      { src: "/images/estilos/silk-3.webp", alt: "Oficina de silk com telas de serigrafia, rodos, latas de tinta turquesa e camisetas estampadas na mesa" },
     ],
     texto: "Tinta grossa em cores chapadas, com o toque e a durabilidade da tinta na tela.",
     bomPara: "logos de poucas cores e tiragens maiores.",
