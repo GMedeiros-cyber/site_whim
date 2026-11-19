@@ -389,3 +389,8 @@ Uma entrada por tarefa, sempre acrescentada no fim (nunca reescrever as anterior
 - Prints a 390 de antes e depois de cada item e o detalhe do item 4: `docs/ponte/prints/agente-celular-ajustes-18-11/` (README).
 - Comandos: `git checkout main && git pull && git checkout -b agente-celular/ajustes-18-11 && git merge --no-edit origin/claude/logo-home-18-11`, `npm run lint` (ok), `npx tsc --noEmit` (ok), `npm run build` (webpack, ok), `next start` + Playwright.
 - Commits: `cf07120`, `3667ea7` e o de docs. Pendente: confirmar num iPhone de verdade (data detectors só no aparelho); 12º cenário do build final parou em 13/20 (sem erro).
+
+### 2026-11-19 00:10 · Claude · Revisão e publicação dos ajustes do celular (18/11 à noite)
+- Revisei `agente-celular/ajustes-18-11` (`cf07120`, `3667ea7`, `98cc679`) e publiquei no main.
+- Comandos: lint, tsc, build (webpack, ok); Playwright no Chromium a 360/390/430 (menu nas 4 seções, barra no pé, flutuante no Resumo, sem rolagem lateral, console limpo) e 1280/1920 (14 cliques na barra, sem rastro).
+- Pendente: conferir num iPhone de verdade a tinta e as idas e voltas Monte → home.
