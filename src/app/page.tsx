@@ -159,6 +159,8 @@ const WHATSAPP_TECNICA = linkWhatsApp("Olá, Whim! Não sei qual técnica escolh
 const MARCAS = [
   { nome: "Globo", arquivo: "globo", largura: 514, altura: 37 },
   { nome: "Lollapalooza", arquivo: "lollapalooza", largura: 568, altura: 35 },
+  // Logo oficial do site da Yamaha Motor (global.yamaha-motor.com), sem o slogan, no cinza dos outros.
+  { nome: "Yamaha", arquivo: "yamaha", largura: 562, altura: 38 },
   { nome: "Santander", arquivo: "santander", largura: 688, altura: 32 },
   { nome: "SBT", arquivo: "sbt", largura: 120, altura: 52 },
   { nome: "Bauducco", arquivo: "bauducco", largura: 345, altura: 45 },

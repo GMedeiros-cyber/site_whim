@@ -13,7 +13,7 @@ export function GET() {
 - Tamanhos: infantil do 2 ao 16 e adulto do PP ao G3.
 - Pedido mínimo: 50 peças. Prazo de produção: 20 a 30 dias, conforme a quantidade e o modelo.
 - Região atendida: Guarulhos e Grande São Paulo.
-- Clientes: Globo, Lollapalooza, Santander, SBT, Bauducco, Aurora Coop, Electrochemical, Lopes Kalil Engenharia, Indovinya e Colégio Progresso (Guarulhos).
+- Clientes: Globo, Lollapalooza, Yamaha, Santander, SBT, Bauducco, Aurora Coop, Electrochemical, Lopes Kalil Engenharia, Indovinya e Colégio Progresso (Guarulhos).
 
 ## Páginas
 
