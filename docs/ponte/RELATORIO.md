@@ -442,3 +442,10 @@ Uma entrada por tarefa, sempre acrescentada no fim (nunca reescrever as anterior
 - `EtapasCelular` virou linha do tempo vertical: os 5 nomes e frases à vista; a linha e as bolinhas acendem até o passo que cruza 60% da tela (volta ao subir; no fim da página acende o 5); passo atual maior; toque num número também marca. PC sem mudança.
 - Comandos: lint, tsc, build (webpack, ok), Playwright a 390 (rolagem 1→5, sem rolagem lateral, console limpo).
 - Pendente: teste como iPhone (prompt para o agente).
+
+### 2026-11-24 04:40 · Claude · Site publicado como iPhone (WebKit do Playwright)
+- Testei https://whimconfeccao.com.br no WebKit, perfis iPhone SE (1ª geração, 320 px), 15 e 15 Pro Max: home, Monte (camiseta, Azul-marinho, PNG no peito esquerdo, 50 M), /privacidade, 404 e 180 idas e voltas (logo, menu, Voltar). wa.me e /api/contatos bloqueados: 0 pedidos.
+- Erro de verdade, só a 320 px, no Monte: cartões do Contato (o e-mail não quebra) fazem a página rolar 21 px de lado, e "Continuar · Estampa/Quantidade" passa da borda. A 375 px está certo. O resto passou nos 3 perfis: abertura, menu, abas, vídeo, capítulos, passos, marcas, nenhuma "Esta página não carregou", barra ao voltar.
+- O WebKit do Playwright não é um iPhone real: não cobre data detectors, teclado nem barras do Safari, e não tem OffscreenCanvas, por isso a prévia da estampa fica vazia nele (no Chromium aparece).
+- Comandos: `node tests/iphone/iphone.mjs tudo` e `paginas`, mais `ver.mjs` (moldura de iPhone para olhar à mão). Sem build: nada de produção mudou. Commit `eabf99a`, branch `agente-iphone/24-11`.
+- Pendente: corrigir E1 e E2; confirmar num iPhone real (data detectors, teclado, prévia em iOS anterior ao 16.4). Relatório: `docs/qualidade/iphone-24-11.md`.
