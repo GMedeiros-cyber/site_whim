@@ -30,6 +30,19 @@ export function depoisDaTransicao(fn: () => void): () => void {
 
 const quadro = () => new Promise((r) => requestAnimationFrame(r));
 
+/** Espera as fotos visíveis na 1ª tela da página nova decodificarem (com um limite de tempo). */
+async function fotosDaPrimeiraTela(limite: number) {
+  const visiveis = Array.from(document.images).filter((img) => {
+    const r = img.getBoundingClientRect();
+    return r.width > 40 && r.bottom > 0 && r.top < innerHeight && img.loading !== "lazy";
+  });
+  if (!visiveis.length) return;
+  await Promise.race([
+    Promise.allSettled(visiveis.map((img) => img.decode())),
+    new Promise((r) => setTimeout(r, limite)),
+  ]);
+}
+
 /**
  * Transição "a página se pinta" (no layout), só ao ir para o Monte sua peça ou sair dele.
  * Uma faixa de tinta (azul-marinho com a frente turquesa e pingos atrás) sobe pela tela só
@@ -56,30 +69,50 @@ export function TransicaoPinta() {
       tinta.dataset.ativa = "";
       const opcoes = { fill: "forwards" } as const;
       try {
-        // 1) cobre a tela (a frente passa do topo)
+        // 1) cobre a tela (a frente passa do topo). Mais calma que antes (pedido de 23/11).
         await tinta.animate([{ transform: "translateY(0)" }, { transform: "translateY(-68.5%)" }], {
           ...opcoes,
-          duration: 360,
-          easing: "cubic-bezier(.55,0,.8,.3)",
+          duration: 560,
+          easing: "cubic-bezier(.6,0,.3,1)",
         }).finished;
-        // 2) troca a rota por baixo e espera a página nova pintar (rota lenta: segue em 3 s)
+        // 2) com a tela coberta, o símbolo da Whim aparece no meio (a espera não parece travada),
+        //    a rota troca por baixo e esperamos a página nova pintar e as fotos da 1ª tela
+        //    decodificarem (rota lenta: segue em 3 s; fotos: no máximo 1,2 s).
+        const logo = tinta.firstElementChild as HTMLElement | null;
+        const entrada = logo?.animate(
+          [
+            { opacity: 0, transform: "translate(-50%,-50%) scale(.85)" },
+            { opacity: 1, transform: "translate(-50%,-50%) scale(1)" },
+          ],
+          {
+            ...opcoes,
+            duration: 260,
+            easing: "ease-out",
+          }
+        );
+        const inicio = performance.now();
         await new Promise<void>((pronto) => {
           rotaTrocou = pronto;
           setTimeout(pronto, 3000);
           router.push(destino);
         });
         await quadro();
-        await quadro();
+        await fotosDaPrimeiraTela(1200);
+        // Fica pelo menos 380 ms coberta, para o símbolo ser visto e não piscar.
+        const resta = 380 - (performance.now() - inicio);
+        if (resta > 0) await new Promise((r) => setTimeout(r, resta));
+        await entrada?.finished.catch(() => {});
+        logo?.animate([{ opacity: 1 }, { opacity: 0 }], { ...opcoes, duration: 200, easing: "ease-in" });
         // 3) termina de passar, revelando a página nova
         await tinta.animate([{ transform: "translateY(-68.5%)" }, { transform: "translateY(-162%)" }], {
           ...opcoes,
-          duration: 460,
-          easing: "cubic-bezier(.2,.75,.35,1)",
+          duration: 720,
+          easing: "cubic-bezier(.3,0,.2,1)",
         }).finished;
       } finally {
         // Mesmo se uma animação for cancelada, a transição não fica presa (os cliques voltam a valer).
         delete tinta.dataset.ativa;
-        tinta.getAnimations().forEach((a) => a.cancel());
+        tinta.getAnimations({ subtree: true }).forEach((a) => a.cancel());
         andando = false;
         window.dispatchEvent(new Event(EVENTO_FIM));
       }
@@ -106,5 +139,9 @@ export function TransicaoPinta() {
     return () => document.removeEventListener("click", clique, true);
   }, [router]);
 
-  return <div ref={tintaRef} aria-hidden className="pinta-tinta" />;
+  return (
+    <div ref={tintaRef} aria-hidden className="pinta-tinta">
+      <span className="pinta-logo" />
+    </div>
+  );
 }

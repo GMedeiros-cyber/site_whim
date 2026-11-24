@@ -21,3 +21,17 @@
 .pinta-tinta[data-ativa] {
   display: block;
 }
+
+/* Símbolo da Whim no meio da tela enquanto ela está coberta (23/11). Com a faixa em
+   translateY(-68,5%), o meio da tela fica a 37,25% da altura dela. */
+.pinta-logo {
+  position: absolute;
+  top: 37.25%;
+  left: 50%;
+  width: 72px;
+  height: 72px;
+  border-radius: 9999px;
+  background: var(--background) url("/brand/whim-simbolo.webp") center / 78% no-repeat;
+  opacity: 0;
+  transform: translate(-50%, -50%);
+}

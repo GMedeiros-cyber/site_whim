@@ -288,7 +288,16 @@ function liberar(b: Banco) {
  * maiores, em fileiras de 3 (sem rolar de lado), cada fileira no seu cano. A escolhida fica com o
  * fundo turquesa claro e o nome em negrito. Só o quadro parado de frente (sem canvas nem giro).
  */
-export function AraraGrade({ selecionada, cor, onEscolher }: { selecionada: string; cor: string; onEscolher: (nome: string) => void }) {
+export function AraraGrade({
+  selecionada,
+  cor,
+  onEscolher,
+}: {
+  selecionada: string;
+  /** Cor da vitrine, só depois que a pessoa passou pelo passo Cor; antes, cada peça fica na cor própria. */
+  cor?: string;
+  onEscolher: (nome: string) => void;
+}) {
   const fileiras = [MODELOS.slice(0, 3), MODELOS.slice(3)];
   // A 1ª fileira é o maior elemento da 1ª tela do celular (o LCP): carrega já, com prioridade.
   return (
@@ -317,7 +326,7 @@ export function AraraGrade({ selecionada, cor, onEscolher }: { selecionada: stri
                   >
                     {/* O gancho cai no eixo do cano, como na arara (manifest.gancho). */}
                     <Image
-                      src={`${m.coresPasta}${pastaDaCor(escolhida ? cor : corPropria(m))}/${String(m.coresQuadros).padStart(3, "0")}.webp`}
+                      src={`${m.coresPasta}${pastaDaCor(escolhida && cor ? cor : corPropria(m))}/${String(m.coresQuadros).padStart(3, "0")}.webp`}
                       alt=""
                       width={m.largura}
                       height={m.altura}

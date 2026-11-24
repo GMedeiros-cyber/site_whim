@@ -430,3 +430,10 @@ Uma entrada por tarefa, sempre acrescentada no fim (nunca reescrever as anterior
 - Testes: `scripts/auditoria.mjs` (regressão da auditoria, agora reconhecendo o selo em `figcaption`) completa no build das correções (360/390/430/768/1280/1920/2560 × Chromium/WebKit × movimento normal/reduzido, com o axe) e de novo a 390 e 2560 depois dos últimos ajustes (padding do link de pular e observer da prévia): sobram só a passagem do flutuante ao rolar a home (baixa, aceita) e 2 falsos positivos conhecidos; checagem item por item: 105 ok; detector da impeccable limpo.
 - Comandos: `git checkout main && git pull && git checkout -b agente-correcoes/19-11 && git checkout origin/agente-auditoria/19-11 -- docs/qualidade`, `npm run lint` (ok), `npx tsc --noEmit` (ok), `npm run build` (webpack, ok), `next start` + Playwright, `scripts/lighthouse.mjs`.
 - Commit: ver o `git log` da branch. Pendente: PageSpeed no site publicado; conferir no iPhone a abertura só na 1ª visita.
+
+### 2026-11-23 23:59 · Claude · Revisão das correções + ajustes do iPhone do Gabriel
+- Revisei e publiquei `agente-correcoes/19-11` (`e83a65b`).
+- Passo Peça (celular): tocar numa peça não troca mais a cor dela; só depois do passo Cor a peça escolhida aparece na cor da vitrine (`AraraGrade` com `cor` opcional).
+- Transição de tinta (Monte ↔ páginas): mais calma (560 ms para cobrir, 720 ms para revelar), símbolo da Whim no meio enquanto a tela está coberta (mín. 380 ms) e espera as fotos da 1ª tela da página nova decodificarem (até 1,2 s). Bug achado no vídeo: voltando do Monte, a barra ficava escondida no topo da home; agora a direção da rolagem é relida a cada troca de página.
+- Comandos: lint, tsc, build (webpack, ok), Playwright a 390 com vídeo da transição (ida e volta) e checagem da barra.
+- Pendente: desenho dos passos "Do pedido à entrega" na vertical (aprovação do Gabriel); teste como iPhone.

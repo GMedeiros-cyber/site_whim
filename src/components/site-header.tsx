@@ -64,12 +64,21 @@ export function SiteHeader({
     const aoRolar = () => {
       raf ||= requestAnimationFrame(ler);
     };
+    // Troca de página: a rolagem pula sem passar pelos quadros de antes (ex.: voltando do Monte
+    // para a home, a barra ficava escondida no topo). Relê a posição no quadro seguinte.
+    raf = requestAnimationFrame(() => {
+      raf = 0;
+      ultimo = window.scrollY;
+      setDescendo(false);
+    });
     window.addEventListener("scroll", aoRolar, { passive: true });
+    window.addEventListener("scrollend", aoRolar);
     return () => {
       window.removeEventListener("scroll", aoRolar);
+      window.removeEventListener("scrollend", aoRolar);
       cancelAnimationFrame(raf);
     };
-  }, []);
+  }, [pathname]);
 
   // Na home, a seção que cruza a linha de 55% da tela define o link marcado. Depois de um
   // clique, fica no link clicado até a rolagem chegar lá (src/lib/rolagem.ts).
