@@ -1,0 +1,13 @@
+{
+  "name": "whim-testes-iphone",
+  "private": true,
+  "type": "module",
+  "description": "Teste do site publicado como iPhone (WebKit do Playwright). Fora do package.json do site.",
+  "scripts": {
+    "teste": "node iphone.mjs",
+    "idas": "node ../../scripts/idas-e-voltas.mjs https://whimconfeccao.com.br 20 WebKit"
+  },
+  "dependencies": {
+    "playwright-core": "^1.65.1"
+  }
+}
