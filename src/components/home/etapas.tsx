@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { cn } from "@/lib/utils";
 
@@ -84,33 +84,34 @@ export function Etapas() {
 }
 
 /**
- * Celular (referencia/celular-18-11): os 5 passos numa linha (círculos ligados por uma
- * linha que fica turquesa até o passo atual) e, embaixo, só a frase do passo atual.
- * O passo anda sozinho com a rolagem (pedido de 19/11): enquanto o bloco sobe de 85% a 25%
- * da altura da tela, vai do 1 ao 5, sem prender a página. Tocar num número ou usar as
- * setas, Home e End também troca; a rolagem volta a mandar quando cruza o próximo trecho.
+ * Celular: os 5 passos numa linha do tempo vertical (opção A, aprovada em 24/11). Todos os
+ * nomes e frases ficam à vista; conforme a pessoa rola, a linha e as bolinhas acendem até o
+ * passo que cruza 60% da altura da tela, e o passo atual fica um pouco maior. Volta ao rolar
+ * para cima. Tocar num passo também o marca; a rolagem volta a mandar quando muda de passo.
  */
 export function EtapasCelular({ className }: { className?: string }) {
   const [atual, setAtual] = useState(0);
-  const id = useId();
-  const passos = useRef<(HTMLButtonElement | null)[]>([]);
-  const caixaRef = useRef<HTMLDivElement>(null);
+  const itens = useRef<(HTMLLIElement | null)[]>([]);
 
   useEffect(() => {
-    const caixa = caixaRef.current;
-    if (!caixa) return;
     let raf = 0;
     let ultimo = -1;
     const ler = () => {
       raf = 0;
-      const r = caixa.getBoundingClientRect();
-      if (!r.height) return; // escondido (PC)
-      const meio = r.top + r.height / 2;
-      const inicio = innerHeight * 0.85;
-      const fim = innerHeight * 0.25;
-      const p = Math.min(1, Math.max(0, (inicio - meio) / (inicio - fim)));
-      const n = Math.min(ULTIMO, Math.floor(p * (ULTIMO + 1)));
-      // Só troca quando a rolagem muda de trecho: um toque num número fica até lá.
+      const linha = innerHeight * 0.6;
+      let n = -1;
+      itens.current.forEach((li, i) => {
+        if (!li) return;
+        const r = li.getBoundingClientRect();
+        if (r.height && r.top + 20 <= linha) n = i;
+      });
+      if (n < 0) {
+        const primeiro = itens.current[0]?.getBoundingClientRect();
+        if (!primeiro?.height) return; // escondido (PC)
+        n = 0;
+      }
+      // No fim da página o último passo acende mesmo sem chegar à linha.
+      if (scrollY + innerHeight >= document.documentElement.scrollHeight - 4) n = ULTIMO;
       if (n !== ultimo) {
         ultimo = n;
         setAtual(n);
@@ -128,81 +129,73 @@ export function EtapasCelular({ className }: { className?: string }) {
       cancelAnimationFrame(raf);
     };
   }, []);
-  const ir = (i: number) => {
-    const n = Math.max(0, Math.min(ULTIMO, i));
-    setAtual(n);
-    passos.current[n]?.focus();
-  };
 
   return (
-    <div ref={caixaRef} className={className}>
-      <div
-        role="tablist"
-        aria-label="Etapas do pedido"
-        onKeyDown={(e) => {
-          if (e.key === "ArrowRight") ir(atual + 1);
-          else if (e.key === "ArrowLeft") ir(atual - 1);
-          else if (e.key === "Home") ir(0);
-          else if (e.key === "End") ir(ULTIMO);
-          else return;
-          e.preventDefault();
-        }}
-        className="relative flex justify-between"
-      >
-        {/* Linha do centro do 1º ao centro do 5º (botões de 64 px, círculos de 36 px). */}
-        <span aria-hidden className="absolute top-[17px] right-8 left-8 h-0.5 bg-primary/12">
-          <span
-            style={{ transform: `scaleX(${atual / ULTIMO})` }}
-            className="block h-full origin-left bg-accent transition-transform duration-300 ease-out motion-reduce:transition-none"
-          />
-        </span>
-        {PASSOS.map((passo, i) => (
-          <button
+    <ol aria-label="Etapas do pedido" className={cn("mx-auto max-w-[22rem] text-left", className)}>
+      {PASSOS.map((passo, i) => {
+        const feito = i <= atual;
+        const agora = i === atual;
+        return (
+          <li
             key={passo.nome}
             ref={(el) => {
-              passos.current[i] = el;
+              itens.current[i] = el;
             }}
-            type="button"
-            role="tab"
-            id={`${id}-passo${i}`}
-            aria-selected={i === atual}
-            aria-controls={`${id}-frase`}
-            tabIndex={i === atual ? 0 : -1}
-            onClick={() => setAtual(i)}
-            className="relative flex w-16 cursor-pointer flex-col items-center gap-2 rounded-xl pb-1 text-center text-[11px] leading-[1.2] font-semibold outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+            aria-current={agora ? "step" : undefined}
+            className="relative flex gap-4 pb-6 last:pb-0"
           >
-            <span
-              aria-hidden
-              className={cn(
-                "grid size-9 place-items-center rounded-full border-2 text-[13px] font-bold tabular-nums transition-[color,background-color,border-color,scale] duration-300 motion-reduce:transition-none",
-                i <= atual ? "border-accent bg-accent text-primary" : "border-primary/14 bg-background",
-                i === atual && "scale-110"
-              )}
+            {/* Trecho da linha até a próxima bolinha: enche quando o próximo passo acende. */}
+            {i < ULTIMO && (
+              <span aria-hidden className="absolute top-10 bottom-0 left-[19px] w-0.5 bg-primary/12">
+                <span
+                  className={cn(
+                    "block size-full origin-top bg-accent transition-transform duration-500 ease-out motion-reduce:transition-none",
+                    i < atual ? "scale-y-100" : "scale-y-0"
+                  )}
+                />
+              </span>
+            )}
+            <button
+              type="button"
+              onClick={() => setAtual(i)}
+              aria-label={`Passo ${i + 1}: ${passo.nome}`}
+              className="relative grid size-10 shrink-0 cursor-pointer place-items-center rounded-full outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
             >
-              {i + 1}
-            </span>
-            {passo.nome}
-          </button>
-        ))}
-      </div>
-      <div
-        id={`${id}-frase`}
-        role="tabpanel"
-        aria-labelledby={`${id}-passo${atual}`}
-        className="mt-7 rounded-[18px] bg-muted px-[18px] py-4 text-center text-sm leading-normal text-muted-foreground"
-      >
-        {/* A frase nova entra com um esmaecimento curto (só opacity e transform). */}
-        <div
-          key={atual}
-          className="animate-in duration-300 ease-out fade-in slide-in-from-bottom-1 motion-reduce:animate-none"
-        >
-          <b className="block text-[15px] font-semibold text-foreground">
-            {atual + 1} · {PASSOS[atual].nome}
-          </b>
-          {PASSOS[atual].texto}
-        </div>
-      </div>
-    </div>
+              <span
+                aria-hidden
+                className={cn(
+                  "grid place-items-center rounded-full border-2 text-[13px] font-bold tabular-nums transition-[width,height,background-color,border-color,color] duration-300 motion-reduce:transition-none",
+                  agora ? "size-10" : "size-[34px]",
+                  feito
+                    ? "border-accent bg-accent text-primary"
+                    : "border-primary/14 bg-background text-muted-foreground"
+                )}
+              >
+                {i + 1}
+              </span>
+            </button>
+            <div className="min-w-0 pt-1.5">
+              <h3
+                className={cn(
+                  "text-base leading-snug font-semibold transition-colors duration-300",
+                  feito ? "text-foreground" : "text-muted-foreground"
+                )}
+              >
+                {passo.nome}
+              </h3>
+              <p
+                className={cn(
+                  "mt-0.5 text-[14px] leading-normal text-muted-foreground transition-opacity duration-300",
+                  agora ? "opacity-100" : "opacity-75"
+                )}
+              >
+                {passo.texto}
+              </p>
+            </div>
+          </li>
+        );
+      })}
+    </ol>
   );
 }
 

@@ -437,3 +437,8 @@ Uma entrada por tarefa, sempre acrescentada no fim (nunca reescrever as anterior
 - Transição de tinta (Monte ↔ páginas): mais calma (560 ms para cobrir, 720 ms para revelar), símbolo da Whim no meio enquanto a tela está coberta (mín. 380 ms) e espera as fotos da 1ª tela da página nova decodificarem (até 1,2 s). Bug achado no vídeo: voltando do Monte, a barra ficava escondida no topo da home; agora a direção da rolagem é relida a cada troca de página.
 - Comandos: lint, tsc, build (webpack, ok), Playwright a 390 com vídeo da transição (ida e volta) e checagem da barra.
 - Pendente: desenho dos passos "Do pedido à entrega" na vertical (aprovação do Gabriel); teste como iPhone.
+
+### 2026-11-24 00:35 · Claude · Passos "Do pedido à entrega" na vertical (celular, opção A)
+- `EtapasCelular` virou linha do tempo vertical: os 5 nomes e frases à vista; a linha e as bolinhas acendem até o passo que cruza 60% da tela (volta ao subir; no fim da página acende o 5); passo atual maior; toque num número também marca. PC sem mudança.
+- Comandos: lint, tsc, build (webpack, ok), Playwright a 390 (rolagem 1→5, sem rolagem lateral, console limpo).
+- Pendente: teste como iPhone (prompt para o agente).
