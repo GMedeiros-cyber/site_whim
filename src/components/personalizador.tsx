@@ -759,7 +759,7 @@ export function Personalizador() {
                                 {i < ultimo && (
                                   <Button size="xl" onClick={continuar} className="flex-1 min-[601px]:ml-auto min-[601px]:flex-none">
                                     <span>
-                                      Continuar<span className="min-[601px]:hidden"> · {passos[i + 1].nome}</span>
+                                      Continuar<span className="max-[359px]:hidden min-[601px]:hidden"> · {passos[i + 1].nome}</span>
                                     </span>{" "}
                                     <Seta />
                                   </Button>

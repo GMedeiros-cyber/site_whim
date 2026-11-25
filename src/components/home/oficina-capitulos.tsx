@@ -177,7 +177,7 @@ export function OficinaCapitulos({ capitulos, className }: { capitulos: Capitulo
             aria-current={i === atual ? "step" : undefined}
             aria-controls={`${id}-texto`}
             className={cn(
-              "flex min-h-14 cursor-pointer flex-col items-center justify-center gap-0.5 rounded-[14px] px-1 text-[11.5px] leading-tight transition-colors duration-300 outline-none focus-visible:ring-3 focus-visible:ring-ring/50 motion-reduce:transition-none",
+              "flex min-h-14 cursor-pointer flex-col items-center justify-center gap-0.5 rounded-[14px] px-1 text-[11.5px] leading-tight max-[359px]:text-[10px] transition-colors duration-300 outline-none focus-visible:ring-3 focus-visible:ring-ring/50 motion-reduce:transition-none",
               i === atual ? "bg-accent/16 font-semibold text-foreground" : "bg-muted font-medium text-muted-foreground"
             )}
           >

@@ -143,7 +143,7 @@ function InfoContato() {
           <a href={`https://wa.me/${WHATSAPP}`} className={linkInfo}>
             {CONTATO.whatsapp}
           </a>
-          <a href={`mailto:${CONTATO.email}`} className={cn(linkInfo, "break-words")}>
+          <a href={`mailto:${CONTATO.email}`} className={cn(linkInfo, "wrap-anywhere")}>
             {CONTATO.email}
           </a>
         </span>
@@ -186,7 +186,7 @@ function AtalhosContato() {
               <Icone className="size-[18px]" />
             </span>
             <span className="grid min-w-0">
-              <span className="text-sm font-semibold break-words">{titulo}</span>
+              <span className="text-sm font-semibold wrap-anywhere">{titulo}</span>
               <span className="text-xs text-muted-foreground">{detalhe}</span>
             </span>
           </a>

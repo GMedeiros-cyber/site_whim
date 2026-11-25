@@ -449,3 +449,8 @@ Uma entrada por tarefa, sempre acrescentada no fim (nunca reescrever as anterior
 - Passo Peça do celular: a arara fica sempre nas cores próprias de cada peça (a escolhida não vira azul-marinho); a cor só aparece a partir do passo Cor.
 - Comandos: lint, tsc, build (webpack, ok), Playwright a 390 e 1280 (0 selos na home do celular, 4 no PC; cores da arara iguais antes e depois de escolher e de voltar do passo Cor; transição sem símbolo; barra visível ao voltar).
 - Pendente: resultado do teste como iPhone (agente-iphone/24-11).
+
+### 2026-11-25 17:20 · Claude · Erros do teste como iPhone (agente-iphone/24-11)
+- E1: e-mail do Contato quebra a linha (`wrap-anywhere`); a 320 px o Monte não rola mais de lado. E2: abaixo de 360 px o botão fica só "Continuar" (sem o nome do próximo passo) e cabe ao lado do Voltar. D1: nome dos capítulos menor abaixo de 360 px ("Acabamento" cabe).
+- Comandos: lint, tsc, build (webpack, ok), Playwright a 320 e 375 (sem rolagem lateral nos 4 passos, botão dentro da tela, capítulo 4 cabe).
+- Pendente: conferir no iPhone real o que a emulação não cobre.
