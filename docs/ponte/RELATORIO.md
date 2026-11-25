@@ -442,3 +442,10 @@ Uma entrada por tarefa, sempre acrescentada no fim (nunca reescrever as anterior
 - `EtapasCelular` virou linha do tempo vertical: os 5 nomes e frases à vista; a linha e as bolinhas acendem até o passo que cruza 60% da tela (volta ao subir; no fim da página acende o 5); passo atual maior; toque num número também marca. PC sem mudança.
 - Comandos: lint, tsc, build (webpack, ok), Playwright a 390 (rolagem 1→5, sem rolagem lateral, console limpo).
 - Pendente: teste como iPhone (prompt para o agente).
+
+### 2026-11-25 17:05 · Claude · Pedidos do Gabriel (25/11)
+- Celular: sem o selo "Imagem ilustrativa" na home (hero, fotos das técnicas e capítulos da oficina); no PC continua.
+- Transição de tinta Monte ↔ páginas sem o símbolo no meio (só a tinta), mantendo a espera pelas fotos da 1ª tela.
+- Passo Peça do celular: a arara fica sempre nas cores próprias de cada peça (a escolhida não vira azul-marinho); a cor só aparece a partir do passo Cor.
+- Comandos: lint, tsc, build (webpack, ok), Playwright a 390 e 1280 (0 selos na home do celular, 4 no PC; cores da arara iguais antes e depois de escolher e de voltar do passo Cor; transição sem símbolo; barra visível ao voltar).
+- Pendente: resultado do teste como iPhone (agente-iphone/24-11).

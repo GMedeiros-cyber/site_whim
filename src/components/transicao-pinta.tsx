@@ -75,21 +75,8 @@ export function TransicaoPinta() {
           duration: 560,
           easing: "cubic-bezier(.6,0,.3,1)",
         }).finished;
-        // 2) com a tela coberta, o símbolo da Whim aparece no meio (a espera não parece travada),
-        //    a rota troca por baixo e esperamos a página nova pintar e as fotos da 1ª tela
-        //    decodificarem (rota lenta: segue em 3 s; fotos: no máximo 1,2 s).
-        const logo = tinta.firstElementChild as HTMLElement | null;
-        const entrada = logo?.animate(
-          [
-            { opacity: 0, transform: "translate(-50%,-50%) scale(.85)" },
-            { opacity: 1, transform: "translate(-50%,-50%) scale(1)" },
-          ],
-          {
-            ...opcoes,
-            duration: 260,
-            easing: "ease-out",
-          }
-        );
+        // 2) com a tela coberta, a rota troca por baixo e esperamos a página nova pintar e as fotos
+        //    da 1ª tela decodificarem (rota lenta: segue em 3 s; fotos: no máximo 1,2 s).
         const inicio = performance.now();
         await new Promise<void>((pronto) => {
           rotaTrocou = pronto;
@@ -98,11 +85,9 @@ export function TransicaoPinta() {
         });
         await quadro();
         await fotosDaPrimeiraTela(1200);
-        // Fica pelo menos 380 ms coberta, para o símbolo ser visto e não piscar.
-        const resta = 380 - (performance.now() - inicio);
+        // Fica pelo menos 200 ms coberta, para a troca não piscar.
+        const resta = 200 - (performance.now() - inicio);
         if (resta > 0) await new Promise((r) => setTimeout(r, resta));
-        await entrada?.finished.catch(() => {});
-        logo?.animate([{ opacity: 1 }, { opacity: 0 }], { ...opcoes, duration: 200, easing: "ease-in" });
         // 3) termina de passar, revelando a página nova
         await tinta.animate([{ transform: "translateY(-68.5%)" }, { transform: "translateY(-162%)" }], {
           ...opcoes,
@@ -139,9 +124,5 @@ export function TransicaoPinta() {
     return () => document.removeEventListener("click", clique, true);
   }, [router]);
 
-  return (
-    <div ref={tintaRef} aria-hidden className="pinta-tinta">
-      <span className="pinta-logo" />
-    </div>
-  );
+  return <div ref={tintaRef} aria-hidden className="pinta-tinta" />;
 }

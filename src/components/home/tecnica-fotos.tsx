@@ -154,7 +154,7 @@ export function TecnicaFotos({
         )}
       </button>
       {!fotos[atual]?.real && (
-        <span className={cn(seloIlustrativa, "top-3 left-3")}>Imagem ilustrativa</span>
+        <span className={cn(seloIlustrativa, "top-3 left-3 cel:hidden")}>Imagem ilustrativa</span>
       )}
       <div className="absolute inset-x-0 bottom-1.5 flex justify-center">
         {fotos.map((f, i) => (

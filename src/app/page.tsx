@@ -220,9 +220,9 @@ function Topo() {
             className="absolute inset-0 -z-20 size-full object-cover object-[50%_50%] [@media(min-aspect-ratio:1/1)]:object-[50%_55%]"
           />
         </picture>
-        {/* Hero provisória gerada com IA: o selo da regra de marca (auditoria de 19/11). O alt já
-            diz "imagem ilustrativa", então o selo fica fora do leitor de tela. */}
-        <span aria-hidden className={cn(seloIlustrativa, "bottom-3 left-3 z-10 md:bottom-5 md:left-5")}>
+        {/* Hero provisória gerada com IA: o selo da regra de marca (auditoria de 19/11), só no PC
+            (no celular saiu, pedido do Gabriel em 25/11). O alt já diz "imagem ilustrativa". */}
+        <span aria-hidden className={cn(seloIlustrativa, "bottom-3 left-3 z-10 md:bottom-5 md:left-5 cel:hidden")}>
           Imagem ilustrativa
         </span>
         {/* Véu azul: forte atrás do texto, mais leve nas bordas e embaixo, onde a estampa aparece.

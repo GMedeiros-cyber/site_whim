@@ -13,7 +13,7 @@ export type Capitulo = {
   src: string;
   alt: string;
   video?: string;
-  /** Imagem gerada por IA: leva o selo "Imagem ilustrativa". */
+  /** Imagem gerada por IA (no celular o selo saiu em 25/11, a pedido do Gabriel). */
   ilustrativa?: boolean;
 };
 
@@ -153,11 +153,6 @@ export function OficinaCapitulos({ capitulos, className }: { capitulos: Capitulo
           ))}
         </div>
 
-        {c.ilustrativa && (
-          <span className="pointer-events-none absolute top-8 left-4 rounded-full bg-background/85 px-2.5 py-[5px] text-[11px] text-foreground">
-            Imagem ilustrativa
-          </span>
-        )}
 
         <div
           key={atual}

@@ -372,9 +372,9 @@ export function Personalizador() {
             <p className="text-sm text-muted-foreground max-[600px]:hidden">Também dá para escolher direto na arara.</p>
             {/* Celular: este passo é só a arara, com todas as peças (a vitrine presa entra no passo Cor). */}
             <div className="mt-2 min-[601px]:hidden">
-              {/* A peça escolhida só muda de cor depois do passo Cor (pedido de 23/11: tocar numa peça não
-                  pode "escolher" uma cor). */}
-              <AraraGrade selecionada={peca} cor={alcancado > 1 ? cor.hex : undefined} onEscolher={trocarPeca} />
+{/* Arara do passo Peça sempre nas cores próprias de cada peça: a cor só aparece a partir do
+                  passo Cor (pedido do Gabriel, 25/11). */}
+              <AraraGrade selecionada={peca} onEscolher={trocarPeca} />
             </div>
             <ToggleGroup aria-label="Peça" value={[peca]} onValueChange={escolha(trocarPeca)} className="mt-3.5 flex-wrap max-[600px]:hidden">
               {PECAS.map((p) => (
